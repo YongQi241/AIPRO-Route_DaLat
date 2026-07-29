@@ -13,19 +13,6 @@ The main rule is:
 
 ## 1. Required data folder
 
-After running `build_dalat_edges_connected.py`, use this folder:
-
-```text
-generated_routes_connected/
-├── nodes_snapped.csv
-├── nodes_snapped.geojson
-├── edges.csv
-├── edges.geojson
-├── edge_conditions_template.csv
-├── dalat_road_network_strong.graphml
-└── connectivity_report.txt
-```
-
 Recommended application structure:
 
 ```text
