@@ -1,747 +1,455 @@
 {
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4706527,
-                    11.9521331
-                ]
-            },
-            "properties": {
-                "@id": "relation/7758125",
-                "building": "yes",
-                "building:levels": "1",
-                "name": "Nhà lao thiếu nhi Đà Lạt",
-                "name:en": "Đà Lạt Youth Prison Museum",
-                "tourism": "museum",
-                "type": "multipolygon",
-                "@geometry": "center"
-            },
-            "id": "relation/7758125"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4544798,
-                    11.9416078
-                ]
-            },
-            "properties": {
-                "@id": "relation/17877171",
-                "building": "train_station;yes",
-                "building:architecture": "french_colonial",
-                "fee": "10000",
-                "name": "Ga Đà Lạt",
-                "name:en": "Da Lat Railway Station",
-                "public_transport": "station",
-                "railway": "station",
-                "tourism": "attraction",
-                "type": "multipolygon",
-                "wikipedia": "vi:Ga Đà Lạt",
-                "year_of_construction": "1938",
-                "@geometry": "center"
-            },
-            "id": "relation/17877171"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4306807,
-                    11.9345615
-                ]
-            },
-            "properties": {
-                "@id": "relation/20657435",
-                "addr:city": "Da Lat City",
-                "addr:housenumber": "3",
-                "addr:province": "Lam Dong",
-                "addr:street": "Huỳnh Thúc Kháng",
-                "building": "yes",
-                "building:levels": "3",
-                "check_date": "2026-05-07",
-                "fee": "yes",
-                "internet_access": "wlan",
-                "layer": "1",
-                "name": "Crazy House",
-                "name:de": "Crazy House",
-                "name:en": "Hang Nga Crazy House",
-                "name:vi": "Ngôi nhà quái dị",
-                "opening_hours": "Mo-Su 08:30-19:00",
-                "payment:cards": "no",
-                "payment:cash": "yes",
-                "payment:credit_cards": "no",
-                "payment:debit_cards": "no",
-                "phone": "0633822070",
-                "tourism": "museum",
-                "type": "multipolygon",
-                "website": "https://www.crazyhouse.vn/",
-                "wikidata": "Q1171693",
-                "wikimedia_commons": "Category:Hang Nga guesthouse",
-                "wikipedia": "de:Das verrückte Haus",
-                "wikipedia:en": "Hằng Nga Guesthouse",
-                "@geometry": "center"
-            },
-            "id": "relation/20657435"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4262529,
-                    11.9463059
-                ]
-            },
-            "properties": {
-                "@id": "way/361692317",
-                "building": "yes",
-                "name": "Museum Madam De Dalat",
-                "tourism": "museum",
-                "@geometry": "center"
-            },
-            "id": "way/361692317"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4721262,
-                    11.8746663
-                ]
-            },
-            "properties": {
-                "@id": "way/407607923",
-                "area": "yes",
-                "name": "Prenn",
-                "name:en": "Prenn Tourist Attraction",
-                "name:vi": "Khu Du Lịch Prenn",
-                "note": "Approx boundary.",
-                "source": "Bing",
-                "tourism": "attraction",
-                "@geometry": "center"
-            },
-            "id": "way/407607923"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4218016,
-                    11.9712588
-                ]
-            },
-            "properties": {
-                "@id": "way/473088090",
-                "building": "public",
-                "building:architecture": "french_colonial",
-                "name": "Viện Khoa học sự sống (cơ sở 2)",
-                "old_name": "Viện Nghiên cứu Khoa học Tây Nguyên",
-                "old_name:en": "Tay Nguyen Biological Institute",
-                "tourism": "museum",
-                "year_of_construction": "1952",
-                "@geometry": "center"
-            },
-            "id": "way/473088090"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4497365,
-                    11.9363896
-                ]
-            },
-            "properties": {
-                "@id": "way/521598336",
-                "addr:street": "Trần Hưng Đạo",
-                "leisure": "park",
-                "name": "French Quarter",
-                "tourism": "attraction",
-                "@geometry": "center"
-            },
-            "id": "way/521598336"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4599038,
-                    11.9405756
-                ]
-            },
-            "properties": {
-                "@id": "node/1152350875",
-                "name": "Bảo Tàng Lâm Đồng",
-                "name:en": "Lam Dong Museum",
-                "opening_hours": "Mo-Su 07:15-11:30, 13:30-17:00",
-                "tourism": "museum"
-            },
-            "id": "node/1152350875"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4499229,
-                    11.9781853
-                ]
-            },
-            "properties": {
-                "@id": "node/1160978742",
-                "name": "Thung Lũng Tình Yêu",
-                "name:en": "Valley of Love",
-                "tourism": "viewpoint"
-            },
-            "id": "node/1160978742"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4489764,
-                    11.9012375
-                ]
-            },
-            "properties": {
-                "@id": "node/1164597191",
-                "name": "Thác Datanla",
-                "name:en": "Datanla Fall",
-                "name:ko": "다딴라 폭포",
-                "tourism": "attraction"
-            },
-            "id": "node/1164597191"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.3498182,
-                    12.0020825
-                ]
-            },
-            "properties": {
-                "@id": "way/1486332120",
-                "area": "yes",
-                "fee": "yes",
-                "name": "Devil Mountain Tourist Area",
-                "opening_hours": "Mo-Su 08:00-17:00",
-                "tourism": "attraction",
-                "@geometry": "center"
-            },
-            "id": "way/1486332120"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.3618731,
-                    12.0265442
-                ]
-            },
-            "properties": {
-                "@id": "way/1509937793",
-                "description": "eco-tourism village with cultural events and performance,\nreconstruction the atmosphere of a mountain village of the Central Highlands (Tây Nguyên) and create a space for outdoor recreation.\n\nThe main ethnic group the concept is based on:\nK'Ho (K'ho)\nThes",
-                "leisure": "park",
-                "name": "Làng Cu Lần",
-                "tourism": "attraction",
-                "@geometry": "center"
-            },
-            "id": "way/1509937793"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4271423,
-                    11.9487973
-                ]
-            },
-            "properties": {
-                "@id": "way/1515399859",
-                "addr:housenumber": "19A",
-                "addr:street": "Mai Hắc Đế",
-                "building": "greenhouse",
-                "leisure": "garden",
-                "name": "Vườn dâu Công nghệ cao Bình Yên",
-                "name:en": "Binh Yen High-Tech Strawberry Garden",
-                "operator": "PHAM HUU LOI",
-                "tourism": "attraction",
-                "@geometry": "center"
-            },
-            "id": "way/1515399859"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.3349037,
-                    11.8235094
-                ]
-            },
-            "properties": {
-                "@id": "node/2706917665",
-                "alt_name": "Thác Liêng Rơwoa",
-                "check_date": "2026-05-10",
-                "name": "Thác Voi",
-                "name:en": "Elephant Falls",
-                "name:ru": "Слоновий водопад",
-                "tourism": "attraction",
-                "waterway": "waterfall",
-                "wikidata": "Q10825676"
-            },
-            "id": "node/2706917665"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4701041,
-                    11.8765192
-                ]
-            },
-            "properties": {
-                "@id": "node/4096525696",
-                "name": "Thác Prenn",
-                "name:en": "Prenn Falls",
-                "name:ko": "프렌 폭포",
-                "source": "Bing",
-                "tourism": "attraction",
-                "waterway": "waterfall",
-                "wikidata": "Q10825669",
-                "wikipedia": "ko:프렌 폭포"
-            },
-            "id": "node/4096525696"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4672653,
-                    11.9348406
-                ]
-            },
-            "properties": {
-                "@id": "node/4299365893",
-                "name": "Coffee weasels plantation",
-                "opening_hours": "Mo-Su 07:30-22:00",
-                "tourism": "attraction"
-            },
-            "id": "node/4299365893"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4112222,
-                    11.8828709
-                ]
-            },
-            "properties": {
-                "@id": "node/4368051989",
-                "name": "Đường hầm điêu khắc",
-                "name:de": "Skulpturen Tunnel",
-                "name:en": "Clay Tunnels - Dalat Star",
-                "name:vi": "Đường hầm điêu khắc",
-                "tourism": "attraction"
-            },
-            "id": "node/4368051989"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4375604,
-                    11.9446106
-                ]
-            },
-            "properties": {
-                "@id": "node/4589456390",
-                "addr:housenumber": "57",
-                "addr:street": "Phan Bội Châu",
-                "air_conditioning": "no",
-                "amenity": "bar",
-                "name": "Maze Bar",
-                "name:en": "Maze Bar",
-                "name:ru": "Кафе «Сто крыш»",
-                "name:vi": "Cafe Đường Lên Trăng",
-                "opening_hours": "Mo-Su 20:00-24:00",
-                "tourism": "attraction"
-            },
-            "id": "node/4589456390"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4635562,
-                    11.9410573
-                ]
-            },
-            "properties": {
-                "@id": "node/4961718922",
-                "name": "Nhà Pháp gần tu viện bỏ hoang",
-                "name:vi": "Nhà Pháp gần tu viện bỏ hoang",
-                "tourism": "museum"
-            },
-            "id": "node/4961718922"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4296735,
-                    11.9300468
-                ]
-            },
-            "properties": {
-                "@id": "node/5274759821",
-                "addr:housenumber": "1",
-                "addr:street": "Triệu Việt Vương",
-                "name": "Dinh III Bảo Đại",
-                "name:ru": "Дворец III Бао Дай",
-                "name:zh": "保大夏宫",
-                "opening_hours": "Mo-Su 07:00-11:00, 13:00-17:00",
-                "tourism": "attraction"
-            },
-            "id": "node/5274759821"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.3476138,
-                    11.8997573
-                ]
-            },
-            "properties": {
-                "@id": "node/5666385422",
-                "name": "Vườn Hoa Tam Giác Mạch, Hoa Cải",
-                "tourism": "attraction"
-            },
-            "id": "node/5666385422"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.5130702,
-                    11.9461533
-                ]
-            },
-            "properties": {
-                "@id": "node/5666385423",
-                "name": "Vườn Hoa Cẩm Tú Cầu",
-                "tourism": "viewpoint"
-            },
-            "id": "node/5666385423"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.3841199,
-                    12.0202851
-                ]
-            },
-            "properties": {
-                "@id": "node/5666387521",
-                "name": "cây thông Cô Đơn",
-                "tourism": "viewpoint"
-            },
-            "id": "node/5666387521"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4474016,
-                    11.9932367
-                ]
-            },
-            "properties": {
-                "@id": "node/6259080085",
-                "name": "Miniature Landmarks",
-                "name:ru": "Достопримечательности мира в миниатюре",
-                "tourism": "attraction"
-            },
-            "id": "node/6259080085"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.426294,
-                    11.9108099
-                ]
-            },
-            "properties": {
-                "@id": "node/6322222686",
-                "name": "Garnet Cellar Farden",
-                "opening_hours": "Mo-Su 08:00-22:00",
-                "phone": "+84907088039",
-                "tourism": "attraction"
-            },
-            "id": "node/6322222686"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.3384789,
-                    12.0462001
-                ]
-            },
-            "properties": {
-                "@id": "node/6341135085",
-                "name": "Tuyệt Tình Cốc",
-                "name:en": "Blue lake",
-                "tourism": "attraction"
-            },
-            "id": "node/6341135085"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4403758,
-                    11.8625865
-                ]
-            },
-            "properties": {
-                "@id": "node/6398597585",
-                "name": "Đỉnh núi",
-                "name:en": "Mountain Peak",
-                "tourism": "attraction"
-            },
-            "id": "node/6398597585"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4224568,
-                    11.9441573
-                ]
-            },
-            "properties": {
-                "@id": "node/7004037185",
-                "name": "nhà thờ Camly",
-                "tourism": "viewpoint"
-            },
-            "id": "node/7004037185"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4441353,
-                    11.9385347
-                ]
-            },
-            "properties": {
-                "@id": "node/9633116697",
-                "name": "Ar Ti So",
-                "tourism": "attraction"
-            },
-            "id": "node/9633116697"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4380122,
-                    11.9429755
-                ]
-            },
-            "properties": {
-                "@id": "node/9644488565",
-                "name": "3D World",
-                "tourism": "museum"
-            },
-            "id": "node/9644488565"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.3392258,
-                    11.9156425
-                ]
-            },
-            "properties": {
-                "@id": "node/11365555079",
-                "addr:city": "Thành phố Đà Lạt",
-                "addr:district": "Tà Nung",
-                "addr:province": "Lâm Đồng",
-                "name": "Mongo Land Dalat",
-                "tourism": "attraction"
-            },
-            "id": "node/11365555079"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4372983,
-                    11.8995542
-                ]
-            },
-            "properties": {
-                "@id": "node/11598941137",
-                "name": "Hồ Tuyền Lâm",
-                "name:en": "Tuyen Lam Lake",
-                "name:ko": "뚜옌럼호",
-                "tourism": "viewpoint"
-            },
-            "id": "node/11598941137"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4351347,
-                    11.825883
-                ]
-            },
-            "properties": {
-                "@id": "node/12878563601",
-                "addr:street": "Đường cao tốc Liên Khương - Prenn",
-                "internet_access": "wlan",
-                "name": "Khu Du Lịch Rừng Thông Núi Voi",
-                "name:en": "Elephant Mountain Pine Forest Travel Area",
-                "tourism": "attraction"
-            },
-            "id": "node/12878563601"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4129861,
-                    11.8883494
-                ]
-            },
-            "properties": {
-                "@id": "node/13057481101",
-                "name": "Reo Có Gì",
-                "opening_hours": "Mo-Su 05:30-17:00",
-                "tourism": "attraction"
-            },
-            "id": "node/13057481101"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.3715298,
-                    11.926564
-                ]
-            },
-            "properties": {
-                "@id": "node/13059586149",
-                "alt_name": "Mario Kart Ride",
-                "contact:email": "caonguyenhoadalat@gmail.com",
-                "contact:facebook": "https://www.facebook.com/KDLSinhThaiCaoNguyenHoaDaLat",
-                "contact:instagram": "https://www.instagram.com/caonguyenhoadalat/",
-                "contact:phone": "+8498 385 55 56",
-                "contact:tiktok": "https://www.tiktok.com/@caonguyenhoadl",
-                "contact:youtube": "youtube.com/%40caonguyenhoadalat944",
-                "internet_access": "wlan",
-                "name": "KDL Sinh Thái Cao Nguyên Hoa Đà Lạt",
-                "name:en": "Dalat Flower Plateau Eco-Tourism Area",
-                "short_name": "Cao Nguyên Hoa Đà Lạt",
-                "short_name:en": "Dalat Flower Plateau",
-                "tourism": "theme_park"
-            },
-            "id": "node/13059586149"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4029778,
-                    11.9485347
-                ]
-            },
-            "properties": {
-                "@id": "node/13072770501",
-                "name": "Làng Cổ Tích",
-                "name:ru": "Деревня хоббитов",
-                "opening_hours": "Mo-Su 07:30-17:00",
-                "tourism": "attraction"
-            },
-            "id": "node/13072770501"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.4347078,
-                    12.0195502
-                ]
-            },
-            "properties": {
-                "@id": "node/13114679227",
-                "name": "Làng Đồng trụ LangBiang",
-                "tourism": "attraction"
-            },
-            "id": "node/13114679227"
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    108.3672292,
-                    11.9908607
-                ]
-            },
-            "properties": {
-                "@id": "node/13805820449",
-                "name": "Thác Ankroet",
-                "tourism": "viewpoint"
-            },
-            "id": "node/13805820449"
-        }
-    ]
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4706527,
+          11.9521331
+        ]
+      },
+      "properties": {
+        "node_id": "DL01",
+        "osm_id": "relation/7758125",
+        "name_vi": "Nhà lao thiếu nhi Đà Lạt",
+        "name_en": "Đà Lạt Youth Prison Museum",
+        "category": "museum",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4544798,
+          11.9416078
+        ]
+      },
+      "properties": {
+        "node_id": "DL02",
+        "osm_id": "relation/17877171",
+        "name_vi": "Ga Đà Lạt",
+        "name_en": "Da Lat Railway Station",
+        "category": "heritage",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4306807,
+          11.9345615
+        ]
+      },
+      "properties": {
+        "node_id": "DL03",
+        "osm_id": "relation/20657435",
+        "name_vi": "Crazy House",
+        "name_en": "Hang Nga Crazy House",
+        "category": "architecture",
+        "opening_hours": "Mo-Su 08:30-19:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4262529,
+          11.9463059
+        ]
+      },
+      "properties": {
+        "node_id": "DL04",
+        "osm_id": "way/361692317",
+        "name_vi": "Museum Madam De Dalat",
+        "name_en": null,
+        "category": "museum",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4599038,
+          11.9405756
+        ]
+      },
+      "properties": {
+        "node_id": "DL05",
+        "osm_id": "node/1152350875",
+        "name_vi": "Bảo tàng Lâm Đồng",
+        "name_en": "Lam Dong Museum",
+        "category": "museum",
+        "opening_hours": "Mo-Su 07:15-11:30, 13:30-17:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4499229,
+          11.9781853
+        ]
+      },
+      "properties": {
+        "node_id": "DL06",
+        "osm_id": "node/1160978742",
+        "name_vi": "Thung Lũng Tình Yêu",
+        "name_en": "Valley of Love",
+        "category": "tourist_area",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4489764,
+          11.9012375
+        ]
+      },
+      "properties": {
+        "node_id": "DL07",
+        "osm_id": "node/1164597191",
+        "name_vi": "Thác Datanla",
+        "name_en": "Datanla Fall",
+        "category": "waterfall",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.3498182,
+          12.0020825
+        ]
+      },
+      "properties": {
+        "node_id": "DL08",
+        "osm_id": "way/1486332120",
+        "name_vi": "Devil Mountain Tourist Area",
+        "name_en": null,
+        "category": "tourist_area",
+        "opening_hours": "Mo-Su 08:00-17:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.3618731,
+          12.0265442
+        ]
+      },
+      "properties": {
+        "node_id": "DL09",
+        "osm_id": "way/1509937793",
+        "name_vi": "Làng Cu Lần",
+        "name_en": null,
+        "category": "tourist_area",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4271423,
+          11.9487973
+        ]
+      },
+      "properties": {
+        "node_id": "DL10",
+        "osm_id": "way/1515399859",
+        "name_vi": "Vườn dâu Công nghệ cao Bình Yên",
+        "name_en": "Binh Yen High-Tech Strawberry Garden",
+        "category": "garden",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4701041,
+          11.8765192
+        ]
+      },
+      "properties": {
+        "node_id": "DL11",
+        "osm_id": "node/4096525696",
+        "name_vi": "Thác Prenn",
+        "name_en": "Prenn Falls",
+        "category": "waterfall",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4112222,
+          11.8828709
+        ]
+      },
+      "properties": {
+        "node_id": "DL12",
+        "osm_id": "node/4368051989",
+        "name_vi": "Đường hầm điêu khắc",
+        "name_en": "Clay Tunnels - Dalat Star",
+        "category": "attraction",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4296735,
+          11.9300468
+        ]
+      },
+      "properties": {
+        "node_id": "DL13",
+        "osm_id": "node/5274759821",
+        "name_vi": "Dinh III Bảo Đại",
+        "name_en": null,
+        "category": "heritage",
+        "opening_hours": "Mo-Su 07:00-11:00, 13:00-17:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.5130702,
+          11.9461533
+        ]
+      },
+      "properties": {
+        "node_id": "DL14",
+        "osm_id": "node/5666385423",
+        "name_vi": "Vườn Hoa Cẩm Tú Cầu",
+        "name_en": null,
+        "category": "garden",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4224568,
+          11.9441573
+        ]
+      },
+      "properties": {
+        "node_id": "DL15",
+        "osm_id": "node/7004037185",
+        "name_vi": "Nhà thờ Cam Ly",
+        "name_en": null,
+        "category": "religious",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4372983,
+          11.8995542
+        ]
+      },
+      "properties": {
+        "node_id": "DL16",
+        "osm_id": "node/11598941137",
+        "name_vi": "Hồ Tuyền Lâm",
+        "name_en": "Tuyen Lam Lake",
+        "category": "lake",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.3715298,
+          11.926564
+        ]
+      },
+      "properties": {
+        "node_id": "DL17",
+        "osm_id": "node/13059586149",
+        "name_vi": "Khu du lịch sinh thái Cao Nguyên Hoa Đà Lạt",
+        "name_en": "Dalat Flower Plateau Eco-Tourism Area",
+        "category": "theme_park",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4029778,
+          11.9485347
+        ]
+      },
+      "properties": {
+        "node_id": "DL18",
+        "osm_id": "node/13072770501",
+        "name_vi": "Làng Cổ Tích",
+        "name_en": null,
+        "category": "attraction",
+        "opening_hours": "Mo-Su 07:30-17:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4347078,
+          12.0195502
+        ]
+      },
+      "properties": {
+        "node_id": "DL19",
+        "osm_id": "node/13114679227",
+        "name_vi": "Làng Đồng trụ LangBiang",
+        "name_en": null,
+        "category": "cultural",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.3672292,
+          11.9908607
+        ]
+      },
+      "properties": {
+        "node_id": "DL20",
+        "osm_id": "node/13805820449",
+        "name_vi": "Thác Ankroet",
+        "name_en": null,
+        "category": "waterfall",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.43721,
+          11.94352
+        ]
+      },
+      "properties": {
+        "node_id": "DL21",
+        "osm_id": "node/1152317883",
+        "name_vi": "Chợ Đà Lạt",
+        "name_en": "Da Lat Market",
+        "category": "market",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4468389,
+          11.94185
+        ]
+      },
+      "properties": {
+        "node_id": "DL22",
+        "osm_id": null,
+        "name_vi": "Hồ Xuân Hương",
+        "name_en": "Xuan Huong Lake",
+        "category": "lake",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.44501,
+          11.93884
+        ]
+      },
+      "properties": {
+        "node_id": "DL23",
+        "osm_id": "node/4426128791",
+        "name_vi": "Quảng trường Lâm Viên",
+        "name_en": "Lam Vien Square",
+        "category": "landmark",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.43562,
+          11.90363
+        ]
+      },
+      "properties": {
+        "node_id": "DL24",
+        "osm_id": "node/1160978725",
+        "name_vi": "Thiền viện Trúc Lâm Đà Lạt",
+        "name_en": "Truc Lam Monastery of Da Lat",
+        "category": "religious",
+        "opening_hours": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.44551,
+          11.92688
+        ]
+      },
+      "properties": {
+        "node_id": "DL25",
+        "osm_id": "node/1152317718",
+        "name_vi": "Bến xe Liên tỉnh Đà Lạt",
+        "name_en": "Da Lat Interprovincial Bus Station",
+        "category": "transport",
+        "opening_hours": null
+      }
+    }
+  ]
 }

@@ -1,0 +1,26 @@
+﻿node_id,osm_id,name_vi,name_en,category,opening_hours,latitude,longitude,road_node,snap_distance_m
+DL01,relation/7758125,Nhà lao thiếu nhi Đà Lạt,Đà Lạt Youth Prison Museum,museum,,11.9521331,108.4706527,13551253122,175.7
+DL02,relation/17877171,Ga Đà Lạt,Da Lat Railway Station,heritage,,11.9416078,108.4544798,1392345419,102.2
+DL03,relation/20657435,Crazy House,Hang Nga Crazy House,architecture,Mo-Su 08:30-19:00,11.9345615,108.4306807,669359914,94.1
+DL04,way/361692317,Museum Madam De Dalat,,museum,,11.9463059,108.4262529,4097375544,55.1
+DL05,node/1152350875,Bảo tàng Lâm Đồng,Lam Dong Museum,museum,"Mo-Su 07:15-11:30, 13:30-17:00",11.9405756,108.4599038,1152347950,76.9
+DL06,node/1160978742,Thung Lũng Tình Yêu,Valley of Love,tourist_area,,11.9781853,108.4499229,11085620945,69.2
+DL07,node/1164597191,Thác Datanla,Datanla Fall,waterfall,,11.9012375,108.4489764,11513242011,427.1
+DL08,way/1486332120,Devil Mountain Tourist Area,,tourist_area,Mo-Su 08:00-17:00,12.0020825,108.3498182,7238226673,935.5
+DL09,way/1509937793,Làng Cu Lần,,tourist_area,,12.0265442,108.3618731,4521722923,766.4
+DL10,way/1515399859,Vườn dâu Công nghệ cao Bình Yên,Binh Yen High-Tech Strawberry Garden,garden,,11.9487973,108.4271423,1152312689,75.1
+DL11,node/4096525696,Thác Prenn,Prenn Falls,waterfall,,11.8765192,108.4701041,4679052634,58.9
+DL12,node/4368051989,Đường hầm điêu khắc,Clay Tunnels - Dalat Star,attraction,,11.8828709,108.4112222,4601899889,122.5
+DL13,node/5274759821,Dinh III Bảo Đại,,heritage,"Mo-Su 07:00-11:00, 13:00-17:00",11.9300468,108.4296735,7241701648,142.2
+DL14,node/5666385423,Vườn Hoa Cẩm Tú Cầu,,garden,,11.9461533,108.5130702,7290129239,154.3
+DL15,node/7004037185,Nhà thờ Cam Ly,,religious,,11.9441573,108.4224568,6544514663,137.5
+DL16,node/11598941137,Hồ Tuyền Lâm,Tuyen Lam Lake,lake,,11.8995542,108.4372983,6372459235,77.8
+DL17,node/13059586149,Khu du lịch sinh thái Cao Nguyên Hoa Đà Lạt,Dalat Flower Plateau Eco-Tourism Area,theme_park,,11.926564,108.3715298,7243852090,899.4
+DL18,node/13072770501,Làng Cổ Tích,,attraction,Mo-Su 07:30-17:00,11.9485347,108.4029778,11085566068,222.0
+DL19,node/13114679227,Làng Đồng trụ LangBiang,,cultural,,12.0195502,108.4347078,10727081217,177.5
+DL20,node/13805820449,Thác Ankroet,,waterfall,,11.9908607,108.3672292,794329780,889.0
+DL21,node/1152317883,Chợ Đà Lạt,Da Lat Market,market,,11.94352,108.43721,13266867208,76.8
+DL22,,Hồ Xuân Hương,Xuan Huong Lake,lake,,11.94185,108.4468389,357447073,174.7
+DL23,node/4426128791,Quảng trường Lâm Viên,Lam Vien Square,landmark,,11.93884,108.44501,7241703661,131.2
+DL24,node/1160978725,Thiền viện Trúc Lâm Đà Lạt,Truc Lam Monastery of Da Lat,religious,,11.90363,108.43562,669359789,361.5
+DL25,node/1152317718,Bến xe Liên tỉnh Đà Lạt,Da Lat Interprovincial Bus Station,transport,,11.92688,108.44551,8659102113,140.5
