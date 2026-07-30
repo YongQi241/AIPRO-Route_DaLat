@@ -1,0 +1,116 @@
+import { useMemo } from 'react'
+import { useAppStore } from '../../store/useAppStore'
+import {
+  createNodeNameLookup,
+  formatMetric,
+  formatNumber,
+} from './resultFormatting'
+import './SegmentDetails.css'
+
+function orderSegments(pathEdgeIds, segments) {
+  const segmentLookup = new Map(
+    segments.map((segment) => [String(segment.edge_id), segment]),
+  )
+
+  return pathEdgeIds.map((edgeId) => ({
+    edgeId: String(edgeId),
+    data: segmentLookup.get(String(edgeId)) ?? null,
+  }))
+}
+
+export default function SegmentDetails({ className = '' }) {
+  const nodes = useAppStore((state) => state.graphData.nodes)
+  const result = useAppStore((state) => state.routeResult)
+
+  const nodeNameLookup = useMemo(
+    () => createNodeNameLookup(nodes),
+    [nodes],
+  )
+  const orderedSegments = useMemo(
+    () => orderSegments(result?.path_edges ?? [], result?.segments ?? []),
+    [result],
+  )
+  const rootClassName = ['segment-details', className]
+    .filter(Boolean)
+    .join(' ')
+
+  return (
+    <section className={rootClassName} aria-labelledby="segment-details-title">
+      <header className="segment-details__header">
+        <div>
+          <span>Breakdown</span>
+          <h2 id="segment-details-title">Segment details</h2>
+        </div>
+        <output>{orderedSegments.length} segments</output>
+      </header>
+
+      {orderedSegments.length === 0 ? (
+        <div className="segment-details__empty">
+          <strong>No route segments</strong>
+          <span>Segment metrics will appear for a successful route.</span>
+        </div>
+      ) : (
+        <ol className="segment-details__list">
+          {orderedSegments.map(({ edgeId, data }, index) => {
+            const congestion = Number(data?.congestion_level)
+            const risk = Number(data?.risk)
+            const hasWarning =
+              (Number.isFinite(congestion) && congestion >= 4) ||
+              (Number.isFinite(risk) && risk > 0)
+            const fromName =
+              nodeNameLookup.get(String(data?.from_node)) ??
+              data?.from_node ??
+              '—'
+            const toName =
+              nodeNameLookup.get(String(data?.to_node)) ?? data?.to_node ?? '—'
+
+            return (
+              <li
+                key={`${edgeId}-${index}`}
+                className={
+                  hasWarning ? 'segment-details__item--warning' : undefined
+                }
+              >
+                <div className="segment-details__index">{index + 1}</div>
+                <div className="segment-details__route">
+                  <strong>
+                    {fromName} <span aria-hidden="true">→</span> {toName}
+                  </strong>
+                  <small>{edgeId}</small>
+                </div>
+                <dl>
+                  <div>
+                    <dt>Distance</dt>
+                    <dd>{formatMetric(data?.distance_km, 'km')}</dd>
+                  </div>
+                  <div>
+                    <dt>Time</dt>
+                    <dd>{formatMetric(data?.adjusted_time_min, 'min')}</dd>
+                  </div>
+                  <div>
+                    <dt>Congestion</dt>
+                    <dd>
+                      {Number.isFinite(congestion) ? (
+                        <span
+                          className={`segment-details__congestion segment-details__congestion--${Math.min(5, Math.max(0, congestion))}`}
+                        >
+                          {congestion}/5
+                        </span>
+                      ) : (
+                        '—'
+                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Risk</dt>
+                    <dd>{formatNumber(data?.risk)}</dd>
+                  </div>
+                </dl>
+              </li>
+            )
+          })}
+        </ol>
+      )}
+    </section>
+  )
+}

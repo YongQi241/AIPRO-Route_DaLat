@@ -1,0 +1,157 @@
+.current-task-panel {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  height: 100%;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.current-task-panel__header,
+.current-task-panel__progress > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.current-task-panel__header > div > span {
+  color: #2563eb;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.current-task-panel__header h2 {
+  margin: 2px 0 0;
+}
+
+.current-task-panel__status {
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #475569;
+  background: #e2e8f0;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.current-task-panel__status--playing {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.current-task-panel__status--paused {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.current-task-panel__status--completed {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.current-task-panel__route {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.current-task-panel__route > div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.current-task-panel__route span,
+.current-task-panel__details dt {
+  color: #64748b;
+  font-size: 0.65rem;
+}
+
+.current-task-panel__route strong {
+  overflow: hidden;
+  color: #1e293b;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.current-task-panel__route small {
+  color: #2563eb;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.current-task-panel__route-arrow {
+  color: #94a3b8 !important;
+  font-size: 1.1rem !important;
+}
+
+.current-task-panel__details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  padding: 0;
+  margin: 0;
+}
+
+.current-task-panel__details div {
+  min-width: 0;
+}
+
+.current-task-panel__details dd {
+  margin: 2px 0 0;
+  overflow: hidden;
+  color: #334155;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.current-task-panel__progress {
+  display: grid;
+  gap: 6px;
+}
+
+.current-task-panel__progress span,
+.current-task-panel__progress strong {
+  color: #475569;
+  font-size: 0.68rem;
+}
+
+.current-task-panel__progress-track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.current-task-panel__progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #2563eb;
+  transition: width 180ms ease;
+}
+
+.current-task-panel__message {
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #1d4ed8;
+  background: #eff6ff;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.current-task-panel__message--no_path,
+.current-task-panel__message--invalid_input,
+.current-task-panel__message--error {
+  color: #b91c1c;
+  background: #fef2f2;
+}

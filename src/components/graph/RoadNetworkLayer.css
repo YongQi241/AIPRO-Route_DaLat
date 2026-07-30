@@ -1,0 +1,22 @@
+.road-network-layer__edge {
+  fill: none;
+  stroke: #cbd5e1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+  transition:
+    stroke 180ms ease,
+    stroke-width 180ms ease,
+    opacity 180ms ease;
+}
+
+.road-network-layer__edge--congested {
+  stroke: #fdba74;
+}
+
+.road-network-layer__edge--closed {
+  stroke: #ef4444;
+  stroke-dasharray: 5 5;
+  opacity: 0.7;
+}

@@ -1,0 +1,126 @@
+.search-log-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.search-log-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.search-log-panel__header > div > span {
+  color: #7c3aed;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.search-log-panel__header h2 {
+  margin: 2px 0 0;
+}
+
+.search-log-panel__header output {
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #5b21b6;
+  background: #f3e8ff;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.search-log-panel__list {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding: 8px;
+  margin: 0;
+  overflow-y: auto;
+  list-style: none;
+  scroll-behavior: smooth;
+}
+
+.search-log-panel__list li {
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr);
+  gap: 9px;
+  padding: 7px 8px;
+  border-radius: 8px;
+}
+
+.search-log-panel__item--active {
+  background: #eff6ff;
+}
+
+.search-log-panel__step {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: #475569;
+  background: #e2e8f0;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.search-log-panel__item--active .search-log-panel__step {
+  color: #fff;
+  background: #2563eb;
+}
+
+.search-log-panel__event {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.search-log-panel__event strong {
+  color: #334155;
+  font-size: 0.73rem;
+}
+
+.search-log-panel__event code {
+  color: #1d4ed8;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.72rem;
+}
+
+.search-log-panel__event small {
+  overflow: hidden;
+  color: #64748b;
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-log-panel__empty {
+  display: grid;
+  place-content: center;
+  padding: 20px;
+  color: #64748b;
+  text-align: center;
+}
+
+.search-log-panel__empty strong {
+  color: #334155;
+  font-size: 0.8rem;
+}
+
+.search-log-panel__empty span {
+  max-width: 340px;
+  margin-top: 4px;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
