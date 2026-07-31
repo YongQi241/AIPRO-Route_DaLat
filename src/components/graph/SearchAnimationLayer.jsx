@@ -1,36 +1,16 @@
 import { useEffect, useMemo } from 'react'
 import { SIMULATION_STATUS, useAppStore } from '../../store/useAppStore'
 import GraphNodeLayer from './GraphNodeLayer'
+import { getSearchAnimationFrame } from './searchTimeline'
 
-export function getSearchAnimationFrame(result, currentStep) {
-  const frontierSteps = result?.frontier_steps ?? []
-
-  if (frontierSteps.length > 0) {
-    const safeStep = Math.min(currentStep, frontierSteps.length - 1)
-    const frame = frontierSteps[safeStep] ?? {}
-
-    return {
-      currentNodeId: frame.current ?? null,
-      frontierNodeIds: frame.frontier ?? [],
-      visitedNodeIds: frame.visited ?? [],
-      totalSteps: frontierSteps.length,
-    }
-  }
-
-  const visitedOrder = result?.visited_order ?? []
-
-  return {
-    currentNodeId: visitedOrder[currentStep] ?? null,
-    frontierNodeIds: [],
-    visitedNodeIds: visitedOrder.slice(0, currentStep),
-    totalSteps: visitedOrder.length,
-  }
-}
+export { getSearchAnimationFrame } from './searchTimeline'
 
 export default function SearchAnimationLayer({
   nodes = [],
   result = null,
   showFinalPath = false,
+  confirmedPathNodeIds = [],
+  latestConfirmedNodeId = null,
 }) {
   const simulation = useAppStore((state) => state.simulation)
   const setCurrentStep = useAppStore((state) => state.setCurrentStep)
@@ -79,6 +59,8 @@ export default function SearchAnimationLayer({
       visitedNodeIds={frame.visitedNodeIds}
       finalPathNodeIds={result?.path_nodes}
       showFinalPath={showFinalPath}
+      confirmedPathNodeIds={confirmedPathNodeIds}
+      latestConfirmedNodeId={latestConfirmedNodeId}
     />
   )
 }

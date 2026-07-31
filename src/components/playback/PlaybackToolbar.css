@@ -34,6 +34,16 @@
   padding: 7px 14px;
 }
 
+.playback-toolbar__button--action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #1d4ed8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .playback-toolbar__button--load {
   color: #fff;
   border-color: #2563eb;
