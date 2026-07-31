@@ -8,9 +8,13 @@ function resolveNodeState(
   visitedNodeIds,
   finalPathNodeIds,
   showFinalPath,
+  confirmedPathNodeIds,
+  latestConfirmedNodeId,
 ) {
+  if (nodeId === latestConfirmedNodeId) return 'latest-confirmed'
   if (showFinalPath && finalPathNodeIds.has(nodeId)) return 'final'
   if (nodeId === currentNodeId) return 'current'
+  if (confirmedPathNodeIds.has(nodeId)) return 'confirmed'
   if (frontierNodeIds.has(nodeId)) return 'frontier'
   if (visitedNodeIds.has(nodeId)) return 'visited'
   return 'unvisited'
@@ -23,6 +27,8 @@ export default function GraphNodeLayer({
   visitedNodeIds = [],
   finalPathNodeIds = [],
   showFinalPath = false,
+  confirmedPathNodeIds = [],
+  latestConfirmedNodeId = null,
 }) {
   const frontierSet = useMemo(
     () => new Set(frontierNodeIds),
@@ -36,6 +42,10 @@ export default function GraphNodeLayer({
     () => new Set(finalPathNodeIds),
     [finalPathNodeIds],
   )
+  const confirmedPathSet = useMemo(
+    () => new Set(confirmedPathNodeIds),
+    [confirmedPathNodeIds],
+  )
 
   return (
     <g className="graph-node-layer" aria-label="Các địa điểm">
@@ -47,6 +57,8 @@ export default function GraphNodeLayer({
           visitedSet,
           finalPathSet,
           showFinalPath,
+          confirmedPathSet,
+          latestConfirmedNodeId,
         )
 
         return (
@@ -64,7 +76,10 @@ export default function GraphNodeLayer({
                 aria-hidden="true"
               />
             )}
-            <circle className="graph-node-layer__marker" r="5">
+            <circle
+              className="graph-node-layer__marker"
+              r={nodeState === 'latest-confirmed' ? 8 : 5}
+            >
               <title>
                 {node.id}: {node.name} · {nodeState}
               </title>

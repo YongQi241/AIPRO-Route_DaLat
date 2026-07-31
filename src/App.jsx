@@ -4,11 +4,7 @@ import StatusMessage from './components/feedback/StatusMessage'
 import GraphWorkspace from './components/graph/GraphWorkspace'
 import AppShell from './components/layout/AppShell'
 import PlaybackToolbar from './components/playback/PlaybackToolbar'
-import CurrentTaskPanel from './components/panels/CurrentTaskPanel'
-import SearchLogPanel from './components/panels/SearchLogPanel'
-import RouteResultPanel from './components/results/RouteResultPanel'
-import RouteExplanation from './components/results/RouteExplanation'
-import SegmentDetails from './components/results/SegmentDetails'
+import BottomPanelTabs from './components/panels/BottomPanelTabs'
 import RouteSelectionControls from './components/route-selection/RouteSelectionControls'
 import { useGraphData } from './hooks/useGraphData'
 import { useRouteSolver } from './hooks/useRouteSolver'
@@ -45,15 +41,7 @@ export default function App() {
       }
       workspace={<GraphWorkspace />}
       sidebar={<AlgorithmSidebar />}
-      bottomPanel={
-        <div className="bottom-panel-grid">
-          <CurrentTaskPanel />
-          <SearchLogPanel />
-          <RouteResultPanel />
-          <SegmentDetails />
-          <RouteExplanation className="bottom-panel-grid__full-width" />
-        </div>
-      }
+      bottomPanel={<BottomPanelTabs />}
     />
   )
 }

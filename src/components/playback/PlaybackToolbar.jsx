@@ -1,4 +1,8 @@
-import { useAppStore, SIMULATION_STATUS } from '../../store/useAppStore'
+import {
+  getAnimationStepCount,
+  SIMULATION_STATUS,
+  useAppStore,
+} from '../../store/useAppStore'
 import './PlaybackToolbar.css'
 
 const SPEED_OPTIONS = [0.5, 1, 1.5, 2]
@@ -17,16 +21,21 @@ export default function PlaybackToolbar({
   const result = useAppStore((state) => state.routeResult)
   const play = useAppStore((state) => state.play)
   const pause = useAppStore((state) => state.pause)
+  const nextAction = useAppStore((state) => state.nextAction)
+  const previousAction = useAppStore((state) => state.previousAction)
   const resetSimulation = useAppStore((state) => state.resetSimulation)
   const setSpeed = useAppStore((state) => state.setSpeed)
 
   const isPlaying = status === SIMULATION_STATUS.PLAYING
   const hasAnimation =
     result?.status === 'success' &&
-    ((result.frontier_steps?.length ?? 0) > 0 ||
-      (result.visited_order?.length ?? 0) > 0)
+    getAnimationStepCount(result) > 0
+  const lastStep = Math.max(0, getAnimationStepCount(result) - 1)
+  const currentStep = useAppStore((state) => state.simulation.currentStep)
   const canPause = isPlaying
   const canReset = status !== SIMULATION_STATUS.IDLE
+  const canGoPrevious = hasAnimation && currentStep > 0
+  const canGoNext = hasAnimation && currentStep < lastStep
   const toolbarClassName = ['playback-toolbar', className]
     .filter(Boolean)
     .join(' ')
@@ -50,6 +59,17 @@ export default function PlaybackToolbar({
         <span className="playback-toolbar__divider" aria-hidden="true" />
 
         <button
+          className="playback-toolbar__button playback-toolbar__button--action"
+          type="button"
+          onClick={previousAction}
+          disabled={!canGoPrevious}
+          aria-label="Previous search action"
+          title="Go to the previous search action"
+        >
+          <span aria-hidden="true">←</span> Previous action
+        </button>
+
+        <button
           className="playback-toolbar__icon-button"
           type="button"
           onClick={play}
@@ -69,6 +89,17 @@ export default function PlaybackToolbar({
           title="Pause"
         >
           <span aria-hidden="true">Ⅱ</span>
+        </button>
+
+        <button
+          className="playback-toolbar__button playback-toolbar__button--action"
+          type="button"
+          onClick={nextAction}
+          disabled={!canGoNext}
+          aria-label="Next search action"
+          title="Go to the next search action"
+        >
+          Next action <span aria-hidden="true">→</span>
         </button>
 
         <button
