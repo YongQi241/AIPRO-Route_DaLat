@@ -23,6 +23,18 @@ LOCAL_NEIGHBORS = 3
 # Padding around the outermost tourist locations.
 BBOX_MARGIN_DEGREES = 0.03
 
+# Douglas-Peucker tolerance (in degrees) used to thin route-line vertices.
+# Coordinates here are lat/lon (EPSG:4326), so this is a rough approximation:
+# at Da Lat's latitude, ~0.00005 deg is roughly 5 meters. Increase for
+# coarser/lighter geometry, decrease to keep more shape detail.
+SIMPLIFY_TOLERANCE_DEGREES = 0.00005
+
+# When True, every edge's stored geometry is a straight 2-point line from
+# origin to destination instead of the traced road path. distance_km,
+# base_time_min, and average_speed_kph still reflect the real routed path
+# on the road network -- only the drawn/exported geometry is straightened.
+USE_STRAIGHT_LINE_GEOMETRY = True
+
 # Modeling assumptions, not official posted speed limits.
 ASSUMED_SPEEDS_KPH = {
     "living_street": 15,
@@ -135,7 +147,7 @@ def build_route_record(
                 (source["longitude"], source["latitude"]),
                 (destination["longitude"], destination["latitude"]),
             ]
-        )
+        ).simplify(SIMPLIFY_TOLERANCE_DEGREES, preserve_topology=True)
 
         return {
             "from_node": source["node_id"],
@@ -185,6 +197,17 @@ def build_route_record(
         )
 
     geometry = unary_union(route_edges.geometry.tolist())
+    geometry = geometry.simplify(
+        SIMPLIFY_TOLERANCE_DEGREES,
+        preserve_topology=True,
+    )
+    if USE_STRAIGHT_LINE_GEOMETRY:
+        geometry = LineString(
+            [
+                (source["longitude"], source["latitude"]),
+                (destination["longitude"], destination["latitude"]),
+            ]
+        )
     average_speed_kph = (
         (distance_m / 1000) / (travel_time_s / 3600)
     )
