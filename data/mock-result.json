@@ -1,0 +1,126 @@
+{
+  "status": "success",
+  "algorithm": "A*",
+  "scenario_id": "S1",
+  "optimization": "balanced",
+  "start_node": "DL01",
+  "goal_node": "DL09",
+  "path_nodes": ["DL01", "DL06", "DL19", "DL09"],
+  "path_edges": ["E005", "E041", "E064"],
+  "visited_order": [
+    "DL01",
+    "DL02",
+    "DL05",
+    "DL22",
+    "DL06",
+    "DL21",
+    "DL23",
+    "DL19",
+    "DL09"
+  ],
+  "frontier_steps": [
+    {
+      "current": "DL01",
+      "frontier": ["DL02", "DL05", "DL06", "DL14", "DL22"],
+      "visited": ["DL01"]
+    },
+    {
+      "current": "DL02",
+      "frontier": ["DL05", "DL06", "DL14", "DL22", "DL23"],
+      "visited": ["DL01", "DL02"]
+    },
+    {
+      "current": "DL05",
+      "frontier": ["DL06", "DL14", "DL22", "DL23"],
+      "visited": ["DL01", "DL02", "DL05"]
+    },
+    {
+      "current": "DL22",
+      "frontier": ["DL06", "DL14", "DL21", "DL23", "DL25"],
+      "visited": ["DL01", "DL02", "DL05", "DL22"]
+    },
+    {
+      "current": "DL06",
+      "frontier": ["DL14", "DL19", "DL21", "DL23", "DL25"],
+      "visited": ["DL01", "DL02", "DL05", "DL22", "DL06"]
+    },
+    {
+      "current": "DL21",
+      "frontier": ["DL14", "DL19", "DL23", "DL25"],
+      "visited": ["DL01", "DL02", "DL05", "DL22", "DL06", "DL21"]
+    },
+    {
+      "current": "DL23",
+      "frontier": ["DL14", "DL19", "DL25"],
+      "visited": ["DL01", "DL02", "DL05", "DL22", "DL06", "DL21", "DL23"]
+    },
+    {
+      "current": "DL19",
+      "frontier": ["DL09", "DL10", "DL14", "DL25"],
+      "visited": [
+        "DL01",
+        "DL02",
+        "DL05",
+        "DL22",
+        "DL06",
+        "DL21",
+        "DL23",
+        "DL19"
+      ]
+    },
+    {
+      "current": "DL09",
+      "frontier": ["DL08", "DL10", "DL14", "DL20", "DL25"],
+      "visited": [
+        "DL01",
+        "DL02",
+        "DL05",
+        "DL22",
+        "DL06",
+        "DL21",
+        "DL23",
+        "DL19",
+        "DL09"
+      ]
+    }
+  ],
+  "metrics": {
+    "total_distance_km": 39.429,
+    "total_time_min": 63.04,
+    "total_cost": 3.943,
+    "explored_nodes": 9,
+    "processing_time_ms": 1.82
+  },
+  "segments": [
+    {
+      "edge_id": "E005",
+      "from_node": "DL01",
+      "to_node": "DL06",
+      "distance_km": 6.008,
+      "adjusted_time_min": 9.1,
+      "congestion_level": 1,
+      "risk": 0
+    },
+    {
+      "edge_id": "E041",
+      "from_node": "DL06",
+      "to_node": "DL19",
+      "distance_km": 11.125,
+      "adjusted_time_min": 18.59,
+      "congestion_level": 1,
+      "risk": 0
+    },
+    {
+      "edge_id": "E064",
+      "from_node": "DL19",
+      "to_node": "DL09",
+      "distance_km": 22.296,
+      "adjusted_time_min": 35.35,
+      "congestion_level": 1,
+      "risk": 0
+    }
+  ],
+  "explanation": "Demo result for frontend testing. It visualizes the predefined route DL01 → DL06 → DL19 → DL09 using real edges from the sample GeoJSON. This fixture does not claim algorithmic optimality and should be replaced by the Algorithm member's factual explanation.",
+  "optimality_note": "Demo fixture only — no optimality guarantee is asserted.",
+  "message": "Frontend demo result loaded for DL01 → DL09."
+}

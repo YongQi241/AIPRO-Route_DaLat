@@ -60,11 +60,11 @@ export default function GraphNodeLayer({
             {nodeState === 'current' && (
               <circle
                 className="graph-node-layer__pulse"
-                r="15"
+                r="10"
                 aria-hidden="true"
               />
             )}
-            <circle className="graph-node-layer__marker" r="8">
+            <circle className="graph-node-layer__marker" r="5">
               <title>
                 {node.id}: {node.name} · {nodeState}
               </title>

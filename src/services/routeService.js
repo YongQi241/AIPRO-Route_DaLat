@@ -1,4 +1,4 @@
-const MOCK_RESULT_URL = '/data/mock-result.json'
+const MOCK_RESULT_URL = '../../data/mock-result.json'
 
 const ALGORITHM_LABELS = {
   bfs: 'BFS',
