@@ -6,7 +6,11 @@ import RoadNetworkLayer from './RoadNetworkLayer'
 import SearchAnimationLayer, {
   getSearchAnimationFrame,
 } from './SearchAnimationLayer'
-import { getConfirmedRoutePrefix } from './searchTimeline'
+import SearchTraversalLayer from './SearchTraversalLayer'
+import {
+  getActiveSearchBranchEdgeIds,
+  getConfirmedRoutePrefix,
+} from './searchTimeline'
 import './GraphWorkspace.css'
 
 const VIEWBOX = {
@@ -96,6 +100,15 @@ export default function GraphWorkspace({ className = '' }) {
   const confirmedRoute = useMemo(
     () => getConfirmedRoutePrefix(result, frame),
     [frame, result],
+  )
+  const activeSearchEdgeIds = useMemo(
+    () =>
+      getActiveSearchBranchEdgeIds(
+        result,
+        simulation.currentStep,
+        edgeFeatures,
+      ),
+    [edgeFeatures, result, simulation.currentStep],
   )
 
   const drawing = useMemo(() => {
@@ -333,6 +346,11 @@ export default function GraphWorkspace({ className = '' }) {
               features={edgeFeatures}
               project={drawing.project}
             />
+            <SearchTraversalLayer
+              features={edgeFeatures}
+              project={drawing.project}
+              edgeIds={activeSearchEdgeIds}
+            />
             <FinalRouteLayer
               features={edgeFeatures}
               project={drawing.project}
@@ -358,6 +376,7 @@ export default function GraphWorkspace({ className = '' }) {
           ['frontier', 'Frontier'],
           ['visited', 'Visited'],
           ['current', 'Current'],
+          ['search-path', 'Active search path'],
           ['final', 'Final path'],
         ].map(([state, label]) => (
           <li key={state}>
