@@ -6,6 +6,11 @@ import RoadNetworkLayer from './RoadNetworkLayer'
 import SearchAnimationLayer, {
   getSearchAnimationFrame,
 } from './SearchAnimationLayer'
+import SearchTraversalLayer from './SearchTraversalLayer'
+import {
+  getActiveSearchBranchEdgeIds,
+  getConfirmedRoutePrefix,
+} from './searchTimeline'
 import './GraphWorkspace.css'
 
 const VIEWBOX = {
@@ -92,6 +97,19 @@ export default function GraphWorkspace({ className = '' }) {
     () => getSearchAnimationFrame(result, simulation.currentStep),
     [result, simulation.currentStep],
   )
+  const confirmedRoute = useMemo(
+    () => getConfirmedRoutePrefix(result, frame),
+    [frame, result],
+  )
+  const activeSearchEdgeIds = useMemo(
+    () =>
+      getActiveSearchBranchEdgeIds(
+        result,
+        simulation.currentStep,
+        edgeFeatures,
+      ),
+    [edgeFeatures, result, simulation.currentStep],
+  )
 
   const drawing = useMemo(() => {
     const bounds = getBounds(nodeFeatures, edgeFeatures)
@@ -123,6 +141,12 @@ export default function GraphWorkspace({ className = '' }) {
     isSuccessful &&
     (simulation.status === SIMULATION_STATUS.COMPLETED ||
       frame.totalSteps === 0)
+  const visiblePathEdges = showFinalPath
+    ? (result?.path_edges ?? [])
+    : confirmedRoute.visiblePathEdges
+  const visiblePathNodes = showFinalPath
+    ? (result?.path_nodes ?? [])
+    : confirmedRoute.visiblePathNodes
   const rootClassName = ['graph-workspace', className]
     .filter(Boolean)
     .join(' ')
@@ -322,18 +346,25 @@ export default function GraphWorkspace({ className = '' }) {
               features={edgeFeatures}
               project={drawing.project}
             />
+            <SearchTraversalLayer
+              features={edgeFeatures}
+              project={drawing.project}
+              edgeIds={activeSearchEdgeIds}
+            />
             <FinalRouteLayer
               features={edgeFeatures}
               project={drawing.project}
-              pathEdgeIds={result?.path_edges}
+              pathEdgeIds={visiblePathEdges}
               segments={result?.segments}
-              visible={showFinalPath}
+              visible={isSuccessful && visiblePathEdges.length > 0}
             />
 
             <SearchAnimationLayer
               nodes={drawing.nodes}
               result={result}
               showFinalPath={showFinalPath}
+              confirmedPathNodeIds={visiblePathNodes}
+              latestConfirmedNodeId={confirmedRoute.latestConfirmedNodeId}
             />
           </g>
         </svg>
@@ -345,6 +376,7 @@ export default function GraphWorkspace({ className = '' }) {
           ['frontier', 'Frontier'],
           ['visited', 'Visited'],
           ['current', 'Current'],
+          ['search-path', 'Active search path'],
           ['final', 'Final path'],
         ].map(([state, label]) => (
           <li key={state}>

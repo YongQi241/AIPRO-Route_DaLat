@@ -1,0 +1,32 @@
+.search-traversal-layer {
+  pointer-events: none;
+}
+
+.search-traversal-layer__edge {
+  fill: none;
+  stroke: #06b6d4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+  vector-effect: non-scaling-stroke;
+  filter: url("#search-traversal-glow");
+  animation: search-traversal-pulse 900ms ease-in-out infinite alternate;
+}
+
+@keyframes search-traversal-pulse {
+  from {
+    stroke-opacity: 0.72;
+    stroke-width: 3.5;
+  }
+
+  to {
+    stroke-opacity: 1;
+    stroke-width: 5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-traversal-layer__edge {
+    animation: none;
+  }
+}

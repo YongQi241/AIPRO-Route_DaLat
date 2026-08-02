@@ -30,6 +30,10 @@ const initialRouteSelection = {
   optimization: 'balanced',
 }
 
+export function getAnimationStepCount(result) {
+  return result?.frontier_steps?.length || result?.visited_order?.length || 0
+}
+
 export const useAppStore = create((set) => ({
   graphData: {
     nodes: null,
@@ -175,12 +179,24 @@ export const useAppStore = create((set) => ({
     }),
 
   play: () =>
-    set((state) => ({
-      simulation: {
-        ...state.simulation,
-        status: SIMULATION_STATUS.PLAYING,
-      },
-    })),
+    set((state) => {
+      const totalSteps = getAnimationStepCount(state.routeResult)
+      if (state.routeResult?.status !== REQUEST_STATUS.SUCCESS || !totalSteps) {
+        return state
+      }
+
+      const shouldReplay =
+        state.simulation.status === SIMULATION_STATUS.COMPLETED ||
+        state.simulation.currentStep >= totalSteps - 1
+
+      return {
+        simulation: {
+          ...state.simulation,
+          currentStep: shouldReplay ? 0 : state.simulation.currentStep,
+          status: SIMULATION_STATUS.PLAYING,
+        },
+      }
+    }),
 
   pause: () =>
     set((state) => ({
@@ -202,9 +218,58 @@ export const useAppStore = create((set) => ({
     set((state) => ({
       simulation: {
         ...state.simulation,
-        currentStep,
+        currentStep: Math.max(
+          0,
+          Math.min(
+            Number(currentStep) || 0,
+            Math.max(0, getAnimationStepCount(state.routeResult) - 1),
+          ),
+        ),
       },
     })),
+
+  nextAction: () =>
+    set((state) => {
+      const totalSteps = getAnimationStepCount(state.routeResult)
+      if (state.routeResult?.status !== REQUEST_STATUS.SUCCESS || !totalSteps) {
+        return state
+      }
+
+      const lastStep = totalSteps - 1
+      if (state.simulation.currentStep >= lastStep) return state
+
+      const currentStep = state.simulation.currentStep + 1
+      return {
+        simulation: {
+          ...state.simulation,
+          currentStep,
+          status:
+            currentStep === lastStep
+              ? SIMULATION_STATUS.COMPLETED
+              : SIMULATION_STATUS.PAUSED,
+        },
+      }
+    }),
+
+  previousAction: () =>
+    set((state) => {
+      const totalSteps = getAnimationStepCount(state.routeResult)
+      if (
+        state.routeResult?.status !== REQUEST_STATUS.SUCCESS ||
+        !totalSteps ||
+        state.simulation.currentStep <= 0
+      ) {
+        return state
+      }
+
+      return {
+        simulation: {
+          ...state.simulation,
+          currentStep: state.simulation.currentStep - 1,
+          status: SIMULATION_STATUS.PAUSED,
+        },
+      }
+    }),
 
   completeSimulation: () =>
     set((state) => ({
@@ -214,5 +279,11 @@ export const useAppStore = create((set) => ({
       },
     })),
 
-  resetSimulation: () => set({ simulation: initialSimulationState }),
+  resetSimulation: () =>
+    set((state) => ({
+      simulation: {
+        ...initialSimulationState,
+        speed: state.simulation.speed,
+      },
+    })),
 }))

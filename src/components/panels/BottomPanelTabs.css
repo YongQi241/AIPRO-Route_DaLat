@@ -1,0 +1,104 @@
+.bottom-panel-tabs {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: 100%;
+  height: 100%;
+  min-height: 150px;
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.bottom-panel-tabs__bar {
+  display: flex;
+  align-items: end;
+  min-width: 0;
+  padding: 6px 8px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-bottom: 1px solid #b8c3d1;
+  background: #e8edf3;
+  scrollbar-width: thin;
+}
+
+.bottom-panel-tabs__bar button {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 7px 16px;
+  margin: 0 2px -1px 0;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 9px 9px 0 0;
+  color: #475569;
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.bottom-panel-tabs__bar button:hover {
+  color: #172033;
+  background: rgb(255 255 255 / 55%);
+}
+
+.bottom-panel-tabs__bar button > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.bottom-panel-tabs__bar .bottom-panel-tabs__tab--active {
+  z-index: 1;
+  color: #172033;
+  border-color: #b8c3d1;
+  background: #fff;
+  box-shadow: 0 -2px 5px rgb(15 23 42 / 5%);
+}
+
+.bottom-panel-tabs__bar .bottom-panel-tabs__tab--active > span {
+  background: #2563eb;
+}
+
+.bottom-panel-tabs__bar button:focus-visible {
+  z-index: 2;
+  outline: 3px solid rgb(37 99 235 / 28%);
+  outline-offset: -3px;
+}
+
+.bottom-panel-tabs__content {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  background: #fff;
+}
+
+.bottom-panel-tabs__content > .current-task-panel,
+.bottom-panel-tabs__content > .search-log-panel,
+.bottom-panel-tabs__content > .route-result-panel,
+.bottom-panel-tabs__content > .segment-details,
+.bottom-panel-tabs__content > .route-explanation {
+  min-height: 100%;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+}
+
+.bottom-panel-tabs__content > .current-task-panel > .current-task-panel__header,
+.bottom-panel-tabs__content > .search-log-panel > .search-log-panel__header,
+.bottom-panel-tabs__content > .route-result-panel > .route-result-panel__header,
+.bottom-panel-tabs__content > .segment-details > .segment-details__header,
+.bottom-panel-tabs__content > .route-explanation > .route-explanation__header {
+  display: none;
+}
+
+@media (max-width: 620px) {
+  .bottom-panel-tabs__bar button {
+    padding-inline: 12px;
+  }
+}
