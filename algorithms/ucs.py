@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import networkx as nx
 
+from .common import build_human_explanation
 from .dijkstra import dijkstra_search
 
 
@@ -40,8 +41,14 @@ def ucs_search(
     )
     result["algorithm"] = "UCS"
     if result["status"] == "success":
-        result["explanation"] = (
-            "Uniform-Cost Search expanded nodes by increasing cumulative "
-            f"{selected_weight} and returned the least-cost route."
+        result["explanation"] = build_human_explanation(
+            graph,
+            result["path_nodes"],
+            algorithm_explanation=(
+                "Uniform-Cost Search expanded nodes by increasing "
+                f"cumulative {selected_weight} and returned the "
+                "least-cost route."
+            ),
+            weight_used=selected_weight,
         )
     return result

@@ -102,6 +102,142 @@ def summarize_path(
     return segments, metrics
 
 
+_WEIGHT_LABELS = {
+    "distance_km": "distance",
+    "adjusted_time_min": "travel time",
+    "route_cost": "total cost",
+    "risk": "risk",
+    "edge_count": "number of road segments",
+    "heuristic_only": "heuristic estimate",
+}
+
+
+def _node_label(graph: nx.DiGraph, node: str) -> str:
+    """Return a concise location label while retaining its stable ID."""
+
+    name = graph.nodes[node].get("name_vi")
+    return f"{name} ({node})" if name else str(node)
+
+
+def _path_label(graph: nx.DiGraph, path_nodes: list[str]) -> str:
+    return " → ".join(_node_label(graph, node) for node in path_nodes)
+
+
+def _same_path(left: list[str], right: list[str]) -> bool:
+    return left == right
+
+
+def _benchmark_path(
+    graph: nx.DiGraph,
+    start_node: str,
+    goal_node: str,
+    weight: str,
+) -> list[str]:
+    try:
+        return nx.shortest_path(
+            graph, start_node, goal_node, weight=weight, method="dijkstra"
+        )
+    except (nx.NetworkXNoPath, nx.NodeNotFound):
+        return []
+
+
+def build_human_explanation(
+    graph: nx.DiGraph,
+    path_nodes: list[str],
+    *,
+    algorithm_explanation: str,
+    weight_used: str | None,
+) -> str:
+    """Explain the chosen route, congestion, and a meaningful alternative."""
+
+    selected_segments, selected_metrics = summarize_path(graph, path_nodes)
+    route = _path_label(graph, path_nodes)
+    objective = _WEIGHT_LABELS.get(weight_used or "", weight_used or "criterion")
+
+    benchmarks = {
+        "distance": _benchmark_path(
+            graph, path_nodes[0], path_nodes[-1], "distance_km"
+        ),
+        "travel time": _benchmark_path(
+            graph, path_nodes[0], path_nodes[-1], "adjusted_time_min"
+        ),
+        "total cost": _benchmark_path(
+            graph, path_nodes[0], path_nodes[-1], "route_cost"
+        ),
+    }
+    achieved = [
+        label for label, benchmark in benchmarks.items()
+        if benchmark and _same_path(path_nodes, benchmark)
+    ]
+    if achieved:
+        quality = (
+            "It is the best route for "
+            + ", ".join(achieved[:-1])
+            + (" and " if len(achieved) > 1 else "")
+            + achieved[-1]
+            + " in the current scenario."
+        )
+    else:
+        quality = (
+            f"It is not the shortest-distance, fastest-time, or "
+            f"lowest-total-cost route; it was selected according to the "
+            f"algorithm's {objective} search behavior."
+        )
+
+    congested = [
+        segment for segment in selected_segments
+        if segment["congestion_level"] >= 4
+    ]
+    if congested:
+        congestion_text = "High congestion occurs on " + ", ".join(
+            f"{_node_label(graph, segment['from_node'])} → "
+            f"{_node_label(graph, segment['to_node'])} "
+            f"(level {segment['congestion_level']:g}/5)"
+            for segment in congested
+        ) + "."
+    else:
+        congestion_text = (
+            "None of its road segments has high congestion "
+            "(level 4 or 5)."
+        )
+
+    alternative_kind = next(
+        (
+            label for label in ("distance", "travel time", "total cost")
+            if benchmarks[label] and not _same_path(path_nodes, benchmarks[label])
+        ),
+        None,
+    )
+    if alternative_kind is None:
+        comparison = (
+            "The shortest-distance, fastest-time, and lowest-total-cost "
+            "benchmarks all use the same route, so there is no distinct "
+            "benchmark alternative to compare."
+        )
+    else:
+        alternative = benchmarks[alternative_kind]
+        _, alternative_metrics = summarize_path(graph, alternative)
+        comparison = (
+            f"By comparison, the best route by {alternative_kind} is "
+            f"{_path_label(graph, alternative)}. It covers "
+            f"{alternative_metrics['total_distance_km']:.3f} km in "
+            f"{alternative_metrics['total_time_min']:.3f} minutes with "
+            f"total cost {alternative_metrics['total_cost']:.3f}, versus "
+            f"{selected_metrics['total_distance_km']:.3f} km, "
+            f"{selected_metrics['total_time_min']:.3f} minutes, and cost "
+            f"{selected_metrics['total_cost']:.3f} for the selected route."
+        )
+
+    return " ".join(
+        [
+            f"The route {route} was selected. {algorithm_explanation}",
+            quality,
+            congestion_text,
+            comparison,
+        ]
+    )
+
+
 def make_base_result(
     *,
     algorithm: str,
@@ -264,7 +400,12 @@ def finish_result(
         frontier_steps=trace.frontier_steps,
         metrics=metrics,
         segments=segments,
-        explanation=explanation,
+        explanation=build_human_explanation(
+            graph,
+            trace.path_nodes,
+            algorithm_explanation=explanation,
+            weight_used=weight_used,
+        ),
         optimality_note=optimality_note,
         message=None,
     )
