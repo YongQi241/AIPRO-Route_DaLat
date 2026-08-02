@@ -8,6 +8,47 @@ Nearest Neighbor, Hill Climbing, or exact Brute-Force TSP.
 The UI replays the complete search trace after the API responds. It is not a
 live-streaming search.
 
+## Run guide
+
+Requirements: Python 3.10+, Node.js 18+, and npm.
+
+From the repository root, install everything once:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+npm install
+```
+
+Then run the application in two terminals.
+
+Terminal 1 — backend:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python -m backend.server
+```
+
+Terminal 2 — frontend:
+
+```powershell
+npm run dev
+```
+
+Open `http://localhost:5173`. The backend runs at
+`http://127.0.0.1:8000`; its status can be checked at
+`http://127.0.0.1:8000/api/health`.
+
+On macOS or Linux, replace the PowerShell activation command with:
+
+```bash
+source .venv/bin/activate
+```
+
+No environment variable is required locally. Vite automatically forwards
+`/api/*` requests to the Python backend.
+
 ## What was unified
 
 Previously, the frontend and algorithms existed beside each other but were not
@@ -80,63 +121,6 @@ Zustand store -> SVG search replay, final route, metrics, and explanation
 The API is deliberately thin. Validation and transport belong to
 `backend/server.py`; graph construction and route logic remain in
 `algorithms/`.
-
-## Requirements
-
-- Python 3.10 or newer
-- Node.js 18 or newer
-- npm
-
-Python packages:
-
-- `networkx`
-- `pandas`
-
-Frontend packages:
-
-- React 19
-- Vite 6
-- Zustand 5
-
-## Installation
-
-From the repository root:
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-npm install
-```
-
-On macOS or Linux, activate the environment with:
-
-```bash
-source .venv/bin/activate
-```
-
-## Run the application
-
-Use two terminals from the repository root.
-
-Terminal 1 — backend:
-
-```powershell
-python -m backend.server
-```
-
-The API listens on `http://127.0.0.1:8000`.
-
-Terminal 2 — frontend:
-
-```powershell
-npm run dev
-```
-
-Open the URL printed by Vite, normally `http://localhost:5173`.
-
-No frontend environment variable is required for local development. Vite
-forwards `/api/*` requests to the Python server.
 
 ### Custom backend URL
 
