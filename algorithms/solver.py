@@ -7,10 +7,13 @@ import pandas as pd
 
 from .astar import astar_search
 from .bfs import bfs_search
+from .brute_force_tsp import brute_force_tsp_route
 from .dfs import dfs_search
 from .dijkstra import dijkstra_search
 from .graph_loader import load_graph
+from .graph_loader import DATA_DIR
 from .greedy_best_first import greedy_best_first_search
+from .hill_climbing import hill_climbing_search
 from .multi_location import nearest_neighbor_route
 from .ucs import ucs_search
 
@@ -29,6 +32,12 @@ ALGORITHM_ALIASES = {
     "nearest-neighbor": "nearest_neighbor",
     "nearest neighbor": "nearest_neighbor",
     "nn": "nearest_neighbor",
+    "hill-climbing": "hill_climbing",
+    "hill climbing": "hill_climbing",
+    "brute_force": "brute_force_tsp",
+    "brute-force": "brute_force_tsp",
+    "brute force": "brute_force_tsp",
+    "tsp": "brute_force_tsp",
 }
 
 SINGLE_ROUTE_ALGORITHMS = {
@@ -38,9 +47,10 @@ SINGLE_ROUTE_ALGORITHMS = {
     "dijkstra",
     "astar",
     "greedy",
+    "hill_climbing",
 }
 
-MULTI_ROUTE_ALGORITHMS = {"nearest_neighbor"}
+MULTI_ROUTE_ALGORITHMS = {"nearest_neighbor", "brute_force_tsp"}
 
 
 def normalize_algorithm(algorithm: str) -> str:
@@ -55,17 +65,29 @@ def optimization_weight(optimization: str) -> str:
 
     profile = optimization.strip().lower()
 
-    if profile == "shortest":
+    if profile in {"shortest", "distance"}:
         return "distance_km"
-    if profile == "fastest":
+    if profile in {"fastest", "time"}:
         return "adjusted_time_min"
-    if profile in {"balanced", "safest"}:
+    if profile in {"balanced", "safest", "cost"}:
         return "route_cost"
 
     raise ValueError(
-        "Unknown optimization. Choose shortest, fastest, balanced, "
-        "or safest."
+        "Unknown optimization. Choose shortest/distance, fastest/time, "
+        "balanced/cost, or safest."
     )
+
+
+def normalize_optimization(optimization: str) -> str:
+    """Accept both API/UI names and the graph loader's profile names."""
+
+    aliases = {
+        "distance": "shortest",
+        "time": "fastest",
+        "cost": "balanced",
+    }
+    normalized = optimization.strip().lower()
+    return aliases.get(normalized, normalized)
 
 
 def solve_route(
@@ -75,7 +97,7 @@ def solve_route(
     scenario_id: str = "S0",
     optimization: str = "balanced",
     *,
-    data_dir: str | Path = "data",
+    data_dir: str | Path = DATA_DIR,
     weight: str | None = None,
     maximum_speed_kph: float = 60.0,
 ) -> dict[str, Any]:
@@ -94,19 +116,20 @@ def solve_route(
     try:
         if normalized_algorithm in MULTI_ROUTE_ALGORITHMS:
             raise ValueError(
-                "Nearest Neighbor requires visit_nodes. Use "
-                "solve_multi_location(...) instead of solve_route(...)."
+                "Multi-location algorithms require intermediate or "
+                "destination locations."
             )
 
         if normalized_algorithm not in SINGLE_ROUTE_ALGORITHMS:
             raise ValueError(
-                "Unknown algorithm. Choose bfs, dfs, ucs, dijkstra, "
-                "astar, or greedy."
+                "Unknown algorithm. Choose BFS, DFS, UCS, Dijkstra, A*, "
+                "Greedy Best-First, or Hill Climbing."
             )
 
+        loader_optimization = normalize_optimization(optimization)
         graph = load_graph(
             scenario_id=scenario_id,
-            optimization=optimization,
+            optimization=loader_optimization,
             data_dir=data_dir,
         )
         selected_weight = weight or optimization_weight(optimization)
@@ -117,12 +140,13 @@ def solve_route(
         }
 
         if normalized_algorithm == "bfs":
-            return bfs_search(
+            result = bfs_search(
                 graph,
                 start_node,
                 goal_node,
                 **common,
             )
+            return result
 
         if normalized_algorithm == "dfs":
             return dfs_search(
@@ -159,12 +183,13 @@ def solve_route(
                 **common,
             )
 
-        # The only remaining valid single-route algorithm is Greedy.
-        return greedy_best_first_search(
-            graph,
-            start_node,
-            goal_node,
-            **common,
+        if normalized_algorithm == "greedy":
+            return greedy_best_first_search(
+                graph, start_node, goal_node, **common,
+            )
+
+        return hill_climbing_search(
+            graph, start_node, goal_node, **common,
         )
 
     except (
@@ -203,7 +228,7 @@ def solve_multi_location(
     optimization: str = "balanced",
     *,
     algorithm: str = "nearest_neighbor",
-    data_dir: str | Path = "data",
+    data_dir: str | Path = DATA_DIR,
     weight: str | None = None,
     return_to_start: bool = False,
 ) -> dict[str, Any]:
@@ -214,18 +239,30 @@ def solve_multi_location(
     try:
         if normalized_algorithm not in MULTI_ROUTE_ALGORITHMS:
             raise ValueError(
-                "The only supported multi-location algorithm is "
-                "nearest_neighbor."
+                "Choose Nearest Neighbor or Exact TSP for a "
+                "multi-location route."
             )
 
+        loader_optimization = normalize_optimization(optimization)
         graph = load_graph(
             scenario_id=scenario_id,
-            optimization=optimization,
+            optimization=loader_optimization,
             data_dir=data_dir,
         )
         selected_weight = weight or optimization_weight(optimization)
 
-        return nearest_neighbor_route(
+        if normalized_algorithm == "nearest_neighbor":
+            return nearest_neighbor_route(
+                graph,
+                start_node,
+                visit_nodes,
+                weight=selected_weight,
+                return_to_start=return_to_start,
+                scenario_id=scenario_id,
+                optimization=optimization,
+            )
+
+        return brute_force_tsp_route(
             graph,
             start_node,
             visit_nodes,
@@ -254,7 +291,7 @@ def solve(
     visit_nodes: list[str] | None = None,
     scenario_id: str = "S0",
     optimization: str = "balanced",
-    data_dir: str | Path = "data",
+    data_dir: str | Path = DATA_DIR,
     weight: str | None = None,
     maximum_speed_kph: float = 60.0,
     return_to_start: bool = False,
@@ -276,7 +313,7 @@ def solve(
                 optimization=optimization,
                 start_node=start_node,
                 visit_nodes=[],
-                message="Nearest Neighbor requires visit_nodes.",
+                message=f"{algorithm} requires visit_nodes.",
             )
 
         return solve_multi_location(

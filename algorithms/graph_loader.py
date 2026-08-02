@@ -6,7 +6,8 @@ import networkx as nx
 import pandas as pd
 
 
-DATA_DIR = Path("data")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DATA_DIR = PROJECT_ROOT / "data" / "generated_routes_connected"
 
 
 def parse_bool(series: pd.Series) -> pd.Series:
@@ -38,7 +39,7 @@ def min_max(series: pd.Series) -> pd.Series:
 def load_scenario(
     scenario_id: str,
     optimization: str = "balanced",
-    data_dir: str = "data",
+    data_dir: str | Path = DATA_DIR,
 ):
     """
     Load nodes + edges and apply one traffic/weather scenario.
@@ -205,7 +206,7 @@ def build_graph(
 def load_graph(
     scenario_id: str = "S0",
     optimization: str = "balanced",
-    data_dir: str = "data",
+    data_dir: str | Path = DATA_DIR,
 ):
     """
     Main function used by BFS, DFS, UCS, Dijkstra, and A*.

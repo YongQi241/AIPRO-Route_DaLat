@@ -37,6 +37,27 @@ const DEFAULT_ALGORITHMS = [
     description: 'Combines accumulated cost with a goal heuristic.',
     guarantee: 'Optimal if admissible',
   },
+  {
+    value: 'nearest_neighbor',
+    name: 'Nearest Neighbor',
+    shortName: 'Nearest Neighbor',
+    description: 'Builds a route through intermediate locations.',
+    guarantee: 'Fast heuristic',
+  },
+  {
+    value: 'hill_climbing',
+    name: 'Hill Climbing with Backtracking',
+    shortName: 'Hill Climbing',
+    description: 'Prefers closer nodes and backtracks out of local minima.',
+    guarantee: 'Complete, not optimal',
+  },
+  {
+    value: 'brute_force_tsp',
+    name: 'Brute Force TSP',
+    shortName: 'Exact TSP',
+    description: 'Checks every intermediate-location order (up to 8).',
+    guarantee: 'Globally optimal',
+  },
 ]
 
 export default function AlgorithmSidebar({

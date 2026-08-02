@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react'
+import { createRouteRequest } from '../../services/routeRequest'
 import { useAppStore } from '../../store/useAppStore'
 import './RouteSelectionControls.css'
 
 const DEFAULT_SCENARIOS = [
-  { value: 'S1', label: 'S1 — Normal traffic' },
-  { value: 'S2', label: 'S2 — Rush hour' },
-  { value: 'S3', label: 'S3 — Rainy weather' },
-  { value: 'S4', label: 'S4 — Weekend busy' },
-  { value: 'S5', label: 'S5 — Road closures' },
+  { value: 'S0', label: 'S0 — Weekday normal' },
+  { value: 'S1', label: 'S1 — Weekend busy' },
+  { value: 'S2', label: 'S2 — Evening rush' },
+  { value: 'S3', label: 'S3 — Heavy rain' },
+  { value: 'S4', label: 'S4 — Dense fog' },
 ]
 
 const DEFAULT_OPTIMIZATIONS = [
@@ -78,14 +79,7 @@ export default function RouteSelectionControls({
     event.preventDefault()
     if (!canSubmit) return
 
-    onSolve({
-      start_node: routeSelection.startNode,
-      goal_node: routeSelection.goalNode,
-      visit_nodes: routeSelection.visitNodes,
-      algorithm: selectedAlgorithm,
-      scenario_id: routeSelection.scenarioId,
-      optimization: routeSelection.optimization,
-    })
+    onSolve(createRouteRequest(routeSelection, selectedAlgorithm))
   }
 
   const rootClassName = ['route-selection', className]

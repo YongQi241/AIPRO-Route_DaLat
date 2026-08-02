@@ -103,6 +103,16 @@
   background: #eff6ff;
 }
 
+.graph-workspace__map-controls button.is-active {
+  color: #fff;
+  background: #2563eb;
+}
+
+.graph-workspace__map-controls button.is-active:not(:disabled):hover {
+  color: #fff;
+  background: #1d4ed8;
+}
+
 .graph-workspace__map-controls button:disabled {
   cursor: not-allowed;
   opacity: 0.35;

@@ -85,7 +85,9 @@ from algorithms import solve
 It dispatches to either:
 
 - a single start-to-goal algorithm, or
-- Nearest Neighbor for several requested locations.
+- Nearest Neighbor for a fast approximate multi-location order.
+- Hill Climbing for local point-to-point search.
+- Brute Force TSP for an exact multi-location order of up to eight targets.
 
 The package also keeps the explicit functions:
 
@@ -290,6 +292,8 @@ but it does not guarantee the globally best complete visiting order.
 | A* | `g(n) + h(n)` | Optimal when the heuristic is admissible |
 | Greedy Best-First | `h(n)` only | No optimality guarantee |
 | Nearest Neighbor | Cheapest next Dijkstra leg | Approximate visit order only |
+| Hill Climbing | Best heuristic successor with local-minimum escape and backtracking | Complete on finite reachable graphs; not optimal |
+| Brute Force TSP | Every feasible target permutation | Globally optimal for the selected weight, capped at eight targets |
 
 ## 8. Optimization-to-weight mapping
 

@@ -4,24 +4,24 @@
 
 .search-traversal-layer__edge {
   fill: none;
-  stroke: #06b6d4;
+  stroke: #22d3ee;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 4;
+  stroke-width: 3.25;
   vector-effect: non-scaling-stroke;
   filter: url("#search-traversal-glow");
-  animation: search-traversal-pulse 900ms ease-in-out infinite alternate;
+  animation: search-traversal-pulse 800ms ease-in-out infinite alternate;
 }
 
 @keyframes search-traversal-pulse {
   from {
-    stroke-opacity: 0.72;
-    stroke-width: 3.5;
+    stroke-opacity: 0.48;
+    stroke-width: 3;
   }
 
   to {
-    stroke-opacity: 1;
-    stroke-width: 5;
+    stroke-opacity: 0.82;
+    stroke-width: 4;
   }
 }
 

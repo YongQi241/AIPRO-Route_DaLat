@@ -1,10 +1,10 @@
 import sys
 
-from graph_loader import load_scenario, add_costs, build_graph
-from greedy_best_first import GreedyBestFirstSearch
-from hill_climbing import HillClimbingSearch
-from nearest_neighbor import NearestNeighborTSP
-from brute_force_tsp import BruteForceTSP
+from advance_search.graph_loader import load_scenario, build_graph
+from advance_search.greedy_best_first import GreedyBestFirstSearch
+from advance_search.hill_climbing import HillClimbingSearch
+from advance_search.nearest_neighbor import NearestNeighborTSP
+from advance_search.brute_force_tsp import BruteForceTSP
 
 
 if __name__ == "__main__":
@@ -13,7 +13,6 @@ if __name__ == "__main__":
     if nodes is None:
         sys.exit(1)
         
-    edges = add_costs(edges, "balanced")
     graph = build_graph(nodes, edges)
     print(f"Graph built with {graph.number_of_nodes()} nodes and {graph.number_of_edges()} edges.")
     
@@ -42,12 +41,12 @@ if __name__ == "__main__":
     nn_solver = NearestNeighborTSP(graph, "S0", "balanced")
     res_nn = nn_solver.solve(start_node, visit_nodes)
     print(f"Status: {res_nn['status']}")
-    print(f"Visited Order: {res_nn['visited_order']}")
+    print(f"Visit Order: {res_nn['visit_order']}")
     print(f"Cost: {res_nn['metrics'].get('total_cost')}")
     
     print(f"\n--- Testing Brute Force TSP (Multi-location) ---")
     bf_solver = BruteForceTSP(graph, "S0", "balanced")
     res_bf = bf_solver.solve(start_node, visit_nodes)
     print(f"Status: {res_bf['status']}")
-    print(f"Visited Order: {res_bf['visited_order']}")
+    print(f"Visit Order: {res_bf['visit_order']}")
     print(f"Cost: {res_bf['metrics'].get('total_cost')}")

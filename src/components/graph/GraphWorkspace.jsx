@@ -7,6 +7,7 @@ import SearchAnimationLayer, {
   getSearchAnimationFrame,
 } from './SearchAnimationLayer'
 import SearchTraversalLayer from './SearchTraversalLayer'
+import { createTopologyLayout } from './topologyLayout'
 import {
   getActiveSearchBranchEdgeIds,
   getConfirmedRoutePrefix,
@@ -23,6 +24,7 @@ const MIN_ZOOM = 0.6
 const MAX_ZOOM = 5
 const ZOOM_STEP = 1.25
 const INITIAL_VIEWPORT = { x: 0, y: 0, scale: 1 }
+const IDENTITY_PROJECTOR = ([x, y]) => [x, y]
 
 function clamp(value, minimum, maximum) {
   return Math.min(maximum, Math.max(minimum, value))
@@ -87,6 +89,7 @@ export default function GraphWorkspace({ className = '' }) {
   const dragRef = useRef(null)
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT)
   const [isPanning, setIsPanning] = useState(false)
+  const [layoutMode, setLayoutMode] = useState('map')
   const graphData = useAppStore((state) => state.graphData)
   const result = useAppStore((state) => state.routeResult)
   const simulation = useAppStore((state) => state.simulation)
@@ -111,7 +114,48 @@ export default function GraphWorkspace({ className = '' }) {
     [edgeFeatures, result, simulation.currentStep],
   )
 
+  const treeLayout = useMemo(
+    () =>
+      createTopologyLayout(
+        nodeFeatures,
+        edgeFeatures,
+        result?.start_node,
+        {
+          width: VIEWBOX.width,
+          height: VIEWBOX.height,
+          paddingX: 58,
+          paddingY: 58,
+        },
+      ),
+    [edgeFeatures, nodeFeatures, result?.start_node],
+  )
+  const displayEdgeFeatures =
+    layoutMode === 'tree' ? treeLayout.edgeFeatures : edgeFeatures
+
   const drawing = useMemo(() => {
+    if (layoutMode === 'tree') {
+      return {
+        project: IDENTITY_PROJECTOR,
+        nodes: nodeFeatures
+          .map((feature, index) => {
+            const properties = feature.properties ?? {}
+            const id = String(properties.node_id ?? index)
+            const position = treeLayout.positions.get(id)
+            if (!position) return null
+            return {
+              id,
+              name:
+                properties.name_vi ??
+                properties.name_en ??
+                id,
+              x: position[0],
+              y: position[1],
+            }
+          })
+          .filter(Boolean),
+      }
+    }
+
     const bounds = getBounds(nodeFeatures, edgeFeatures)
     const project = createProjector(bounds)
     if (!project) return null
@@ -134,19 +178,15 @@ export default function GraphWorkspace({ className = '' }) {
           }
         }),
     }
-  }, [edgeFeatures, nodeFeatures])
+  }, [edgeFeatures, layoutMode, nodeFeatures, treeLayout.positions])
 
   const isSuccessful = result?.status === 'success'
   const showFinalPath =
     isSuccessful &&
     (simulation.status === SIMULATION_STATUS.COMPLETED ||
       frame.totalSteps === 0)
-  const visiblePathEdges = showFinalPath
-    ? (result?.path_edges ?? [])
-    : confirmedRoute.visiblePathEdges
-  const visiblePathNodes = showFinalPath
-    ? (result?.path_nodes ?? [])
-    : confirmedRoute.visiblePathNodes
+  const visiblePathEdges = showFinalPath ? (result?.path_edges ?? []) : []
+  const visiblePathNodes = showFinalPath ? (result?.path_nodes ?? []) : []
   const rootClassName = ['graph-workspace', className]
     .filter(Boolean)
     .join(' ')
@@ -235,6 +275,11 @@ export default function GraphWorkspace({ className = '' }) {
     setViewport(INITIAL_VIEWPORT)
   }
 
+  const changeLayout = (nextLayout) => {
+    setLayoutMode(nextLayout)
+    setViewport(INITIAL_VIEWPORT)
+  }
+
   if (graphData.error) {
     return (
       <section className={rootClassName} aria-label="Không gian đồ thị">
@@ -276,7 +321,9 @@ export default function GraphWorkspace({ className = '' }) {
           <h1>Đà Lạt road network</h1>
           <p>
             {drawing.nodes.length} locations · {edgeFeatures.length} directed
-            edges
+            edges · {layoutMode === 'tree'
+              ? 'even graph layout'
+              : 'geographic map'}
           </p>
         </div>
         <div className="graph-workspace__progress" aria-live="polite">
@@ -291,6 +338,24 @@ export default function GraphWorkspace({ className = '' }) {
           role="toolbar"
           aria-label="Điều khiển bản đồ"
         >
+          <button
+            type="button"
+            className={layoutMode === 'map' ? 'is-active' : ''}
+            onClick={() => changeLayout('map')}
+            aria-pressed={layoutMode === 'map'}
+            title="Geographic map layout"
+          >
+            Map
+          </button>
+          <button
+            type="button"
+            className={layoutMode === 'tree' ? 'is-active' : ''}
+            onClick={() => changeLayout('tree')}
+            aria-pressed={layoutMode === 'tree'}
+            title="Evenly spaced graph layout"
+          >
+            Graph
+          </button>
           <button
             type="button"
             onClick={() => zoomFromCenter(ZOOM_STEP)}
@@ -343,16 +408,16 @@ export default function GraphWorkspace({ className = '' }) {
             transform={`translate(${viewport.x} ${viewport.y}) scale(${viewport.scale})`}
           >
             <RoadNetworkLayer
-              features={edgeFeatures}
+              features={displayEdgeFeatures}
               project={drawing.project}
             />
             <SearchTraversalLayer
-              features={edgeFeatures}
+              features={displayEdgeFeatures}
               project={drawing.project}
               edgeIds={activeSearchEdgeIds}
             />
             <FinalRouteLayer
-              features={edgeFeatures}
+              features={displayEdgeFeatures}
               project={drawing.project}
               pathEdgeIds={visiblePathEdges}
               segments={result?.segments}

@@ -1,3 +1,11 @@
+function getTraceNodeId(value) {
+  if (value == null) return ''
+  if (typeof value === 'object') {
+    return String(value.node ?? value.node_id ?? value.id ?? '')
+  }
+  return String(value)
+}
+
 export function getSearchAnimationFrame(result, currentStep) {
   const frontierSteps = result?.frontier_steps ?? []
 
@@ -9,9 +17,13 @@ export function getSearchAnimationFrame(result, currentStep) {
     const frame = frontierSteps[safeStep] ?? {}
 
     return {
-      currentNodeId: frame.current ?? null,
-      frontierNodeIds: frame.frontier ?? [],
-      visitedNodeIds: frame.visited ?? [],
+      currentNodeId: getTraceNodeId(frame.current) || null,
+      frontierNodeIds: (frame.frontier ?? [])
+        .map(getTraceNodeId)
+        .filter(Boolean),
+      visitedNodeIds: (frame.visited ?? [])
+        .map(getTraceNodeId)
+        .filter(Boolean),
       totalSteps: frontierSteps.length,
     }
   }
@@ -74,8 +86,10 @@ export function getActiveSearchBranchEdgeIds(
   if (result?.status !== 'success' || frames.length === 0) return []
 
   const safeStep = Math.max(0, Math.min(currentStep, frames.length - 1))
-  const startNode = String(result.start_node || frames[0]?.current || '')
-  const currentNode = String(frames[safeStep]?.current || '')
+  const startNode = getTraceNodeId(
+    result.start_node || frames[0]?.current,
+  )
+  const currentNode = getTraceNodeId(frames[safeStep]?.current)
   if (!startNode || !currentNode || currentNode === startNode) return []
 
   const discovered = new Set([startNode])
@@ -83,12 +97,12 @@ export function getActiveSearchBranchEdgeIds(
 
   for (let index = 0; index <= safeStep; index += 1) {
     const frame = frames[index] ?? {}
-    const parentNode = String(frame.current || '')
+    const parentNode = getTraceNodeId(frame.current)
     if (!parentNode) continue
 
     discovered.add(parentNode)
     for (const frontierNodeValue of frame.frontier ?? []) {
-      const frontierNode = String(frontierNodeValue)
+      const frontierNode = getTraceNodeId(frontierNodeValue)
       if (!frontierNode || discovered.has(frontierNode)) continue
 
       parentByNode.set(frontierNode, parentNode)
