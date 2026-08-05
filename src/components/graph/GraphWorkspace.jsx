@@ -416,6 +416,11 @@ export default function GraphWorkspace({ className = '' }) {
               project={drawing.project}
               edgeIds={activeSearchEdgeIds}
             />
+            <SearchTraversalLayer
+              features={edgeFeatures}
+              project={drawing.project}
+              edgeIds={activeSearchEdgeIds}
+            />
             <FinalRouteLayer
               features={displayEdgeFeatures}
               project={drawing.project}
