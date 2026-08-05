@@ -50,7 +50,7 @@ export default function FinalRouteLayer({
           width="140%"
           height="140%"
         >
-          <feGaussianBlur stdDeviation="2.5" result="blur" />
+          <feGaussianBlur stdDeviation="3.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />

@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { getSearchAnimationFrame } from '../graph/SearchAnimationLayer'
+import { MULTI_LOCATION_ALGORITHMS } from '../../services/routeRequest'
 import { useAppStore } from '../../store/useAppStore'
 import './CurrentTaskPanel.css'
 
@@ -47,6 +48,17 @@ export default function CurrentTaskPanel({ className = '' }) {
   const currentNodeName = frame.currentNodeId
     ? displayName(frame.currentNodeId)
     : 'Waiting'
+  const usesIntermediateLocations = MULTI_LOCATION_ALGORITHMS.has(
+    selectedAlgorithm,
+  )
+  const requestedStops = result?.visit_nodes ?? (
+    usesIntermediateLocations
+      ? [...routeSelection.visitNodes, routeSelection.goalNode].filter(Boolean)
+      : []
+  )
+  const requestedStopLabels = [...new Set(requestedStops)]
+    .map((nodeId) => displayName(nodeId))
+    .join(' → ')
   const rootClassName = ['current-task-panel', className]
     .filter(Boolean)
     .join(' ')
@@ -94,6 +106,14 @@ export default function CurrentTaskPanel({ className = '' }) {
         <div>
           <dt>Optimization</dt>
           <dd>{result?.optimization ?? routeSelection.optimization}</dd>
+        </div>
+        <div>
+          <dt>Intermediate route</dt>
+          <dd>
+            {usesIntermediateLocations || result?.visit_nodes
+              ? requestedStopLabels || 'No stops selected'
+              : 'Not used by this algorithm'}
+          </dd>
         </div>
         <div>
           <dt>Current node</dt>

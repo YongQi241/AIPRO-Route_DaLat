@@ -37,7 +37,7 @@ export default function SearchTraversalLayer({
           width="150%"
           height="150%"
         >
-          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feGaussianBlur stdDeviation="1.75" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />

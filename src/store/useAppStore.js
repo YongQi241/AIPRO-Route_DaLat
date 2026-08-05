@@ -26,7 +26,7 @@ const initialRouteSelection = {
   startNode: '',
   goalNode: '',
   visitNodes: [],
-  scenarioId: 'S1',
+  scenarioId: 'S0',
   optimization: 'balanced',
 }
 

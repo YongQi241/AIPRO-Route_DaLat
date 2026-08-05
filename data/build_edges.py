@@ -11,6 +11,8 @@ import pandas as pd
 from shapely.geometry import LineString
 from shapely.ops import unary_union
 
+from generate_edge_conditions import generate_edge_conditions
+
 
 BASE_DIR = Path(__file__).resolve().parent
 INPUT_FILE = BASE_DIR / "nodes.geojson"
@@ -492,36 +494,9 @@ def main() -> None:
             f"See {component_file}."
         )
 
-    print("6/6 Creating scenario templates...")
-    scenario_definitions = {
-        "S0": ("weekday_normal", 1.00, 1, 0, 0),
-        "S1": ("weekend_busy", 1.35, 4, 0, 0),
-        "S2": ("evening_rush", 1.60, 5, 0, 0),
-        "S3": ("heavy_rain", 1.30, 3, 4, 0),
-        "S4": ("dense_fog", 1.20, 2, 0, 4),
-    }
-
-    condition_rows: list[dict[str, Any]] = []
-    for edge in edges.itertuples(index=False):
-        for scenario_id, values in scenario_definitions.items():
-            scenario_name, multiplier, congestion, rain, fog = values
-            condition_rows.append(
-                {
-                    "scenario_id": scenario_id,
-                    "scenario_name": scenario_name,
-                    "edge_id": edge.edge_id,
-                    "congestion_level": congestion,
-                    "time_multiplier": multiplier,
-                    "rain_risk": rain,
-                    "fog_risk": fog,
-                    "construction_penalty": 0,
-                    "closed": False,
-                    "notes": "Template value—review manually",
-                }
-            )
-
-    pd.DataFrame(condition_rows).to_csv(
-        OUTPUT_DIR / "edge_conditions_template.csv",
+    print("6/6 Creating varied scenario conditions...")
+    generate_edge_conditions(edges).to_csv(
+        OUTPUT_DIR / "edge_conditions.csv",
         index=False,
         encoding="utf-8-sig",
     )

@@ -1,4 +1,4 @@
-const MOCK_RESULT_URL = '../../data/mock-result.json'
+const DEFAULT_API_URL = '/api/routes/solve'
 
 const ALGORITHM_LABELS = {
   bfs: 'BFS',
@@ -6,6 +6,10 @@ const ALGORITHM_LABELS = {
   ucs: 'UCS',
   dijkstra: 'Dijkstra',
   astar: 'A*',
+  greedy: 'Greedy Best-First',
+  hill_climbing: 'Hill Climbing',
+  nearest_neighbor: 'Nearest Neighbor',
+  brute_force_tsp: 'Brute Force TSP',
 }
 
 function createInvalidDemoResult(request) {
@@ -77,9 +81,14 @@ async function requestDemoRoute(request) {
   }
 }
 
-export function solveRoute(request) {
-  const apiUrl = import.meta.env.VITE_ROUTE_API_URL?.trim()
-  return apiUrl
-    ? requestBackendRoute(apiUrl, request)
-    : requestDemoRoute(request)
+export async function solveRoute(request) {
+  const configuredUrl = import.meta.env.VITE_ROUTE_API_URL?.trim()
+  const apiUrl = configuredUrl || DEFAULT_API_URL
+
+  try {
+    return await requestBackendRoute(apiUrl, request)
+  } catch (error) {
+    if (configuredUrl || import.meta.env.PROD) throw error
+    return requestDemoRoute(request)
+  }
 }
