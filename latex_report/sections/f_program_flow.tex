@@ -1,0 +1,72 @@
+\chapter{Program Flow}
+\label{chap:program-flow}
+
+\section{Main Processing Steps}
+
+Figure~\ref{fig:flowchart} shows the general flow of the program from
+launch to displaying a result. \fillin{Adjust the boxes below if your
+actual program flow is different.}
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[
+  node distance=1.1cm,
+  box/.style={rectangle, draw, rounded corners, minimum width=6.5cm, minimum height=0.9cm, align=center, font=\small},
+  decision/.style={diamond, draw, aspect=2.2, minimum width=4cm, align=center, font=\small},
+  arrow/.style={-{Latex[length=2mm]}, thick}
+]
+  \node (start) [box] {Start program};
+  \node (load) [box, below=of start] {Load dataset and build the graph};
+  \node (input) [box, below=of load] {User selects start location, goal location, and algorithm through the GUI};
+  \node (run) [box, below=of input] {Run the selected search algorithm on the graph};
+  \node (check) [decision, below=of run] {Path found};
+  \node (display) [box, below left=1.1cm and -1.3cm of check] {Display the route on the map with cost and statistics};
+  \node (fail) [box, below right=1.1cm and -1.3cm of check] {Display a no route found message};
+  \node (endnode) [box, below=2.3cm of check] {End};
+
+  \draw[arrow] (start) -- (load);
+  \draw[arrow] (load) -- (input);
+  \draw[arrow] (input) -- (run);
+  \draw[arrow] (run) -- (check);
+  \draw[arrow] (check) -- node[left, font=\scriptsize] {yes} (display);
+  \draw[arrow] (check) -- node[right, font=\scriptsize] {no} (fail);
+  \draw[arrow] (display) |- (endnode);
+  \draw[arrow] (fail) |- (endnode);
+\end{tikzpicture}
+\caption{Main processing flow of the program}
+\label{fig:flowchart}
+\end{figure}
+
+\section{Main Modules, Functions, and Program Structure}
+
+\fillin{Replace the module names and descriptions below with the real structure of your codebase.}
+
+\begin{table}[h!]
+\centering
+\caption{Main modules of the program}
+\begin{tabular}{p{3.2cm}p{9.3cm}}
+\toprule
+Module & Responsibility \\
+\midrule
+\fillin{data\_loader} & Reads the location and edge data, for example from a CSV file, and builds the internal graph structure used by every search algorithm. \\
+\fillin{graph} & Defines the node and edge classes, stores the adjacency list, and exposes the cost function described in Chapter~\ref{chap:problem-modeling}. \\
+\fillin{search\_algorithms} & Implements BFS, DFS, UCS, Greedy Best First Search, and A star as separate functions that share a common interface, so any one of them can be called with the same start node, goal node, and graph. \\
+\fillin{multi\_route} & Implements the multi location optimization method described in Chapter~\ref{chap:multilocation}. \\
+\fillin{gui} & Builds the window, the map display, the input forms, and the buttons, and connects user actions to the modules above. \\
+\fillin{main} & Entry point of the program, responsible for starting the GUI and wiring the modules together. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{How the GUI Interacts with the Search Algorithms}
+
+\fillin{Describe the exact sequence used by your own GUI, following the outline below as a guide.}
+
+\begin{enumerate}[itemsep=2pt]
+  \item The user selects a start location and a goal location from a dropdown list or by clicking on the map.
+  \item The user selects which algorithm to run, for example through a set of radio buttons or a dropdown menu.
+  \item When the user presses the search button, the GUI calls the corresponding function in the search algorithms module, passing the graph, the start node, and the goal node.
+  \item The search function returns the resulting path, its total cost, the number of nodes explored, and the running time.
+  \item The GUI draws the path on the map, usually by highlighting the sequence of edges, and shows the cost and statistics in a results panel.
+  \item If the user asks to compare algorithms, the GUI repeats steps three through five for each selected algorithm and displays the results side by side, which is the data used for the comparison in Chapter~\ref{chap:algorithm-comparison}.
+\end{enumerate}

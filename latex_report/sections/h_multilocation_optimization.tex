@@ -1,0 +1,45 @@
+\chapter{Tối Ưu Hóa Đa Điểm Đến}
+\label{chap:multilocation}
+
+\section{Mô Tả Bài Toán Định Tuyến Đa Điểm}
+
+Trong nhiều tình huống thực tế, một lộ trình phải đi qua nhiều địa điểm chứ không chỉ một điểm xuất phát và một điểm đích. Ví dụ: một chuyến giao hàng dừng tại nhiều địa chỉ hoặc chuỗi các công việc cần chạy trong một chuyến đi. Đây là bài toán kinh điển về việc tìm thứ tự ghé thăm sao cho tổng chi phí di chuyển là nhỏ nhất, còn gọi là bài toán Người Chào Hàng (Traveling Salesman Problem - TSP). Cho một tập hợp các địa điểm phải ghé thăm đúng một lần từ một điểm xuất phát cố định, nhiệm vụ là chọn thứ tự ghé thăm để giảm thiểu tổng chi phí của các đoạn đường đi qua.
+
+Số lượng thứ tự ghé thăm có thể có tăng theo giai thừa của số lượng địa điểm, do đó việc kiểm tra mọi thứ tự là không khả thi nếu số điểm dừng quá lớn. Vì vậy, cần các phương pháp hợp lý tùy theo quy mô của bài toán.
+
+\section{Giải Thích Các Phương Pháp Được Áp Dụng}
+
+Trong đồ án này, nhóm đã triển khai hai phương pháp khác nhau để giải quyết bài toán đa điểm, tùy thuộc vào số lượng địa điểm cần đến:
+
+\textbf{1. Duyệt Cạn (Brute Force TSP):} Được sử dụng khi số lượng điểm đến nhỏ. Thuật toán tạo ra tất cả các hoán vị của thứ tự ghé thăm. Chi phí của mỗi đoạn đường giữa các cặp điểm được tính toán sẵn bằng thuật toán A* (để tối ưu). Sau đó, tổng chi phí của từng hoán vị được tính và thứ tự có chi phí thấp nhất được chọn. Phương pháp này đảm bảo tìm ra đường đi tối ưu tuyệt đối (đường đi tổng thể ngắn nhất), nhưng tốc độ chạy rất chậm nếu số điểm vượt quá mức nhỏ gọn do độ phức tạp thời gian là $O(N!)$.
+
+\textbf{2. Láng Giềng Gần Nhất (Nearest Neighbor TSP):} Bắt đầu từ điểm xuất phát cố định, thuật toán liên tục tìm điểm chưa thăm có chi phí đường đi gần nhất (sử dụng thuật toán A* để tính toán đường đi giữa các điểm) cho đến khi tất cả các địa điểm đều được ghé thăm. Phương pháp này rất nhanh và hoạt động tốt với số lượng điểm lớn, tuy nhiên, do là thuật toán tham lam cục bộ, nó không đảm bảo đường đi tổng thể tìm được là tối ưu tuyệt đối.
+
+\section{So Sánh Kết Quả Tối Ưu Hóa}
+
+Với bài toán xuất phát từ DL01 và đi qua các điểm DL03, DL07, DL15. Chi phí ban đầu nếu đi theo thứ tự nhập (DL01 $\rightarrow$ DL03 $\rightarrow$ DL07 $\rightarrow$ DL15) được so sánh với thứ tự được hệ thống tối ưu bằng thuật toán Brute Force.
+
+\begin{table}[h!]
+\centering
+\caption{Thứ tự ban đầu so với thứ tự đã tối ưu}
+\label{tab:multilocation_opt}
+\begin{tabular}{lcc}
+\toprule
+Trường hợp & Thứ Tự Ghé Thăm & Tổng Chi Phí \\
+\midrule
+Thứ tự ban đầu & DL01 $\rightarrow$ DL03 $\rightarrow$ DL07 $\rightarrow$ DL15 & 25.10 \\
+Thứ tự đã tối ưu & DL01 $\rightarrow$ DL07 $\rightarrow$ DL03 $\rightarrow$ DL15 & 19.87 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Qua kết quả trên, thứ tự tối ưu bằng Brute Force đã giảm tổng chi phí từ 25.10 xuống 19.87, tương đương mức cải thiện giảm khoảng \textbf{20.8\%} chi phí so với thứ tự ban đầu.
+
+\section{Mức Độ Tối Ưu Của Kết Quả}
+
+Tùy vào phương pháp được lựa chọn (dựa trên số lượng điểm dừng) mà kết quả trả về sẽ là tối ưu hay xấp xỉ:
+
+\begin{itemize}[itemsep=2pt]
+  \item \textbf{Duyệt Cạn (Brute Force TSP):} kết quả thu được là \textbf{tối ưu tuyệt đối} vì thuật toán đã vét cạn tất cả các hoán vị có thể có của lộ trình và đối chiếu chi phí của chúng.
+  \item \textbf{Láng Giềng Gần Nhất (Nearest Neighbor TSP):} kết quả thu được chỉ mang tính \textbf{xấp xỉ (approximate)}. Do thuật toán thường chọn các bước đi có vẻ là tốt nhất ở hiện tại, nó có thể dẫn đến một lựa chọn tồi tệ ở cuối lộ trình (ví dụ phải đi một quãng đường rất dài để đến điểm cuối cùng). Trong các thử nghiệm thực tế với danh sách điểm dừng trên, Nearest Neighbor cho ra tổng chi phí là \textbf{21.02} (thứ tự DL01 $\rightarrow$ DL03 $\rightarrow$ DL15 $\rightarrow$ DL07). Kết quả này kém hơn mức tối ưu tuyệt đối của Brute Force (19.87) một chút (khoảng 5.8\%), nhưng đổi lại nó chạy rất nhanh và phù hợp nếu số điểm cần đi qua lớn.
+\end{itemize}

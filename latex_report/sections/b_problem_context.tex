@@ -1,0 +1,33 @@
+\chapter{Problem Context}
+\label{chap:problem-context}
+
+\section{Description of the Selected Vietnamese Traffic Scenario}
+
+\fillin{Describe the specific traffic scenario your group chose, for example finding a route between districts in Ho Chi Minh City during rush hour, or planning a delivery route across several wards in Hanoi.}
+
+The scenario used in this project is set in \fillin{city name}, and it covers the area of \fillin{describe the area, for example a set of districts, a university campus, or an industrial zone}. The locations involved and the reason they were chosen are explained in more detail in the dataset section of this report.
+
+\section{Explanation of the Real World Problem Being Addressed}
+
+Vietnamese cities, particularly the large ones such as Ho Chi Minh City and Hanoi, face a combination of high motorbike density, narrow streets, and irregular traffic flow. A driver who only looks at the shortest distance between two points on a map often ends up on a route that is slower in practice because of congestion, one way streets, or poor road quality. The real world problem this project addresses is:
+
+\begin{itemize}[itemsep=2pt]
+  \item How to find a route between two locations that is efficient not only in distance but also in travel time.
+  \item How to take congestion level and road type into account when more than one path exists between the same two points.
+  \item How to plan a trip that must pass through several locations in an order that reduces total time or distance, similar to a delivery run or an errand route.
+\end{itemize}
+
+\fillin{Add any details specific to your own scenario, for example a delivery company, a ride hailing service, or a personal commute problem that motivated the choice of this scenario.}
+
+\section{Why Route Optimization Is Useful in This Context}
+
+Route optimization is useful here for several concrete reasons.
+
+\begin{enumerate}[itemsep=2pt]
+  \item \textbf{Time saving.} Even a small reduction in travel time per trip becomes significant when multiplied across many trips per day, which matters for delivery services and ride hailing drivers.
+  \item \textbf{Fuel and cost saving.} A shorter or less congested route reduces fuel consumption and vehicle wear.
+  \item \textbf{Congestion awareness.} Traffic in Vietnamese cities changes quickly during the day. A system that models congestion as part of the cost of a route can recommend a path that is realistic for the current conditions instead of a path that is only correct on paper.
+  \item \textbf{Scalability to multiple stops.} Many real tasks are not a single trip from A to B but a sequence of stops, so a method that also optimizes the order of visits adds real value beyond a simple point to point route.
+\end{enumerate}
+
+This project applies classic search algorithms studied in the Introduction to Artificial Intelligence course to this practical setting, treating the road network as a graph and the route finding task as a search problem, which is described in detail in the next chapter.

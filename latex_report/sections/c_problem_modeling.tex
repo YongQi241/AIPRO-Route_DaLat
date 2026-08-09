@@ -1,0 +1,93 @@
+\chapter{Problem Modeling}
+\label{chap:problem-modeling}
+
+\section{Description of the Graph Model}
+
+The road network is represented as a weighted, directed graph
+$G = (V, E)$, where $V$ is the set of locations and $E$ is the set of
+road segments connecting them. Each location becomes a node, and each
+usable road segment between two locations becomes an edge. Because
+many Vietnamese streets are one way, or have different travel
+conditions in each direction, the graph is directed rather than
+undirected, and two opposite edges are used whenever traffic can flow
+both ways between the same pair of locations.
+
+Figure~\ref{fig:example-graph} shows a small example graph with four
+locations, used only to illustrate the model before the real dataset
+is introduced in the next chapter.
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[
+  node distance=3cm,
+  every node/.style={circle, draw, minimum size=1cm, font=\small},
+  edge/.style={-{Latex[length=2mm]}, thick}
+]
+  \node (A) {A};
+  \node (B) [right of=A] {B};
+  \node (C) [below of=A] {C};
+  \node (D) [right of=C] {D};
+
+  \draw[edge] (A) -- node[above, font=\scriptsize] {4.2 km} (B);
+  \draw[edge] (A) -- node[left, font=\scriptsize] {3.1 km} (C);
+  \draw[edge] (B) -- node[right, font=\scriptsize] {2.5 km} (D);
+  \draw[edge] (C) -- node[below, font=\scriptsize] {5.0 km} (D);
+  \draw[edge] (A) -- node[above, sloped, font=\scriptsize] {6.4 km} (D);
+\end{tikzpicture}
+\caption{Simplified example of the graph model with four locations}
+\label{fig:example-graph}
+\end{figure}
+
+\section{Nodes, Edges, Start State, Goal State, and Transition Rules}
+
+\begin{itemize}[itemsep=3pt]
+  \item \textbf{Node.} A node represents a physical location such as an intersection, a landmark, or an address used in the dataset. Each node has a unique identifier and, for the map display, a pair of coordinates.
+  \item \textbf{Edge.} An edge represents a road segment that allows travel from one node directly to another. An edge carries the attributes described in Section~\ref{sec:edge-attributes}, which are used to compute its cost.
+  \item \textbf{Start state.} The start state is the node chosen as the current location of the vehicle, given as an input by the user through the GUI.
+  \item \textbf{Goal state.} The goal state is the node chosen as the destination. In the single destination case there is one goal node, and in the multi location case, described in Chapter~\ref{chap:multilocation}, the goal is to visit a whole set of nodes.
+  \item \textbf{Transition rule.} From any given node, the available actions are to move along any outgoing edge to a neighboring node. A transition is only valid if an edge exists in the graph from the current node to the target node, which naturally enforces one way streets and other real restrictions in the road network.
+\end{itemize}
+
+\section{Description of Edge Attributes}
+\label{sec:edge-attributes}
+
+Each edge in the graph stores the following attributes, which together describe the real world conditions of that road segment.
+
+\begin{table}[h!]
+\centering
+\caption{Edge attributes used in the graph model}
+\begin{tabular}{p{2.8cm}p{9cm}}
+\toprule
+Attribute & Meaning \\
+\midrule
+Distance & The physical length of the road segment, measured in kilometers. \\
+Base travel time & The time needed to travel the segment under normal, non congested conditions, measured in minutes. \\
+Congestion level & A factor that represents how crowded the road segment currently is, for example a value from 1 for free flowing traffic to 5 for heavy congestion. \\
+Road type & A category such as main road, secondary road, or alley, which affects the achievable speed and the reliability of the base travel time. \\
+Direction & Whether the segment can be used in one direction only or in both directions. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Cost Function}
+
+The cost of moving along an edge is defined as a combination of travel
+time and a congestion penalty, since a route that looks short in
+distance can still be slow if it passes through a congested road.
+
+\begin{equation}
+\text{cost}(e) = w_1 \cdot t(e) + w_2 \cdot c(e) \cdot t(e) + w_3 \cdot r(e)
+\end{equation}
+
+where, for an edge $e$:
+
+\begin{itemize}[itemsep=2pt]
+  \item $t(e)$ is the base travel time of the edge, in minutes.
+  \item $c(e)$ is the congestion level of the edge, normalized to a value between 0 and 1.
+  \item $r(e)$ is a penalty term associated with the road type, for example a small alley receiving a higher penalty than a main road because of lower reliability and lower safe speed.
+  \item $w_1$, $w_2$, and $w_3$ are weights chosen by the group to balance the importance of raw travel time, congestion, and road type. \fillin{state the actual weight values your group used and the reasoning behind them.}
+\end{itemize}
+
+The total cost of a path is the sum of the cost of every edge along that path, and this is the value every search algorithm in this project tries to minimize.
+
+\fillin{If your group used a different or more detailed cost function, replace the formula above with the exact one implemented in your code, and explain each term the same way.}
