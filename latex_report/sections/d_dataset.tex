@@ -1,0 +1,65 @@
+\chapter{Dataset}
+\label{chap:dataset}
+
+\section{Source of Data or Data Creation Method}
+
+\fillin{Explain where the data came from. Common options include: manually collected from Google Maps by recording distances and typical travel times between chosen locations, exported from OpenStreetMap for a chosen area, or manually created by the group to represent a simplified but realistic version of a real district.}
+
+\fillin{If data was collected from an online map service, mention the date it was collected on, since travel time and congestion values depend on when they were recorded. If the data was synthetically created, explain the logic used to assign realistic values.}
+
+\section{List of Locations Used}
+
+The table below lists every location, that is every node, used in the graph for this project. Replace the placeholder rows with the real locations chosen by the group.
+
+\begin{table}[h!]
+\centering
+\caption{List of locations in the dataset}
+\begin{tabular}{clp{6cm}}
+\toprule
+ID & Location Name & Description \\
+\midrule
+N01 & \fillin{location name} & \fillin{short description, for example a landmark, intersection, or ward} \\
+N02 & \fillin{location name} & \fillin{short description} \\
+N03 & \fillin{location name} & \fillin{short description} \\
+N04 & \fillin{location name} & \fillin{short description} \\
+N05 & \fillin{location name} & \fillin{short description} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Description of Distance, Time, Congestion, and Road Type Values}
+
+\begin{itemize}[itemsep=3pt]
+  \item \textbf{Distance.} Recorded in kilometers, rounded to one decimal place, taken as the actual road distance between two connected locations rather than the straight line distance.
+  \item \textbf{Time.} Recorded in minutes, representing the expected travel time under normal traffic conditions, before any congestion adjustment is applied.
+  \item \textbf{Congestion.} Recorded as a value from \fillin{state your scale, for example 1 to 5}, where a low value means free flowing traffic and a high value means heavy congestion. \fillin{Explain whether this value is fixed per edge or whether it changes with time of day in your implementation.}
+  \item \textbf{Road type.} Recorded as one of a small set of categories, for example main road, secondary road, or alley, used to apply the road type penalty described in the cost function.
+\end{itemize}
+
+An excerpt of the raw edge data used in the graph is shown below as an example of the table format. Replace the values with your actual dataset.
+
+\begin{table}[h!]
+\centering
+\caption{Sample of edge data}
+\begin{tabular}{cccccc}
+\toprule
+From & To & Distance (km) & Time (min) & Congestion & Road Type \\
+\midrule
+N01 & N02 & \fillin{value} & \fillin{value} & \fillin{value} & \fillin{value} \\
+N02 & N03 & \fillin{value} & \fillin{value} & \fillin{value} & \fillin{value} \\
+N03 & N04 & \fillin{value} & \fillin{value} & \fillin{value} & \fillin{value} \\
+N01 & N04 & \fillin{value} & \fillin{value} & \fillin{value} & \fillin{value} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Assumptions Made by the Group}
+
+\fillin{List every simplifying assumption made while building the dataset, since a graph model of a real city always leaves something out. Examples of common assumptions are listed below, edit them to match what your group actually did.}
+
+\begin{itemize}[itemsep=2pt]
+  \item Congestion levels are treated as fixed values rather than changing continuously through the day.
+  \item Traffic lights and intersection wait times are not modeled separately and are assumed to be already reflected in the base travel time.
+  \item Only the road segments that were manually recorded are included, so the graph is a simplified subset of the real road network rather than a complete map.
+  \item Weather conditions and temporary road closures are not taken into account.
+\end{itemize}

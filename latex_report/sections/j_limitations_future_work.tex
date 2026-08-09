@@ -1,0 +1,30 @@
+\chapter{Limitations and Future Work}
+\label{chap:limitations}
+
+\section{Difficulties and Challenges Encountered During Development}
+
+\fillin{List the real difficulties your group faced. Some common ones for this type of project are listed below as a starting point.}
+
+\begin{itemize}[itemsep=2pt]
+  \item Collecting realistic distance, time, and congestion values for a real area was time consuming, since public map services do not always expose exact travel time or congestion figures directly.
+  \item Choosing weights for the cost function that produced sensible looking routes required several rounds of testing and adjustment.
+  \item Keeping the GUI responsive while a search algorithm is running on a larger graph required attention to how the interface updates.
+  \item Coordinating the work between members so that the graph structure, the algorithms, and the GUI all agreed on the same data format.
+\end{itemize}
+
+\section{Limitations of the Dataset, Cost Function, and Algorithms}
+
+\begin{itemize}[itemsep=2pt]
+  \item \textbf{Dataset.} The dataset only covers a limited number of locations chosen by the group, so it does not represent the full road network of the chosen area, and some real road segments and shortcuts are missing.
+  \item \textbf{Cost function.} Congestion values are treated as fixed rather than changing dynamically through the day, so the model does not reflect how traffic conditions evolve during an actual trip. \fillin{Add any other simplification specific to your cost function.}
+  \item \textbf{Algorithms.} The multi location optimization method used, if it is an approximate method such as nearest neighbor with local improvement, does not guarantee the true optimal visiting order once the number of stops becomes large. \fillin{Add any other limitation you observed while testing, for example a case where an algorithm performed unexpectedly badly.}
+\end{itemize}
+
+\section{Suggestions for Future Extensions}
+
+\begin{itemize}[itemsep=2pt]
+  \item \textbf{Real time traffic data.} Connecting the program to a live traffic data source would let congestion values update automatically instead of relying on fixed values entered by the group.
+  \item \textbf{Map API integration.} Using a mapping service application programming interface would allow the program to pull real road geometry and travel time directly, removing the need to manually collect edge data, and would let the map display look closer to a real navigation app.
+  \item \textbf{Support for multiple vehicles.} Extending the multi location optimization to split the set of stops among several vehicles, each with its own route, would make the project closer to a real delivery planning system rather than a single vehicle route finder.
+  \item \fillin{Add any other extension your group would like to pursue, for example accounting for one way street changes at different times of day, adding a walking or motorbike specific cost model, or letting the user set custom weights for the cost function from the GUI.}
+\end{itemize}
