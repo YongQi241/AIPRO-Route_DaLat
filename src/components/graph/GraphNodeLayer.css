@@ -9,14 +9,23 @@
     r 180ms ease;
 }
 
-.graph-node-layer__node text {
+.graph-node-layer__node {
+  cursor: help;
+  outline: none;
+}
+
+.graph-node-layer__node:hover .graph-node-layer__marker,
+.graph-node-layer__node:focus-visible .graph-node-layer__marker {
+  filter: drop-shadow(0 0 5px rgb(15 23 42 / 50%));
+  stroke-width: 3;
+}
+
+.graph-node-layer__notation {
   fill: #475569;
-  font-size: 11px;
-  font-weight: 700;
-  paint-order: stroke;
-  stroke: #fff;
-  stroke-linejoin: round;
-  stroke-width: 3px;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: -0.25px;
+  pointer-events: none;
   user-select: none;
 }
 
@@ -34,6 +43,11 @@
   fill: #f97316;
   stroke: #c2410c;
   stroke-width: 3;
+}
+
+.graph-node-layer__node--current .graph-node-layer__notation,
+.graph-node-layer__node--final .graph-node-layer__notation {
+  fill: #fff;
 }
 
 .graph-node-layer__node--final .graph-node-layer__marker {

@@ -1,0 +1,134 @@
+% =====================================================================
+% MAIN FILE
+% Introduction to Artificial Intelligence - Route Optimization Report
+% Compile with pdflatex (run twice for the table of contents to settle)
+% =====================================================================
+% !TeX program = pdflatex
+% !TeX encoding = UTF-8
+
+\documentclass[12pt]{report}
+
+% ---------------------------------------------------------------
+% PAGE GEOMETRY
+% ---------------------------------------------------------------
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=3cm, right=2cm]{geometry}
+
+% ---------------------------------------------------------------
+% VIETNAMESE ENCODING, LANGUAGE, AND FONT FOR PDFLATEX
+% T5 supplies Vietnamese glyph encoding, inputenc reads the UTF-8 source,
+% and babel localizes automatic document labels. mathptmx provides a
+% Times-like text and mathematics font while retaining pdfLaTeX.
+% ---------------------------------------------------------------
+\usepackage[T5]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel}
+\usepackage{mathptmx}
+
+% ---------------------------------------------------------------
+% FONT SIZE 13 AND LINE SPACING 1.15
+% ---------------------------------------------------------------
+\usepackage{setspace}
+\makeatletter
+\renewcommand{\normalsize}{%
+  \@setfontsize{\normalsize}{13pt}{15.6pt}%
+}
+\normalsize
+\makeatother
+\setstretch{1.15}
+
+% ---------------------------------------------------------------
+% GENERAL PACKAGES
+% ---------------------------------------------------------------
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage[hidelinks]{hyperref}
+
+% Justify is the default paragraph style in LaTeX, so no extra
+% package is needed for the justify requirement.
+
+% ---------------------------------------------------------------
+% CHAPTER AND SECTION TITLE STYLE
+% ---------------------------------------------------------------
+\titleformat{\chapter}[hang]
+  {\normalfont\bfseries\fontsize{16}{19}\selectfont}
+  {\chaptername~\thechapter.}
+  {10pt}
+  {}
+\titlespacing*{\chapter}{0pt}{10pt}{20pt}
+
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{14}{16.8}\selectfont}
+  {\thesection}{10pt}{}
+
+\titleformat{\subsection}
+  {\normalfont\bfseries\fontsize{13}{15.6}\selectfont}
+  {\thesubsection}{10pt}{}
+
+% ---------------------------------------------------------------
+% HEADER AND FOOTER
+% ---------------------------------------------------------------
+\pagestyle{fancy}
+\setlength{\headheight}{14pt}
+\fancyhf{}
+\fancyhead[L]{\small Nhập môn Trí tuệ nhân tạo}
+\fancyhead[R]{\small Báo cáo tối ưu hóa tuyến đường}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ---------------------------------------------------------------
+% A REUSABLE BOX FOR PLACES WHERE THE GROUP MUST FILL IN REAL DATA
+% Usage: \fillin{describe what goes here}
+% ---------------------------------------------------------------
+\newcommand{\fillin}[1]{\textcolor{red}{\textbf{[CẦN BỔ SUNG: #1]}}}
+
+\begin{document}
+
+% -----------------------------------------------------------
+% COVERS
+% Outside cover and inside cover are two separate files, both
+% unnumbered pages.
+% -----------------------------------------------------------
+\input{covers/outside_cover.tex}
+\input{covers/inside_cover.tex}
+
+% -----------------------------------------------------------
+% FRONT MATTER
+% -----------------------------------------------------------
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+\clearpage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% -----------------------------------------------------------
+% BODY, ONE FILE PER SECTION
+% -----------------------------------------------------------
+\input{sections/a_group_introduction.tex}
+\input{sections/b_problem_context.tex}
+\input{sections/c_problem_modeling.tex}
+\input{sections/d_dataset.tex}
+\input{sections/e_algorithm_principles.tex}
+\input{sections/f_program_flow.tex}
+\input{sections/g_algorithm_comparison.tex}
+\input{sections/h_multilocation_optimization.tex}
+\input{sections/i_program_instructions.tex}
+\input{sections/j_limitations_future_work.tex}
+
+\end{document}

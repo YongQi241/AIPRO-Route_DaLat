@@ -1,5 +1,8 @@
-import { useMemo, useState } from 'react'
-import { createRouteRequest } from '../../services/routeRequest'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  createRouteRequest,
+  isMultiLocationAlgorithm,
+} from '../../services/routeRequest'
 import { useAppStore } from '../../store/useAppStore'
 import './RouteSelectionControls.css'
 
@@ -18,6 +21,11 @@ const DEFAULT_OPTIMIZATIONS = [
   { value: 'cost', label: 'Lowest cost' },
 ]
 
+const MULTI_LOCATION_LABELS = {
+  nearest_neighbor: 'Nearest Neighbor',
+  brute_force_tsp: 'Brute Force TSP',
+}
+
 export default function RouteSelectionControls({
   locations = [],
   scenarios = DEFAULT_SCENARIOS,
@@ -33,6 +41,15 @@ export default function RouteSelectionControls({
   const setRouteField = useAppStore((state) => state.setRouteField)
   const addVisitNode = useAppStore((state) => state.addVisitNode)
   const removeVisitNode = useAppStore((state) => state.removeVisitNode)
+  const clearVisitNodes = useAppStore((state) => state.clearVisitNodes)
+  const supportsMultiLocation = isMultiLocationAlgorithm(selectedAlgorithm)
+
+  useEffect(() => {
+    if (supportsMultiLocation) return
+
+    setIntermediateDraft('')
+    clearVisitNodes()
+  }, [clearVisitNodes, supportsMultiLocation])
 
   const locationNames = useMemo(
     () =>
@@ -70,7 +87,7 @@ export default function RouteSelectionControls({
   }
 
   const handleAddIntermediate = () => {
-    if (!intermediateDraft) return
+    if (!supportsMultiLocation || !intermediateDraft) return
     addVisitNode(intermediateDraft)
     setIntermediateDraft('')
   }
@@ -171,16 +188,52 @@ export default function RouteSelectionControls({
         </button>
       </fieldset>
 
-      <div className="route-selection__intermediate">
+      <div
+        className={`route-selection__intermediate${
+          supportsMultiLocation
+            ? ''
+            : ' route-selection__intermediate--disabled'
+        }`}
+      >
+        <p
+          className="route-selection__multi-location-note"
+          id="multi-location-guidance"
+        >
+          <strong>Chosen multi-location methods:</strong> Nearest Neighbor and
+          Brute Force TSP.
+          {supportsMultiLocation && (
+            <span>
+              {' '}
+              Currently using {MULTI_LOCATION_LABELS[selectedAlgorithm]}.
+            </span>
+          )}
+          {!supportsMultiLocation && (
+            <span>
+              {' '}
+              Select either method in Search strategy to add intermediate
+              locations.
+            </span>
+          )}
+        </p>
+
         <label className="route-selection__field">
           <span>Intermediate locations (optional)</span>
           <span className="route-selection__intermediate-input">
             <select
               value={intermediateDraft}
-              disabled={disabled || availableIntermediateLocations.length === 0}
+              aria-describedby="multi-location-guidance"
+              disabled={
+                disabled ||
+                !supportsMultiLocation ||
+                availableIntermediateLocations.length === 0
+              }
               onChange={(event) => setIntermediateDraft(event.target.value)}
             >
-              <option value="">Add a location</option>
+              <option value="">
+                {supportsMultiLocation
+                  ? 'Add a location'
+                  : 'Choose a multi-location method first'}
+              </option>
               {availableIntermediateLocations.map((location) => (
                 <option key={location.value} value={location.value}>
                   {location.label}
@@ -190,14 +243,16 @@ export default function RouteSelectionControls({
             <button
               type="button"
               onClick={handleAddIntermediate}
-              disabled={disabled || !intermediateDraft}
+              disabled={
+                disabled || !supportsMultiLocation || !intermediateDraft
+              }
             >
               Add
             </button>
           </span>
         </label>
 
-        {routeSelection.visitNodes.length > 0 && (
+        {supportsMultiLocation && routeSelection.visitNodes.length > 0 && (
           <ul
             className="route-selection__chips"
             aria-label="Các điểm trung gian đã chọn"

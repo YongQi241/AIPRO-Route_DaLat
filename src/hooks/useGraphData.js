@@ -2,8 +2,8 @@ import { useCallback, useEffect } from 'react'
 import { useAppStore } from '../store/useAppStore'
 
 const GRAPH_DATA_URLS = {
-  nodes: '../../data/generated_routes_connected/nodes_snapped.geojson',
-  edges: '../../data/generated_routes_connected/edges.geojson',
+  nodes: '../../data/generated/nodes_snapped.geojson',
+  edges: '../../data/generated/edges.geojson',
 }
 
 let pendingGraphRequest = null

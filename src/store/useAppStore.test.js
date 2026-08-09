@@ -147,3 +147,20 @@ test('A new request clears reveal and a successful result without trace reveals'
   })
   assert.equal(useAppStore.getState().hasRevealedFinalResult, true)
 })
+
+test('clearVisitNodes removes selections when multi-location mode is unavailable', () => {
+  const store = useAppStore.getState()
+  store.resetRouteSelection()
+  store.setRouteField('startNode', 'DL01')
+  store.setRouteField('goalNode', 'DL09')
+  store.addVisitNode('DL03')
+  store.addVisitNode('DL08')
+
+  assert.deepEqual(useAppStore.getState().routeSelection.visitNodes, [
+    'DL03',
+    'DL08',
+  ])
+
+  useAppStore.getState().clearVisitNodes()
+  assert.deepEqual(useAppStore.getState().routeSelection.visitNodes, [])
+})

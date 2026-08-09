@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { describeNodeConnections } from './nodeConnections'
 import './GraphNodeLayer.css'
 
 function resolveNodeState(
@@ -14,6 +15,11 @@ function resolveNodeState(
   if (frontierNodeIds.has(nodeId)) return 'frontier'
   if (visitedNodeIds.has(nodeId)) return 'visited'
   return 'unvisited'
+}
+
+function getNodeNotation(nodeId) {
+  const numericPart = String(nodeId).match(/\d+$/)?.[0]
+  return numericPart ?? String(nodeId)
 }
 
 export default function GraphNodeLayer({
@@ -48,7 +54,7 @@ export default function GraphNodeLayer({
           finalPathSet,
           showFinalPath,
         )
-
+        const hoverDescription = describeNodeConnections(node)
         return (
           <g
             key={node.id}
@@ -56,31 +62,35 @@ export default function GraphNodeLayer({
             data-node-id={node.id}
             data-node-state={nodeState}
             transform={`translate(${node.x} ${node.y})`}
+            tabIndex="0"
+            role="img"
+            aria-label={`${hoverDescription.replaceAll('\n', '. ')}; ${nodeState}`}
           >
+            <title>{hoverDescription}</title>
             {node.id === evaluatedNodeId && (
               <circle
                 className="graph-node-layer__evaluation-ring"
-                r="11"
+                r="15"
                 aria-hidden="true"
               />
             )}
             {nodeState === 'current' && (
               <circle
                 className="graph-node-layer__pulse"
-                r="10"
+                r="14"
                 aria-hidden="true"
               />
             )}
-            <circle
-              className="graph-node-layer__marker"
-              r="5"
+            <circle className="graph-node-layer__marker" r="10" />
+            <text
+              className="graph-node-layer__notation"
+              x="0"
+              y="0"
+              textAnchor="middle"
+              dominantBaseline="central"
+              aria-hidden="true"
             >
-              <title>
-                {node.id}: {node.name} · {nodeState}
-              </title>
-            </circle>
-            <text x="12" y="-10" aria-hidden="true">
-              {node.id}
+              {getNodeNotation(node.id)}
             </text>
           </g>
         )

@@ -81,10 +81,32 @@
 }
 
 .route-selection__intermediate {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(240px, auto) 1fr;
   align-items: end;
-  gap: 12px;
+  gap: 8px 12px;
   margin-top: 10px;
+}
+
+.route-selection__multi-location-note {
+  grid-column: 1 / -1;
+  padding: 8px 11px;
+  margin: 0;
+  border: 1px solid #7dd3fc;
+  border-left: 4px solid #0284c7;
+  border-radius: 6px;
+  color: #0c4a6e;
+  background: #f0f9ff;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.route-selection__intermediate--disabled
+  .route-selection__multi-location-note {
+  border-color: #fcd34d;
+  border-left-color: #d97706;
+  color: #78350f;
+  background: #fffbeb;
 }
 
 .route-selection__intermediate-input {
@@ -177,8 +199,8 @@
   }
 
   .route-selection__intermediate {
+    grid-template-columns: 1fr;
     align-items: stretch;
-    flex-direction: column;
   }
 }
 

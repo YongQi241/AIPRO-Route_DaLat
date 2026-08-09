@@ -1,4 +1,8 @@
 import { useMemo } from 'react'
+import {
+  describeCandidateEdgeDecision,
+  getTraceEdgeState,
+} from './edgeDecision'
 import { createDrawableEdges } from './graphGeometry'
 import './SearchTraversalLayer.css'
 
@@ -20,14 +24,11 @@ function EdgePaths({ edge, keyPrefix }) {
         `search-traversal-layer__edge--${edge.kind}`,
       ].join(' ')}
       d={path.value}
+      aria-label={`${edge.fromNode} to ${edge.toNode}: ${edge.reason ?? 'inferred path'}`}
     >
       <title>
-        {edge.kind === 'candidate'
-          ? 'Possible directed successor'
-          : edge.kind === 'active'
-            ? 'Active edge relaxation'
-            : 'Inferred path to current node'}
-        : {edge.fromNode} → {edge.toNode} ({edge.edgeId})
+        {edge.fromNode} → {edge.toNode} ({edge.edgeId}):{' '}
+        {edge.reason ?? 'Inferred path to current node.'}
       </title>
     </path>
   ))
@@ -38,29 +39,55 @@ export default function SearchTraversalLayer({
   project,
   branchEdgeIds = [],
   candidateEdgeIds = [],
-  activeEdgeId = null,
+  evaluatedCandidateActions = [],
+  finalPathEdgeIds = [],
 }) {
   const highlights = useMemo(() => {
-    if (!project) return { branch: [], candidate: [], active: [] }
+    if (!project) return { branch: [], trace: [] }
 
     const edgeLookup = new Map(
       createDrawableEdges(features, project).map((edge) => [edge.edgeId, edge]),
     )
 
+    const withTraceState = (edge) => {
+      const kind = getTraceEdgeState(
+        edge.edgeId,
+        evaluatedCandidateActions,
+        finalPathEdgeIds,
+      )
+      const decisionReason = describeCandidateEdgeDecision(
+        edge.edgeId,
+        evaluatedCandidateActions,
+      )
+
+      return {
+        ...edge,
+        kind,
+        reason:
+          kind === 'chosen'
+            ? `Finally chosen: this edge belongs to the returned route. ${decisionReason}`
+            : decisionReason,
+      }
+    }
+
     return {
       branch: resolveEdges(edgeLookup, branchEdgeIds, 'branch'),
-      candidate: resolveEdges(edgeLookup, candidateEdgeIds, 'candidate'),
-      active:
-        activeEdgeId == null
-          ? []
-          : resolveEdges(edgeLookup, [activeEdgeId], 'active'),
+      trace: resolveEdges(edgeLookup, candidateEdgeIds, 'pending').map(
+        withTraceState,
+      ),
     }
-  }, [activeEdgeId, branchEdgeIds, candidateEdgeIds, features, project])
+  }, [
+    branchEdgeIds,
+    candidateEdgeIds,
+    evaluatedCandidateActions,
+    features,
+    finalPathEdgeIds,
+    project,
+  ])
 
   if (
     highlights.branch.length === 0 &&
-    highlights.candidate.length === 0 &&
-    highlights.active.length === 0
+    highlights.trace.length === 0
   ) {
     return null
   }
@@ -95,21 +122,12 @@ export default function SearchTraversalLayer({
           />
         ))}
       </g>
-      <g aria-label="Candidate outgoing edges">
-        {highlights.candidate.map((edge) => (
+      <g aria-label="Trace edges by evaluation state">
+        {highlights.trace.map((edge) => (
           <EdgePaths
-            key={`candidate-${edge.edgeId}`}
+            key={`trace-${edge.edgeId}`}
             edge={edge}
-            keyPrefix="candidate"
-          />
-        ))}
-      </g>
-      <g aria-label="Active edge relaxation">
-        {highlights.active.map((edge) => (
-          <EdgePaths
-            key={`active-${edge.edgeId}`}
-            edge={edge}
-            keyPrefix="active"
+            keyPrefix="trace"
           />
         ))}
       </g>

@@ -3,8 +3,12 @@ export const MULTI_LOCATION_ALGORITHMS = new Set([
   'brute_force_tsp',
 ])
 
+export function isMultiLocationAlgorithm(algorithm) {
+  return MULTI_LOCATION_ALGORITHMS.has(algorithm)
+}
+
 export function createRouteRequest(routeSelection, selectedAlgorithm) {
-  const isMultiLocation = MULTI_LOCATION_ALGORITHMS.has(selectedAlgorithm)
+  const isMultiLocation = isMultiLocationAlgorithm(selectedAlgorithm)
   const intermediateNodes = Array.isArray(routeSelection.visitNodes)
     ? routeSelection.visitNodes
     : []

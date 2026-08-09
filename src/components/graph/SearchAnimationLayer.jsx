@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { SIMULATION_STATUS, useAppStore } from '../../store/useAppStore'
 import GraphNodeLayer from './GraphNodeLayer'
+import { getCompletedVisitedNodeIds } from './searchTimeline'
 
 export default function SearchAnimationLayer({
   nodes = [],
@@ -44,13 +45,18 @@ export default function SearchAnimationLayer({
     totalActions,
   ])
 
+  const isComplete = simulation.status === SIMULATION_STATUS.COMPLETED
+  const completedVisitedNodeIds = isComplete
+    ? getCompletedVisitedNodeIds(result, action)
+    : null
+
   return (
     <GraphNodeLayer
       nodes={nodes}
-      currentNodeId={action?.currentNodeId}
-      frontierNodeIds={action?.frontierNodeIds}
-      visitedNodeIds={action?.visitedNodeIds}
-      evaluatedNodeId={action?.activeNeighborId}
+      currentNodeId={isComplete ? null : action?.currentNodeId}
+      frontierNodeIds={isComplete ? [] : action?.frontierNodeIds}
+      visitedNodeIds={completedVisitedNodeIds ?? action?.visitedNodeIds}
+      evaluatedNodeId={isComplete ? null : action?.activeNeighborId}
       finalPathNodeIds={result?.path_nodes}
       showFinalPath={showFinalPath}
     />

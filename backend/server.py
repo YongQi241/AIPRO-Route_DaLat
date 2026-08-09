@@ -8,15 +8,15 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-from algorithms import solve
-from algorithms.solver import (
+from routing import solve
+from routing.solver import (
     MULTI_ROUTE_ALGORITHMS,
     normalize_algorithm,
 )
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = PROJECT_ROOT / "data" / "generated_routes_connected"
+DATA_DIR = PROJECT_ROOT / "data" / "generated"
 REQUIRED_FIELDS = ("algorithm", "start_node")
 API_VERSION = "2.0"
 ALGORITHM_CAPABILITIES = [

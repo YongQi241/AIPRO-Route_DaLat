@@ -138,6 +138,14 @@ export const useAppStore = create((set) => ({
       },
     })),
 
+  clearVisitNodes: () =>
+    set((state) => ({
+      routeSelection: {
+        ...state.routeSelection,
+        visitNodes: [],
+      },
+    })),
+
   resetRouteSelection: () => set({ routeSelection: initialRouteSelection }),
 
   setRouteResult: (routeResult) =>

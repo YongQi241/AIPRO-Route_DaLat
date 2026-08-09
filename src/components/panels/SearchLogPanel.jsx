@@ -2,31 +2,19 @@ import { useEffect, useMemo, useRef } from 'react'
 import {
   buildSearchActionTimeline,
 } from '../graph/searchTimeline'
+import { describeCandidateEdgeDecision } from '../graph/edgeDecision'
+import { describeLocationDecision } from '../graph/locationDecision'
 import { SIMULATION_STATUS, useAppStore } from '../../store/useAppStore'
 import './SearchLogPanel.css'
 
-function formatNumber(value) {
-  return value == null
-    ? null
-    : Number(value).toLocaleString(undefined, { maximumFractionDigits: 3 })
-}
+function describeAction(action, actions) {
+  if (action.type === 'select-next-location') {
+    return {
+      title: `Choose the next stop from ${action.currentNodeId}`,
+      detail: `Compare ${action.selectionCandidates.length} remaining locations; the lowest reachable Dijkstra score wins.`,
+    }
+  }
 
-function formatTraceValues(entry) {
-  if (!entry) return null
-
-  const values = [
-    ['g', entry.gCost],
-    ['h', entry.hCost],
-    ['f', entry.fCost],
-    ['priority', entry.priority],
-  ]
-    .filter(([, value]) => value != null)
-    .map(([label, value]) => `${label}=${formatNumber(value)}`)
-
-  return values.length > 0 ? values.join(', ') : null
-}
-
-function describeAction(action) {
   if (action.type === 'expand') {
     return {
       title: `Expand ${action.currentNodeId}`,
@@ -38,20 +26,37 @@ function describeAction(action) {
   }
 
   if (action.type === 'consider-edge') {
-    const oldValues = formatTraceValues(action.oldValues)
-    const newValues = formatTraceValues(action.newValues)
-    const valueChange =
-      oldValues || newValues
-        ? `Before: ${oldValues ?? 'not in frontier'} · After: ${newValues ?? 'not provided'}`
-        : 'The trace does not provide enough values to compare'
+    const evaluatedAtThisPoint = actions.filter(
+      (candidateAction) =>
+        candidateAction.type === 'consider-edge' &&
+        candidateAction.frameIndex === action.frameIndex &&
+        candidateAction.actionIndex <= action.actionIndex,
+    )
+    const reason = describeCandidateEdgeDecision(
+      action.activeEdgeId,
+      evaluatedAtThisPoint,
+    )
 
     return {
       title: `Consider ${action.activeEdgeId}: ${action.currentNodeId} → ${action.activeNeighborId}`,
-      detail: `${action.outcome.toUpperCase()} · ${valueChange}`,
+      detail: `${action.outcome.toUpperCase()} · ${reason}`,
+    }
+  }
+
+  if (action.type === 'consider-location') {
+    return {
+      title: `Compare location ${action.activeNeighborId}`,
+      detail: `${action.outcome.toUpperCase()} · ${describeLocationDecision(action)}`,
     }
   }
 
   if (action.type === 'frame-complete') {
+    if (action.selectionRule === 'lowest_candidate_score') {
+      return {
+        title: `Selected ${action.selectedNodeId} after comparing all locations`,
+        detail: `Lowest reachable score: ${action.selectedScore ?? 'not recorded'}`,
+      }
+    }
     return {
       title: `Finish expanding ${action.currentNodeId}`,
       detail:
@@ -122,7 +127,7 @@ export default function SearchLogPanel({ className = '' }) {
         <ol className="search-log-panel__list">
           {visibleActions.map((action, index) => {
             const isActive = index === visibleActions.length - 1
-            const event = describeAction(action)
+            const event = describeAction(action, actions)
 
             return (
               <li

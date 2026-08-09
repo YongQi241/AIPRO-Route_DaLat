@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
   buildSearchActionTimeline,
+  getCompletedVisitedNodeIds,
   normalizeTraceEntry,
   shouldShowFinalPath,
 } from './searchTimeline.js'
@@ -97,7 +98,7 @@ test('keeps directed candidate order and produces ADD, UPDATE, and KEEP', () => 
   assert.ok(!bActions.some((action) => action.activeEdgeId === 'E_CB'))
 })
 
-test('uses UNKNOWN when string-only snapshots cannot prove a comparison', () => {
+test('keeps string-only frontier entries without emitting UNKNOWN', () => {
   const result = {
     status: 'success',
     start_node: 'A',
@@ -112,7 +113,125 @@ test('uses UNKNOWN when string-only snapshots cannot prove a comparison', () => 
     (action) => action.type === 'consider-edge' && action.activeEdgeId === 'E_BC',
   )
 
-  assert.equal(bToC.outcome, 'unknown')
+  assert.equal(bToC.outcome, 'keep')
+  assert.ok(
+    !timeline.some((action) => action.outcome === 'unknown'),
+  )
+})
+
+test('uses exact A* relaxation g, h, and f costs when provided', () => {
+  const timeline = buildSearchActionTimeline(
+    {
+      status: 'success',
+      start_node: 'A',
+      goal_node: 'D',
+      frontier_steps: [
+        {
+          current: 'A',
+          current_values: { g_cost: 0, h_cost: 4, f_cost: 4 },
+          selection_rule: 'lowest_f_cost',
+          frontier: [{ node: 'B', g_cost: 2, h_cost: 1, f_cost: 3 }],
+          visited: ['A'],
+          relaxations: [
+            {
+              edge_id: 'E_AB',
+              node: 'B',
+              outcome: 'add',
+              previous_values: null,
+              candidate_values: { g_cost: 2, h_cost: 1, f_cost: 3 },
+            },
+          ],
+        },
+      ],
+    },
+    edges,
+  )
+
+  const expand = timeline.find((action) => action.type === 'expand')
+  const relaxation = timeline.find(
+    (action) => action.type === 'consider-edge' && action.activeEdgeId === 'E_AB',
+  )
+
+  assert.equal(expand.selectionRule, 'lowest_f_cost')
+  assert.deepEqual(expand.currentValues, {
+    nodeId: 'A',
+    gCost: 0,
+    hCost: 4,
+    fCost: 4,
+    priority: null,
+  })
+  assert.deepEqual(relaxation.newValues, {
+    nodeId: 'B',
+    gCost: 2,
+    hCost: 1,
+    fCost: 3,
+    priority: null,
+  })
+})
+
+test('uses CONSIDERED for visited-order-only traces', () => {
+  const timeline = buildSearchActionTimeline(
+    {
+      status: 'success',
+      start_node: 'A',
+      goal_node: 'D',
+      visited_order: ['A', 'B', 'D'],
+    },
+    edges,
+  )
+
+  assert.ok(
+    timeline
+      .filter((action) => action.type === 'consider-edge')
+      .every((action) => action.outcome === 'considered'),
+  )
+})
+
+test('turns Nearest Neighbor candidate scores into comparison actions', () => {
+  const timeline = buildSearchActionTimeline({
+    status: 'success',
+    algorithm: 'Nearest Neighbor',
+    frontier_steps: [
+      {
+        current: 'A',
+        candidates: [
+          { node: 'B', reachable: true, score: 2 },
+          { node: 'C', reachable: true, score: 5 },
+          { node: 'D', reachable: false, score: null },
+        ],
+        selected: 'B',
+        selected_score: 2,
+      },
+    ],
+  })
+
+  assert.equal(timeline[0].type, 'select-next-location')
+  assert.deepEqual(
+    timeline
+      .filter(({ type }) => type === 'consider-location')
+      .map(({ activeNeighborId, outcome, newValues }) => [
+        activeNeighborId,
+        outcome,
+        newValues.priority,
+      ]),
+    [
+      ['B', 'selected', 2],
+      ['C', 'rejected', 5],
+      ['D', 'unreachable', null],
+    ],
+  )
+  assert.equal(timeline.at(-1).selectedNodeId, 'B')
+  assert.equal(timeline.at(-1).selectedScore, 2)
+})
+
+test('preserves every visited node when playback completes', () => {
+  assert.deepEqual(
+    getCompletedVisitedNodeIds(
+      { visited_order: ['A', 'B', 'D'] },
+      { visitedNodeIds: ['A', 'B'] },
+    ),
+    ['A', 'B', 'D'],
+  )
 })
 
 test('shows final route only after completion, except results without a timeline', () => {

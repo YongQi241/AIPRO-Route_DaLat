@@ -1,8 +1,11 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { SIMULATION_STATUS, useAppStore } from '../../store/useAppStore'
+import EdgeLabelLayer from './EdgeLabelLayer'
 import FinalRouteLayer from './FinalRouteLayer'
+import { getEvaluatedCandidateEdgeIds } from './edgeDecision'
 import { getLineCoordinates } from './graphGeometry'
 import { GRAPH_LEGEND_ITEMS } from './graphLegend'
+import { createNodeConnectionLookup } from './nodeConnections'
 import RoadNetworkLayer from './RoadNetworkLayer'
 import SearchAnimationLayer from './SearchAnimationLayer'
 import SearchTraversalLayer from './SearchTraversalLayer'
@@ -90,7 +93,7 @@ export default function GraphWorkspace({ className = '' }) {
   const dragRef = useRef(null)
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT)
   const [isPanning, setIsPanning] = useState(false)
-  const [layoutMode, setLayoutMode] = useState('map')
+  const [layoutMode, setLayoutMode] = useState('tree')
   const graphData = useAppStore((state) => state.graphData)
   const result = useAppStore((state) => state.routeResult)
   const simulation = useAppStore((state) => state.simulation)
@@ -105,7 +108,31 @@ export default function GraphWorkspace({ className = '' }) {
   const isSearchVisible =
     simulation.status !== SIMULATION_STATUS.IDLE &&
     simulation.status !== SIMULATION_STATUS.COMPLETED
+  const isSearchComplete =
+    simulation.status === SIMULATION_STATUS.COMPLETED
   const visibleAction = isSearchVisible ? action : null
+  const preservedCandidateEdgeIds = useMemo(
+    () =>
+      isSearchComplete
+        ? getEvaluatedCandidateEdgeIds(actionTimeline)
+        : visibleAction?.candidateEdgeIds ?? [],
+    [actionTimeline, isSearchComplete, visibleAction],
+  )
+  const evaluatedCandidateActions = useMemo(() => {
+    if (isSearchComplete) {
+      return actionTimeline.filter(
+        (candidateAction) => candidateAction.type === 'consider-edge',
+      )
+    }
+    if (!isSearchVisible || action.type === 'expand') return []
+
+    return actionTimeline.filter(
+      (candidateAction) =>
+        candidateAction.type === 'consider-edge' &&
+        candidateAction.frameIndex === action.frameIndex &&
+        candidateAction.actionIndex <= action.actionIndex,
+    )
+  }, [action, actionTimeline, isSearchComplete, isSearchVisible])
   const activeSearchEdgeIds = useMemo(() => {
     if (!isSearchVisible) return []
 
@@ -138,6 +165,10 @@ export default function GraphWorkspace({ className = '' }) {
   )
   const displayEdgeFeatures =
     layoutMode === 'tree' ? treeLayout.edgeFeatures : edgeFeatures
+  const nodeConnectionLookup = useMemo(
+    () => createNodeConnectionLookup(edgeFeatures),
+    [edgeFeatures],
+  )
 
   const drawing = useMemo(() => {
     if (layoutMode === 'tree') {
@@ -155,6 +186,7 @@ export default function GraphWorkspace({ className = '' }) {
                 properties.name_vi ??
                 properties.name_en ??
                 id,
+              connections: nodeConnectionLookup.get(id) ?? [],
               x: position[0],
               y: position[1],
             }
@@ -180,12 +212,22 @@ export default function GraphWorkspace({ className = '' }) {
               properties.name_vi ??
               properties.name_en ??
               String(properties.node_id ?? index),
+            connections:
+              nodeConnectionLookup.get(
+                String(properties.node_id ?? index),
+              ) ?? [],
             x,
             y,
           }
         }),
     }
-  }, [edgeFeatures, layoutMode, nodeFeatures, treeLayout.positions])
+  }, [
+    edgeFeatures,
+    layoutMode,
+    nodeConnectionLookup,
+    nodeFeatures,
+    treeLayout.positions,
+  ])
 
   const isSuccessful = result?.status === 'success'
   const showFinalPath = shouldShowFinalPath(
@@ -423,13 +465,6 @@ export default function GraphWorkspace({ className = '' }) {
               features={displayEdgeFeatures}
               project={drawing.project}
             />
-            <SearchTraversalLayer
-              features={displayEdgeFeatures}
-              project={drawing.project}
-              branchEdgeIds={activeSearchEdgeIds}
-              candidateEdgeIds={visibleAction?.candidateEdgeIds ?? []}
-              activeEdgeId={visibleAction?.activeEdgeId}
-            />
             <FinalRouteLayer
               features={displayEdgeFeatures}
               project={drawing.project}
@@ -437,11 +472,27 @@ export default function GraphWorkspace({ className = '' }) {
               segments={result?.segments}
               visible={isSuccessful && visiblePathEdges.length > 0}
             />
+            <SearchTraversalLayer
+              features={displayEdgeFeatures}
+              project={drawing.project}
+              branchEdgeIds={activeSearchEdgeIds}
+              candidateEdgeIds={preservedCandidateEdgeIds}
+              evaluatedCandidateActions={evaluatedCandidateActions}
+              finalPathEdgeIds={
+                isSearchComplete ? result?.path_edges ?? [] : []
+              }
+            />
+            <EdgeLabelLayer
+              features={displayEdgeFeatures}
+              project={drawing.project}
+            />
 
             <SearchAnimationLayer
               nodes={drawing.nodes}
               result={result}
-              action={visibleAction}
+              action={
+                simulation.status === SIMULATION_STATUS.IDLE ? null : action
+              }
               totalActions={actionTimeline.length}
               showFinalPath={showFinalPath}
             />

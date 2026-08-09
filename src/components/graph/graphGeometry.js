@@ -14,6 +14,49 @@ export function lineToPath(line, project) {
     .join(' ')
 }
 
+export function getLineLabelPosition(line, project, offset = 7) {
+  const points = line.map(project)
+  if (points.length < 2) return null
+
+  const segments = []
+  let totalLength = 0
+  for (let index = 1; index < points.length; index += 1) {
+    const [startX, startY] = points[index - 1]
+    const [endX, endY] = points[index]
+    const length = Math.hypot(endX - startX, endY - startY)
+    if (length === 0) continue
+    segments.push({ startX, startY, endX, endY, length })
+    totalLength += length
+  }
+  if (segments.length === 0) return null
+
+  const midpoint = totalLength / 2
+  let distance = 0
+  const segment =
+    segments.find((candidate) => {
+      distance += candidate.length
+      return distance >= midpoint
+    }) ?? segments.at(-1)
+  const distanceBeforeSegment = distance - segment.length
+  const ratio = Math.max(
+    0,
+    Math.min(1, (midpoint - distanceBeforeSegment) / segment.length),
+  )
+  const deltaX = segment.endX - segment.startX
+  const deltaY = segment.endY - segment.startY
+  const x = segment.startX + deltaX * ratio
+  const y = segment.startY + deltaY * ratio
+  let angle = (Math.atan2(deltaY, deltaX) * 180) / Math.PI
+  if (angle > 90) angle -= 180
+  if (angle < -90) angle += 180
+
+  return {
+    x: x + (-deltaY / segment.length) * offset,
+    y: y + (deltaX / segment.length) * offset,
+    angle,
+  }
+}
+
 export function createDrawableEdges(features, project) {
   if (!project) return []
 
@@ -30,6 +73,7 @@ export function createDrawableEdges(features, project) {
       paths: getLineCoordinates(feature.geometry).map((line, lineIndex) => ({
         id: `${edgeId}-${featureIndex}-${lineIndex}`,
         value: lineToPath(line, project),
+        label: getLineLabelPosition(line, project),
       })),
     }
   })

@@ -1,0 +1,81 @@
+\chapter{Nguyên Lý Thuật Toán}
+\label{chap:algorithm-principles}
+
+Chương này giải thích lý thuyết đằng sau mỗi thuật toán tìm kiếm được triển khai trong đồ án.
+
+\section{Breadth First Search}
+
+Breadth First Search, or BFS, explores the graph level by level. It keeps a queue of nodes to visit, always following a first in first out order, so all nodes at the current distance, measured in number of edges, are explored before any node one step further away is considered.
+
+\textbf{Example.} Starting at A with the goal D, BFS first visits the direct neighbors of A, which are B, C, and D, in the order they were added to the graph. Since D is a direct neighbor of A in this example, BFS reaches it after exploring only the first level, even though the direct edge from A to D is longer in distance than the path through B or C.
+
+\textbf{Completeness and optimality.} BFS is complete, meaning it is guaranteed to find a goal if one exists, as long as the graph has a finite branching factor. BFS is optimal only when every edge has the same cost, since it always returns the path with the fewest edges rather than the path with the lowest total cost. For this project, where edges have different weighted costs, BFS is used mainly as a baseline for comparison rather than as the main route finding method.
+
+\section{Depth First Search}
+
+Depth First Search, or DFS, explores as far as possible along each branch before backtracking. It uses a stack, either explicitly or through recursion, so the most recently discovered node is always the next one expanded.
+
+\textbf{Example.} Starting at A, DFS might go to B first, then from B to D, reaching the goal quickly if the first branch happens to lead there. If instead the first branch chosen from A leads to a dead end or a long detour, DFS will follow it fully before backtracking to try another neighbor of A.
+
+\textbf{Completeness and optimality.} DFS is complete on finite graphs as long as cycles are handled with a visited set, but it is not complete in general on infinite search spaces. DFS is not optimal, since the first path it finds to the goal depends on the order in which neighbors are explored rather than on the cost of the path. DFS is included in this project mainly to show, by contrast, how a route finding method that ignores cost can return a noticeably worse path than the informed methods described later.
+
+\section{Uniform Cost Search}
+
+Uniform Cost Search, or UCS, expands the node with the lowest cumulative path cost so far, using a priority queue instead of a plain queue or stack. This makes UCS the natural choice for the route finding problem, since it directly minimizes the cost function defined in Chapter~\ref{chap:problem-modeling}, which already combines distance, time, and congestion.
+
+\textbf{Example.} Using the weights on the example graph, UCS starting at A compares the path A to D directly, with cost 6.4, against the path A to B to D, with cost $4.2 + 2.5 = 6.7$, and the path A to C to D, with cost $3.1 + 5.0 = 8.1$. UCS expands nodes in order of increasing cumulative cost and correctly identifies the direct edge A to D as the cheapest path in this small example.
+
+\textbf{Completeness and optimality.} UCS is complete and optimal, provided all edge costs are non negative, which is always true for the distance and time based costs used in this project. This makes UCS a reliable baseline against which the informed methods below can be compared.
+
+\section{Tìm Kiếm A* (A Star Search)}
+
+Thuật toán A* kết hợp chi phí thực tế đã tiêu tốn $g(n)$ và chi phí ước lượng đến đích $h(n)$. Nó luôn chọn mở rộng đỉnh có tổng chi phí $f(n) = g(n) + h(n)$ nhỏ nhất.
+
+\textbf{Hoạt động.} Tại mỗi bước, A* xem xét cả chi phí quãng đường đã đi từ điểm xuất phát và chi phí dự kiến để đến đích. Điều này giúp A* luôn hướng về đích một cách thông minh mà không bị mắc kẹt vào các đường đi dài vô ích.
+
+\textbf{Tính hoàn chỉnh và tối ưu.} A* đảm bảo tính hoàn chỉnh (luôn tìm thấy đường đi nếu có) và tối ưu (đường đi ngắn nhất/chi phí thấp nhất) miễn là hàm heuristic $h(n)$ là "chấp nhận được" (admissible - không bao giờ đánh giá cao hơn chi phí thực tế). Trong đồ án, A* được dùng làm phương pháp chính để tìm đường tối ưu nhất.
+
+\section{Tìm Kiếm Tham Lam (Greedy Best-First Search)}
+
+Tìm kiếm Tham Lam chỉ quan tâm đến hàm ước lượng $h(n)$, tức là tại mỗi bước, nó luôn chọn đi đến đỉnh kề có vẻ gần đích nhất theo đường chim bay, bỏ qua hoàn toàn chi phí quãng đường đã đi qua ($g(n)$).
+
+\textbf{Hoạt động.} Thuật toán này thường tìm đường rất nhanh vì nó đi thẳng hướng về đích. Tuy nhiên, nó dễ bị mắc kẹt vào chướng ngại vật hoặc chọn những con đường vòng vèo có chi phí thực tế rất cao do không xét đến chi phí $g(n)$.
+
+\textbf{Tính hoàn chỉnh và tối ưu.} Greedy BFS không hoàn chỉnh (có thể bị kẹt trong vòng lặp nếu không xử lý tốt tập các đỉnh đã xét) và không tối ưu (đường đi tìm được hiếm khi là đường ngắn nhất).
+
+\section{Leo Đồi (Hill Climbing)}
+
+Thuật toán Leo Đồi cũng ưu tiên chọn đỉnh kề có $h(n)$ nhỏ nhất, nhưng khác với Greedy BFS (duy trì một hàng đợi ưu tiên các đỉnh có thể quay lui), Hill Climbing không có cơ chế quay lui (backtracking). Nó chỉ chọn bước đi tốt nhất ngay tại thời điểm hiện tại và tiến tới.
+
+\textbf{Hoạt động.} Từ đỉnh hiện tại, thuật toán xem xét các đỉnh kề và di chuyển đến đỉnh có khoảng cách ước lượng đến đích nhỏ nhất. Quá trình lặp lại cho đến khi đến đích.
+
+\textbf{Tính hoàn chỉnh và tối ưu.} Hill Climbing rất dễ bị kẹt ở "cực trị địa phương" (Local Optimum), tức là đi vào ngõ cụt mà xung quanh không có đường nào tốt hơn để đi tiếp. Nó không hoàn chỉnh và không tối ưu.
+
+\section{Hàm Heuristic}
+
+Hàm Heuristic $h(n)$ được nhóm sử dụng là khoảng cách đường chim bay (Haversine distance) giữa tọa độ của đỉnh hiện tại và đỉnh đích, đơn vị tính bằng km.
+
+\begin{equation}
+h(n) = 2r \arcsin\left(\sqrt{\sin^2\left(\frac{\Delta \phi}{2}\right) + \cos\phi_1 \cos\phi_2 \sin^2\left(\frac{\Delta \lambda}{2}\right)}\right)
+\end{equation}
+
+Trong đó, $\phi$ là vĩ độ, $\lambda$ là kinh độ và $r$ là bán kính trái đất. Do chi phí thực tế $g(n)$ trong đồ án là sự kết hợp của quãng đường, thời gian và mức độ kẹt xe, khoảng cách đường chim bay đóng vai trò là cơ sở ước lượng tốt để thuật toán có thể hướng về đích một cách tự nhiên. Tuy nhiên, do $g(n)$ được nhân với các trọng số thay đổi theo chiến thuật (profile) và cộng thêm kẹt xe, $h(n)$ (với đơn vị km thuần túy) có thể cần được điều chỉnh (scale) tương ứng để đảm bảo tính "chấp nhận được" (admissible).
+
+\section{Tóm Tắt Về Tính Hoàn Chỉnh Và Tối Ưu}
+
+\begin{table}[h!]
+\centering
+\caption{Tính hoàn chỉnh và tối ưu của từng thuật toán}
+\begin{tabular}{lcc}
+\toprule
+Thuật toán & Hoàn chỉnh & Tối ưu \\
+\midrule
+Breadth First Search & Yes & Only for equal edge costs \\
+Depth First Search & Yes, with a visited set & No \\
+Uniform Cost Search & Yes & Yes, for non negative costs \\
+A* (A Star Search) & Có (với Heuristic hợp lệ) & Có \\
+Greedy Best-First Search & Không & Không \\
+Hill Climbing & Không (Dễ kẹt ngõ cụt) & Không \\
+\bottomrule
+\end{tabular}
+\end{table}

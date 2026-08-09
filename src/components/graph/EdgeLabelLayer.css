@@ -1,0 +1,14 @@
+.edge-label-layer {
+  pointer-events: none;
+}
+
+.edge-label-layer__label {
+  fill: #475569;
+  font-size: 7px;
+  font-weight: 750;
+  paint-order: stroke;
+  stroke: rgb(255 255 255 / 94%);
+  stroke-linejoin: round;
+  stroke-width: 3px;
+  user-select: none;
+}

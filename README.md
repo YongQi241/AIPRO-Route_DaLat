@@ -59,11 +59,11 @@ connected:
 - the UI scenario list did not match the dataset;
 - UI optimization values (`distance`, `time`, and `cost`) were rejected by the
   Python graph loader;
-- the algorithms assumed data files existed in `data/`, although the actual
-  generated files live in `data/generated_routes_connected/`;
+- the routing engine assumed data files existed in `data/`, although the actual
+  generated files live in `data/generated/`;
 - the old condition template assigned identical values to every edge in a
   scenario;
-- `algorithms/ucs.py` contained a duplicate dispatcher and imported itself,
+- `routing/ucs.py` contained a duplicate dispatcher and imported itself,
   causing a circular import that prevented the algorithm package from loading;
 - intermediate stops could be submitted with algorithms that silently ignored
   them.
@@ -99,13 +99,13 @@ Vite dev proxy (development only)
 backend/server.py
   |
   v
-algorithms/solver.py
+routing/solver.py
   |-- graph_loader.py -> scenario-aware NetworkX DiGraph
   |-- bfs.py
   |-- dfs.py
   |-- ucs.py
   |-- dijkstra.py
-  |-- astar.py
+  |-- a_star.py
   |-- greedy_best_first.py
   |-- nearest_neighbor.py
   |-- hill_climbing.py
@@ -120,7 +120,7 @@ Zustand store -> SVG search replay, final route, metrics, and explanation
 
 The API is deliberately thin. Validation and transport belong to
 `backend/server.py`; graph construction and route logic remain in
-`algorithms/`.
+`routing/`.
 
 ### Custom backend URL
 
@@ -315,48 +315,40 @@ limited to eight targets to prevent accidental factorial workloads.
 
 ## Project structure
 
+The repository has one production routing stack:
+
+| Directory | Role | Use for new code? |
+|---|---|---|
+| `routing/` | Canonical NetworkX-based routing engine used by the HTTP API. | Yes |
+| `backend/` | HTTP transport and request validation around `routing.solve`. | Yes |
+
 ```text
 .
-|-- backend/
-|   |-- __init__.py
-|   `-- server.py
-|-- algorithms/
-|   |-- solver.py
-|   |-- graph_loader.py
-|   |-- bfs.py
-|   |-- dfs.py
-|   |-- ucs.py
-|   |-- dijkstra.py
-|   |-- astar.py
-|   |-- greedy_best_first.py
-|   |-- nearest_neighbor.py
-|   |-- hill_climbing.py
-|   `-- brute_force_tsp.py
-|-- data/
-|   |-- generated_routes_connected/
-|   |   |-- nodes_snapped.csv
-|   |   |-- edges.csv
-|   |   |-- edge_conditions.csv
-|   |   |-- nodes_snapped.geojson
-|   |   `-- edges.geojson
-|   `-- mock-result.json
-|-- src/
-|   |-- components/
-|   |-- hooks/
-|   |-- services/routeService.js
-|   |-- store/useAppStore.js
-|   |-- App.jsx
-|   `-- main.jsx
-|-- requirements.txt
-|-- package.json
-`-- vite.config.js
+|-- routing/           # Production route algorithms and solver
+|-- urban_routing/     # Recovered dependency-light reference implementation
+|-- backend/           # Python HTTP API
+|-- src/               # React application
+|-- data/              # Source/generated datasets and data-build scripts
+|-- report/            # Course report and VS Code build guide
+|-- docs/              # Documentation index
+|-- package.json       # Frontend commands and dependencies
+|-- requirements.txt   # Production Python dependencies
+`-- vite.config.js     # Frontend build and API proxy configuration
 ```
+
+More focused documentation lives beside the code it describes:
+
+- [`routing/README.md`](routing/README.md) for the production solver;
+- [`urban_routing/README.md`](urban_routing/README.md) for the recovered reference;
+- [`docs/README.md`](docs/README.md) for the documentation index;
+- [`report/README.md`](report/README.md) for report editing/building.
 
 ## Validation and build commands
 
 Build the frontend:
 
 ```powershell
+npm test
 npm run build
 ```
 
@@ -430,48 +422,3 @@ can disconnect otherwise reachable nodes.
 Choose Nearest Neighbor or Brute Force TSP. BFS, DFS, UCS, Dijkstra, A*,
 Greedy, and Hill Climbing are single-destination searches and intentionally
 reject `visit_nodes`.
-
-## Standalone `urban_routing` module
-
-The repository also includes a dependency-light, modular implementation in
-`urban_routing/`. It defines its own graph structures instead of using
-NetworkX and can be run independently from the full-stack application.
-
-### Cấu trúc thư mục
-Dự án được triển khai thành các file phân tách rõ ràng (Modular Design), tự định nghĩa cấu trúc đồ thị từ đầu (không phụ thuộc thư viện NetworkX) để bám sát bản chất thuật toán.
-
-### 1. `graph_model.py` (Mô hình Dữ liệu Đồ thị)
-Định nghĩa cấu trúc đồ thị cơ bản nhất.
-- **`Node`**: Lưu thông tin của một địa điểm (ID, Tên, Kinh độ, Vĩ độ).
-- **`Edge`**: Lưu thông tin đường đi nối giữa 2 địa điểm (Khoảng cách, Thời gian, Kẹt xe).
-- **`Graph`**: Lớp quản lý tổng thể, cung cấp hàm `add_node`, `add_edge`, và đặc biệt là `get_neighbors(node_id)` dùng để tìm các ngã rẽ xung quanh một điểm.
-
-### 2. `csv_handler.py` (Đọc Dữ liệu)
-- **`load_graph_from_csv()`**: Hàm đọc dữ liệu bản đồ từ 2 file `nodes_snapped.csv` và `edges.csv`. Hàm sẽ làm sạch dữ liệu, tự động bỏ qua các tuyến đường đang bị phong tỏa (closed), và nạp toàn bộ vào đối tượng `Graph`.
-
-### 3. `heuristics.py` (Hàm Chi phí & Đánh giá)
-- **`haversine_distance()`**: Hàm tính khoảng cách đường chim bay thực tế giữa 2 tọa độ GPS.
-- **`calculate_h(current, goal)`**: Cung cấp giá trị ước lượng $h(n)$ (Gợi ý cho thuật toán biết còn cách đích bao xa).
-- **`get_weights_by_profile(profile)`**: Cung cấp bộ trọng số linh hoạt tương ứng với 4 chiến thuật tìm đường: Cân bằng (`balanced`), Ngắn nhất (`shortest`), Nhanh nhất (`fastest`), và Tránh kẹt xe (`avoid_traffic`).
-- **`calculate_g_edge(edge, profile)`**: Tính chi phí thực tế $g(n)$ khi đi qua một cung đường tùy theo chiến thuật người dùng lựa chọn. Ví dụ nếu chọn `fastest`, trọng số thời gian sẽ được đẩy lên 80%.
-
-### 4. `algorithms.py` (Các Thuật toán Lõi)
-Trái tim của dự án, chứa các hàm giải thuật:
-
-**▶ Giải bài toán đi từ A đến B (2 điểm):**
-- **`a_star_search()`**: Thuật toán toàn diện nhất. Kết hợp cả chi phí đã đi $g(n)$ và ước lượng tương lai $h(n)$. Luôn đảm bảo tìm được đường đi tối ưu nhất.
-- **`greedy_bfs()`**: Tìm kiếm tham lam. Chỉ dòm vào tương lai $h(n)$. Thuật toán chạy cực nhanh nhưng lộ trình trả về thường đi đường vòng (không tối ưu).
-- **`hill_climbing()`**: Leo đồi. Cũng tham lam dựa vào $h(n)$ nhưng cực đoan hơn: không lưu vết lịch sử, không biết quay đầu. Nếu lỡ đi vào ngõ cụt thì thuật toán sẽ báo lỗi.
-
-**▶ Giải bài toán đi qua nhiều điểm (TSP - Giao hàng/Du lịch):**
-- **`nearest_neighbor_tsp()`**: Thuật toán Hàng xóm gần nhất. Từ vị trí hiện tại, cứ thấy điểm nào chưa đi mà gần nhất thì phóng tới đó. Tính toán cực nhanh nhưng lộ trình tổng thể chưa chắc là tốt nhất.
-- **`brute_force_tsp()`**: Duyệt cạn hoán vị. Gom hết mọi điểm cần đến ra sắp xếp thành mọi kịch bản có thể (A-B-C, A-C-B, C-A-B...). Tính khoảng cách của tất cả rồi lấy cái ngắn nhất. Chắc chắn tối ưu tuyệt đối nhưng chạy rất chậm nếu điểm đến quá nhiều.
-
-### 5. `main.py` (Thực thi)
-- Hàm **`main()`**: Nơi nối tất cả các file trên lại. Tải dữ liệu -> Gọi thuật toán (Đặc biệt có vòng lặp so sánh trực quan 4 chiến thuật: Balanced, Shortest, Fastest, Avoid_Traffic) -> In ra màn hình console kết quả chi tiết.
-
-## Cú pháp chạy chương trình
-Mở terminal/cmd lên và gõ:
-```bash
-python urban_routing/main.py
-```

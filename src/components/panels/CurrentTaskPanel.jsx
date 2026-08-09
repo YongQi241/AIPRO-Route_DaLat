@@ -18,7 +18,9 @@ const OUTCOME_LABELS = {
   add: 'Added to frontier',
   update: 'Frontier value updated',
   keep: 'Existing value kept',
-  unknown: 'Result not provided',
+  selected: 'Selected as next stop',
+  rejected: 'Higher score rejected',
+  unreachable: 'Location unreachable',
 }
 
 function createLocationLookup(nodes) {

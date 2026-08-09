@@ -16,7 +16,7 @@ from generate_edge_conditions import generate_edge_conditions
 
 BASE_DIR = Path(__file__).resolve().parent
 INPUT_FILE = BASE_DIR / "nodes.geojson"
-OUTPUT_DIR = BASE_DIR / "generated_routes_connected"
+OUTPUT_DIR = BASE_DIR / "generated"
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 # Local alternative links added in addition to the connectivity backbone.
@@ -326,11 +326,6 @@ def main() -> None:
     if strong_nodes == 0:
         raise RuntimeError("The strongly connected road component is empty.")
 
-    ox.io.save_graphml(
-        road_graph,
-        OUTPUT_DIR / "dalat_road_network_strong.graphml",
-    )
-
     print("3/6 Snapping every tourist location to that component...")
     nearest_road_nodes, snap_distances = ox.distance.nearest_nodes(
         road_graph,
@@ -519,11 +514,6 @@ def main() -> None:
         f"Median snap distance: {locations['snap_distance_m'].median():.1f} m",
         f"Duplicate snapped-road-node groups: {duplicate_snaps or 'None'}",
     ]
-
-    (OUTPUT_DIR / "connectivity_report.txt").write_text(
-        "\n".join(report_lines),
-        encoding="utf-8",
-    )
 
     print()
     print("\n".join(report_lines))

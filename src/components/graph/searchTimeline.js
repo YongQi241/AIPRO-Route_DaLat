@@ -7,8 +7,13 @@ const EMPTY_ACTION = Object.freeze({
   activeEdgeId: null,
   activeNeighborId: null,
   outcome: null,
+  selectionRule: null,
+  currentValues: null,
   oldValues: null,
   newValues: null,
+  selectedNodeId: null,
+  selectedScore: null,
+  selectionCandidates: [],
   frontierNodeIds: [],
   visitedNodeIds: [],
 })
@@ -57,11 +62,11 @@ function getComparableScore(entry) {
 
 function classifyRelaxation(beforeEntry, afterEntry) {
   if (!beforeEntry && afterEntry) return 'add'
-  if (!beforeEntry || !afterEntry) return 'unknown'
+  if (!afterEntry) return 'skip'
 
   const oldScore = getComparableScore(beforeEntry)
   const newScore = getComparableScore(afterEntry)
-  if (oldScore == null || newScore == null) return 'unknown'
+  if (oldScore == null || newScore == null) return 'keep'
 
   return newScore < oldScore ? 'update' : 'keep'
 }
@@ -91,6 +96,8 @@ function actionBase({
   candidates,
   frontierNodeIds,
   visitedNodeIds,
+  selectionRule = null,
+  currentValues = null,
 }) {
   return {
     frameIndex,
@@ -99,8 +106,13 @@ function actionBase({
     activeEdgeId: null,
     activeNeighborId: null,
     outcome: null,
+    selectionRule,
+    currentValues,
     oldValues: null,
     newValues: null,
+    selectedNodeId: null,
+    selectedScore: null,
+    selectionCandidates: [],
     frontierNodeIds,
     visitedNodeIds,
   }
@@ -108,6 +120,56 @@ function actionBase({
 
 function appendAction(actions, action) {
   actions.push({ ...action, actionIndex: actions.length })
+}
+
+function buildLocationSelectionActions({ actions, frame, frameIndex }) {
+  const currentNodeId = getTraceNodeId(frame.current)
+  if (!currentNodeId) return
+
+  const selectionCandidates = (frame.candidates ?? [])
+    .map((candidate) => {
+      const nodeId = getTraceNodeId(candidate)
+      if (!nodeId) return null
+      return {
+        nodeId,
+        reachable: candidate?.reachable !== false,
+        score: toFiniteNumber(candidate?.score),
+      }
+    })
+    .filter(Boolean)
+  const selectedNodeId = getTraceNodeId(frame.selected) || null
+  const selectedScore = toFiniteNumber(frame.selected_score)
+  const base = {
+    ...actionBase({
+      frameIndex,
+      currentNodeId,
+      candidates: [],
+      frontierNodeIds: selectionCandidates
+        .filter(({ reachable }) => reachable)
+        .map(({ nodeId }) => nodeId),
+      visitedNodeIds: [],
+      selectionRule: 'lowest_candidate_score',
+    }),
+    selectedNodeId,
+    selectedScore,
+    selectionCandidates,
+  }
+
+  appendAction(actions, { ...base, type: 'select-next-location' })
+  selectionCandidates.forEach(({ nodeId, reachable, score }) => {
+    appendAction(actions, {
+      ...base,
+      type: 'consider-location',
+      activeNeighborId: nodeId,
+      outcome: !reachable
+        ? 'unreachable'
+        : nodeId === selectedNodeId
+          ? 'selected'
+          : 'rejected',
+      newValues: normalizeTraceEntry({ node: nodeId, priority: score }),
+    })
+  })
+  appendAction(actions, { ...base, type: 'frame-complete' })
 }
 
 function buildFrameActions({
@@ -123,8 +185,12 @@ function buildFrameActions({
 
   const isSelectionFrame =
     Array.isArray(frame.candidates) || frame.selected != null
+  if (isSelectionFrame) {
+    buildLocationSelectionActions({ actions, frame, frameIndex })
+    return
+  }
   const candidates =
-    currentNodeId === goalNode || isSelectionFrame
+    currentNodeId === goalNode
       ? []
       : getCandidateEdges(edgeFeatures, currentNodeId)
   const beforeLookup = createFrontierLookup(previousFrame?.frontier)
@@ -139,19 +205,46 @@ function buildFrameActions({
     candidates,
     frontierNodeIds: [...beforeLookup.keys()],
     visitedNodeIds,
+    selectionRule: frame.selection_rule ?? null,
+    currentValues: frame.current_values
+      ? normalizeTraceEntry({
+          node: currentNodeId,
+          ...frame.current_values,
+        })
+      : null,
   })
 
   appendAction(actions, { ...base, type: 'expand' })
 
   const progressiveFrontier = new Map(beforeLookup)
   candidates.forEach(({ edgeId, toNode }) => {
-    const beforeEntry = beforeLookup.get(toNode) ?? null
-    const afterEntry = afterLookup.get(toNode) ?? null
-    const outcome = classifyRelaxation(beforeEntry, afterEntry)
+    const relaxation = (frame.relaxations ?? []).find(
+      (entry) =>
+        String(entry?.edge_id ?? '') === edgeId ||
+        String(entry?.node ?? '') === toNode,
+    )
+    const beforeEntry = relaxation?.previous_values
+      ? normalizeTraceEntry({
+          node: toNode,
+          ...relaxation.previous_values,
+        })
+      : beforeLookup.get(toNode) ?? null
+    const afterEntry = relaxation?.candidate_values
+      ? normalizeTraceEntry({
+          node: toNode,
+          ...relaxation.candidate_values,
+        })
+      : afterLookup.get(toNode) ?? null
+    const outcome =
+      relaxation?.outcome ?? classifyRelaxation(beforeEntry, afterEntry)
 
-    if ((outcome === 'add' || outcome === 'update') && afterEntry) {
-      progressiveFrontier.set(toNode, afterEntry)
+    if (outcome === 'add' || outcome === 'update') {
+      progressiveFrontier.set(
+        toNode,
+        afterLookup.get(toNode) ?? afterEntry,
+      )
     }
+    if (outcome === 'skip') progressiveFrontier.delete(toNode)
 
     appendAction(actions, {
       ...base,
@@ -201,7 +294,7 @@ function buildVisitedOrderActions(result, edgeFeatures) {
         type: 'consider-edge',
         activeEdgeId: edgeId,
         activeNeighborId: toNode,
-        outcome: 'unknown',
+        outcome: 'considered',
       })
     })
     appendAction(actions, { ...base, type: 'frame-complete' })
@@ -248,6 +341,17 @@ export function shouldShowFinalPath(result, simulationStatus, timelineLength) {
     result?.status === 'success' &&
     (simulationStatus === 'completed' || timelineLength === 0)
   )
+}
+
+export function getCompletedVisitedNodeIds(result, action = null) {
+  const visited = [
+    ...(result?.visited_order ?? []),
+    ...(action?.visitedNodeIds ?? []),
+  ]
+    .map(getTraceNodeId)
+    .filter(Boolean)
+
+  return [...new Set(visited)]
 }
 
 export function getSearchAnimationFrame(result, currentStep) {

@@ -7,7 +7,7 @@ import pandas as pd
 
 
 BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "generated_routes_connected"
+DATA_DIR = BASE_DIR / "generated"
 DEFAULT_SEED = 2026
 
 SCENARIOS = {
