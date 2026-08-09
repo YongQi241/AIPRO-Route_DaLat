@@ -1,8 +1,12 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { SIMULATION_STATUS, useAppStore } from '../../store/useAppStore'
+import { selectActiveScenarioCostData } from '../../services/scenarioCostModel'
 import EdgeLabelLayer from './EdgeLabelLayer'
+import EdgeHoverCard from './EdgeHoverCard'
 import FinalRouteLayer from './FinalRouteLayer'
-import { getEvaluatedCandidateEdgeIds } from './edgeDecision'
+import {
+  getEvaluatedCandidateEdgeIds,
+} from './edgeDecision'
 import { getLineCoordinates } from './graphGeometry'
 import { GRAPH_LEGEND_ITEMS } from './graphLegend'
 import { createNodeConnectionLookup } from './nodeConnections'
@@ -89,13 +93,18 @@ function createProjector(bounds) {
   ]
 }
 
-export default function GraphWorkspace({ className = '' }) {
+export default function GraphWorkspace({
+  className = '',
+  scenarioCostModel = null,
+}) {
   const dragRef = useRef(null)
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT)
   const [isPanning, setIsPanning] = useState(false)
   const [layoutMode, setLayoutMode] = useState('tree')
+  const [hoveredEdge, setHoveredEdge] = useState(null)
   const graphData = useAppStore((state) => state.graphData)
   const result = useAppStore((state) => state.routeResult)
+  const routeSelection = useAppStore((state) => state.routeSelection)
   const simulation = useAppStore((state) => state.simulation)
 
   const nodeFeatures = graphData.nodes?.features ?? []
@@ -105,6 +114,11 @@ export default function GraphWorkspace({ className = '' }) {
     [edgeFeatures, result],
   )
   const action = getSearchAction(actionTimeline, simulation.currentStep)
+  const activeCostData = selectActiveScenarioCostData(
+    scenarioCostModel?.data,
+    result,
+    routeSelection,
+  )
   const isSearchVisible =
     simulation.status !== SIMULATION_STATUS.IDLE &&
     simulation.status !== SIMULATION_STATUS.COMPLETED
@@ -133,6 +147,19 @@ export default function GraphWorkspace({ className = '' }) {
         candidateAction.actionIndex <= action.actionIndex,
     )
   }, [action, actionTimeline, isSearchComplete, isSearchVisible])
+  const scenarioEdgeCosts = useMemo(
+    () => new Map(
+      Object.entries(activeCostData?.edge_costs ?? {}).map(([edgeId, cost]) => [
+        String(edgeId),
+        Number(cost),
+      ]),
+    ),
+    [activeCostData?.edge_costs],
+  )
+  const closedEdgeIds = useMemo(
+    () => new Set((activeCostData?.closed_edge_ids ?? []).map(String)),
+    [activeCostData?.closed_edge_ids],
+  )
   const activeSearchEdgeIds = useMemo(() => {
     if (!isSearchVisible) return []
 
@@ -329,6 +356,10 @@ export default function GraphWorkspace({ className = '' }) {
     setViewport(INITIAL_VIEWPORT)
   }
 
+  const handleEdgeHover = useCallback((edge) => {
+    setHoveredEdge(edge)
+  }, [])
+
   if (graphData.error) {
     return (
       <section className={rootClassName} aria-label="Không gian đồ thị">
@@ -464,6 +495,7 @@ export default function GraphWorkspace({ className = '' }) {
             <RoadNetworkLayer
               features={displayEdgeFeatures}
               project={drawing.project}
+              onEdgeHover={handleEdgeHover}
             />
             <FinalRouteLayer
               features={displayEdgeFeatures}
@@ -471,6 +503,7 @@ export default function GraphWorkspace({ className = '' }) {
               pathEdgeIds={visiblePathEdges}
               segments={result?.segments}
               visible={isSuccessful && visiblePathEdges.length > 0}
+              onEdgeHover={handleEdgeHover}
             />
             <SearchTraversalLayer
               features={displayEdgeFeatures}
@@ -481,10 +514,14 @@ export default function GraphWorkspace({ className = '' }) {
               finalPathEdgeIds={
                 isSearchComplete ? result?.path_edges ?? [] : []
               }
+              onEdgeHover={handleEdgeHover}
             />
             <EdgeLabelLayer
               features={displayEdgeFeatures}
               project={drawing.project}
+              edgeCosts={scenarioEdgeCosts}
+              closedEdgeIds={closedEdgeIds}
+              onEdgeHover={handleEdgeHover}
             />
 
             <SearchAnimationLayer
@@ -498,6 +535,13 @@ export default function GraphWorkspace({ className = '' }) {
             />
           </g>
         </svg>
+        <EdgeHoverCard
+          edge={hoveredEdge}
+          detail={activeCostData?.edge_cost_details?.[hoveredEdge?.edgeId]}
+          formula={activeCostData?.edge_cost_formula}
+          scenarioId={routeSelection.scenarioId}
+          optimization={routeSelection.optimization}
+        />
       </div>
 
       <ul className="graph-workspace__legend" aria-label="Chú thích đồ thị">

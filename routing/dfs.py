@@ -56,6 +56,7 @@ def dfs_search(
             frontier_steps.append(
                 {
                     "current": current,
+                    "selection_rule": "lifo_stack",
                     # Next stack item appears first for the GUI.
                     "frontier": list(reversed(stack)),
                     "visited": visited_order.copy(),
@@ -75,6 +76,7 @@ def dfs_search(
         frontier_steps.append(
             {
                 "current": current,
+                "selection_rule": "lifo_stack",
                 "frontier": list(reversed(stack)),
                 "visited": visited_order.copy(),
             }

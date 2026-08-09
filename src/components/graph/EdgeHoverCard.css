@@ -1,0 +1,116 @@
+.edge-hover-card {
+  position: absolute;
+  z-index: 4;
+  right: 14px;
+  bottom: 14px;
+  width: min(520px, calc(100% - 28px));
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  color: #334155;
+  background: rgb(255 255 255 / 97%);
+  box-shadow: 0 12px 30px rgb(15 23 42 / 18%);
+  font-size: 0.72rem;
+  pointer-events: none;
+}
+
+.edge-hover-card header,
+.edge-hover-card header div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.edge-hover-card header div {
+  flex-direction: column;
+  gap: 2px;
+}
+
+.edge-hover-card header span,
+.edge-hover-card h3 {
+  color: #64748b;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.edge-hover-card header b {
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: #166534;
+  background: #dcfce7;
+  white-space: nowrap;
+}
+
+.edge-hover-card header b.is-closed {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.edge-hover-card__reason {
+  padding: 7px 9px;
+  margin: 9px 0;
+  border-left: 3px solid #f59e0b;
+  background: #fffbeb;
+}
+
+.edge-hover-card__unavailable {
+  margin: 9px 0 0;
+  color: #64748b;
+}
+
+.edge-hover-card section {
+  margin-top: 9px;
+}
+
+.edge-hover-card h3 {
+  margin: 0 0 5px;
+}
+
+.edge-hover-card dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px 12px;
+  margin: 0;
+}
+
+.edge-hover-card dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.edge-hover-card dt {
+  color: #64748b;
+}
+
+.edge-hover-card dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.edge-hover-card footer {
+  display: grid;
+  gap: 4px;
+  padding-top: 9px;
+  margin-top: 9px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.edge-hover-card code {
+  overflow-wrap: anywhere;
+  color: #1e3a8a;
+  font-size: 0.68rem;
+  white-space: normal;
+}
+
+.edge-hover-card footer small {
+  color: #64748b;
+}
+
+.edge-hover-card footer > strong {
+  color: #166534;
+  font-size: 0.82rem;
+}

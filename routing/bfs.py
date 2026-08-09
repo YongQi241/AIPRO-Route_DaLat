@@ -55,6 +55,7 @@ def bfs_search(
         frontier_steps.append(
             {
                 "current": current,
+                "selection_rule": "fifo_queue",
                 "frontier": list(frontier),
                 "visited": visited_order.copy(),
             }

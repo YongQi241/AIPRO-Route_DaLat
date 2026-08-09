@@ -169,6 +169,19 @@ test('uses exact A* relaxation g, h, and f costs when provided', () => {
   })
 })
 
+test('normalizes legacy Greedy current_h for readable explanations', () => {
+  const timeline = buildSearchActionTimeline({
+    status: 'success',
+    frontier_steps: [{
+      current: 'A', current_h: 3.25, frontier: [], visited: ['A'],
+    }],
+  }, edges)
+
+  assert.deepEqual(timeline[0].currentValues, {
+    nodeId: 'A', gCost: null, hCost: 3.25, fCost: null, priority: 3.25,
+  })
+})
+
 test('uses CONSIDERED for visited-order-only traces', () => {
   const timeline = buildSearchActionTimeline(
     {

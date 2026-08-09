@@ -10,8 +10,7 @@ from .bfs import bfs_search
 from .brute_force_tsp import brute_force_tsp_route
 from .dfs import dfs_search
 from .dijkstra import dijkstra_search
-from .graph_loader import load_graph
-from .graph_loader import DATA_DIR
+from .graph_loader import DATA_DIR, OPTIMIZATION_PROFILES, load_graph
 from .greedy_best_first import greedy_best_first_search
 from .hill_climbing import hill_climbing_search
 from .nearest_neighbor import nearest_neighbor_route
@@ -53,6 +52,122 @@ SINGLE_ROUTE_ALGORITHMS = {
 MULTI_ROUTE_ALGORITHMS = {"nearest_neighbor", "brute_force_tsp"}
 
 
+def _is_true(value: Any) -> bool:
+    return str(value).strip().lower() in {"true", "1", "yes"}
+
+
+def _attach_scenario_edge_costs(
+    result: dict[str, Any],
+    graph: Any,
+    data_dir: str | Path,
+    scenario_id: str,
+    optimization: str,
+) -> dict[str, Any]:
+    """Expose local scenario costs used by the graph for UI edge labels."""
+
+    alpha, beta, gamma, delta = OPTIMIZATION_PROFILES[optimization]
+    weights = {
+        "distance": alpha,
+        "time": beta,
+        "congestion": gamma,
+        "risk": delta,
+    }
+    graph_edges = {
+        str(data["edge_id"]): data for _, _, data in graph.edges(data=True)
+    }
+    result["edge_costs"] = {
+        edge_id: round(float(data.get("route_cost", 0.0)), 6)
+        for edge_id, data in graph_edges.items()
+    }
+
+    edges = pd.read_csv(Path(data_dir) / "edges.csv")
+    conditions = pd.read_csv(Path(data_dir) / "edge_conditions.csv")
+    scenario_rows = conditions.loc[
+        conditions["scenario_id"] == scenario_id
+    ]
+    condition_by_edge = {
+        str(row.edge_id): row for row in scenario_rows.itertuples(index=False)
+    }
+    scenario_closed = {
+        str(row.edge_id)
+        for row in scenario_rows.itertuples(index=False)
+        if _is_true(row.closed)
+    }
+    base_closed = {
+        str(row.edge_id)
+        for row in edges.itertuples(index=False)
+        if _is_true(row.closed)
+    }
+    result["closed_edge_ids"] = sorted(base_closed | scenario_closed)
+    details: dict[str, dict[str, Any]] = {}
+    for row in edges.itertuples(index=False):
+        edge_id = str(row.edge_id)
+        condition = condition_by_edge.get(edge_id)
+        data = graph_edges.get(edge_id)
+        closed = edge_id in base_closed or edge_id in scenario_closed
+        detail: dict[str, Any] = {
+            "closed": closed,
+            "distance_km": float(row.distance_km),
+            "base_time_min": float(row.base_time_min),
+            "base_congestion": float(row.congestion_level),
+            "base_risk": float(row.risk_score),
+            "scenario_name": (
+                str(condition.scenario_name) if condition is not None else scenario_id
+            ),
+            "scenario_congestion": (
+                float(condition.congestion_level)
+                if condition is not None
+                else float(row.congestion_level)
+            ),
+            "time_multiplier": (
+                float(condition.time_multiplier) if condition is not None else 1.0
+            ),
+            "rain_risk": (
+                float(condition.rain_risk) if condition is not None else 0.0
+            ),
+            "fog_risk": (
+                float(condition.fog_risk) if condition is not None else 0.0
+            ),
+            "construction_penalty": (
+                float(condition.construction_penalty)
+                if condition is not None
+                else 0.0
+            ),
+        }
+        if data is not None:
+            normalized = {
+                "distance": float(data["distance_norm"]),
+                "time": float(data["time_norm"]),
+                "congestion": float(data["congestion_norm"]),
+                "risk": float(data["risk_norm"]),
+            }
+            detail.update(
+                {
+                    "adjusted_time_min": float(data["adjusted_time_min"]),
+                    "effective_congestion": float(data["congestion"]),
+                    "total_risk": float(data["risk"]),
+                    "normalized": normalized,
+                    "contributions": {
+                        key: weights[key] * normalized[key] for key in weights
+                    },
+                    "route_cost": float(data["route_cost"]),
+                }
+            )
+        details[edge_id] = detail
+
+    result["edge_cost_details"] = details
+    result["edge_cost_formula"] = {
+        "optimization": optimization,
+        "expression": (
+            "cost = α·distance_norm + β·time_norm + "
+            "γ·congestion_norm + δ·risk_norm"
+        ),
+        "weights": weights,
+    }
+    result["edge_cost_kind"] = "scenario_route_cost"
+    return result
+
+
 def normalize_algorithm(algorithm: str) -> str:
     """Normalize GUI labels and common aliases to internal names."""
 
@@ -88,6 +203,33 @@ def normalize_optimization(optimization: str) -> str:
     }
     normalized = optimization.strip().lower()
     return aliases.get(normalized, normalized)
+
+
+def get_scenario_edge_costs(
+    scenario_id: str = "S0",
+    optimization: str = "balanced",
+    *,
+    data_dir: str | Path = DATA_DIR,
+) -> dict[str, Any]:
+    """Calculate edge costs without running a route-search algorithm."""
+
+    loader_optimization = normalize_optimization(optimization)
+    graph = load_graph(
+        scenario_id=scenario_id,
+        optimization=loader_optimization,
+        data_dir=data_dir,
+    )
+    return _attach_scenario_edge_costs(
+        {
+            "status": "success",
+            "scenario_id": scenario_id,
+            "optimization": optimization,
+        },
+        graph,
+        data_dir,
+        scenario_id,
+        loader_optimization,
+    )
 
 
 def solve_route(
@@ -133,6 +275,9 @@ def solve_route(
             data_dir=data_dir,
         )
         selected_weight = weight or optimization_weight(optimization)
+        finish = lambda result: _attach_scenario_edge_costs(
+            result, graph, data_dir, scenario_id, loader_optimization
+        )
 
         common = {
             "scenario_id": scenario_id,
@@ -146,51 +291,51 @@ def solve_route(
                 goal_node,
                 **common,
             )
-            return result
+            return finish(result)
 
         if normalized_algorithm == "dfs":
-            return dfs_search(
+            return finish(dfs_search(
                 graph,
                 start_node,
                 goal_node,
                 **common,
-            )
+            ))
 
         if normalized_algorithm == "ucs":
-            return ucs_search(
+            return finish(ucs_search(
                 graph,
                 start_node,
                 goal_node,
                 **common,
-            )
+            ))
 
         if normalized_algorithm == "dijkstra":
-            return dijkstra_search(
+            return finish(dijkstra_search(
                 graph,
                 start_node,
                 goal_node,
                 weight=selected_weight,
                 **common,
-            )
+            ))
 
         if normalized_algorithm == "astar":
-            return a_star_search(
+            return finish(a_star_search(
                 graph,
                 start_node,
                 goal_node,
                 weight=selected_weight,
                 maximum_speed_kph=maximum_speed_kph,
                 **common,
-            )
+            ))
 
         if normalized_algorithm == "greedy":
-            return greedy_best_first_search(
+            return finish(greedy_best_first_search(
                 graph, start_node, goal_node, **common,
-            )
+            ))
 
-        return hill_climbing_search(
+        return finish(hill_climbing_search(
             graph, start_node, goal_node, **common,
-        )
+        ))
 
     except (
         FileNotFoundError,
@@ -250,9 +395,12 @@ def solve_multi_location(
             data_dir=data_dir,
         )
         selected_weight = weight or optimization_weight(optimization)
+        finish = lambda result: _attach_scenario_edge_costs(
+            result, graph, data_dir, scenario_id, loader_optimization
+        )
 
         if normalized_algorithm == "nearest_neighbor":
-            return nearest_neighbor_route(
+            return finish(nearest_neighbor_route(
                 graph,
                 start_node,
                 visit_nodes,
@@ -260,9 +408,9 @@ def solve_multi_location(
                 return_to_start=return_to_start,
                 scenario_id=scenario_id,
                 optimization=optimization,
-            )
+            ))
 
-        return brute_force_tsp_route(
+        return finish(brute_force_tsp_route(
             graph,
             start_node,
             visit_nodes,
@@ -270,7 +418,7 @@ def solve_multi_location(
             return_to_start=return_to_start,
             scenario_id=scenario_id,
             optimization=optimization,
-        )
+        ))
 
     except Exception as error:
         return _multi_error_result(

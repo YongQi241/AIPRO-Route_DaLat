@@ -6,11 +6,12 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from routing import solve
 from routing.solver import (
     MULTI_ROUTE_ALGORITHMS,
+    get_scenario_edge_costs,
     normalize_algorithm,
 )
 
@@ -152,7 +153,8 @@ class RouteRequestHandler(BaseHTTPRequestHandler):
         self._send_json({})
 
     def do_GET(self) -> None:
-        path = urlparse(self.path).path
+        parsed_url = urlparse(self.path)
+        path = parsed_url.path
         if path == "/api/health":
             self._send_json(
                 {
@@ -170,6 +172,29 @@ class RouteRequestHandler(BaseHTTPRequestHandler):
                     "algorithms": ALGORITHM_CAPABILITIES,
                 }
             )
+            return
+        if path == "/api/graph/edge-costs":
+            query = parse_qs(parsed_url.query)
+            scenario_id = query.get("scenario_id", ["S0"])[0]
+            optimization = query.get("optimization", ["balanced"])[0]
+            try:
+                payload = get_scenario_edge_costs(
+                    scenario_id=scenario_id,
+                    optimization=optimization,
+                    data_dir=DATA_DIR,
+                )
+                payload["api_version"] = API_VERSION
+                self._send_json(payload)
+            except Exception as error:
+                self._send_json(
+                    {
+                        "status": "invalid_input",
+                        "scenario_id": scenario_id,
+                        "optimization": optimization,
+                        "message": f"{type(error).__name__}: {error}",
+                    },
+                    HTTPStatus.BAD_REQUEST,
+                )
             return
         self._send_json(
             {"status": "not_found", "message": "Endpoint not found."},

@@ -5,6 +5,7 @@ import './RoadNetworkLayer.css'
 export default function RoadNetworkLayer({
   features = [],
   project,
+  onEdgeHover,
 }) {
   const drawableEdges = useMemo(
     () => createDrawableEdges(features, project),
@@ -25,14 +26,20 @@ export default function RoadNetworkLayer({
               .join(' ')
 
             return (
-              <path key={path.id} className={className} d={path.value}>
-                <title>
-                  {edge.edgeId}: {edge.fromNode} → {edge.toNode}
-                  {edge.closed
-                    ? ' · closed'
-                    : ` · congestion ${edge.congestion}`}
-                </title>
-              </path>
+              <g key={path.id}>
+                <path
+                  className={className}
+                  d={path.value}
+                  aria-label={`${edge.edgeId}: ${edge.fromNode} to ${edge.toNode}`}
+                />
+                <path
+                  className="road-network-layer__edge-hitbox"
+                  d={path.value}
+                  aria-hidden="true"
+                  onPointerEnter={() => onEdgeHover?.(edge)}
+                  onPointerLeave={() => onEdgeHover?.(null)}
+                />
+              </g>
             )
           }),
         )}

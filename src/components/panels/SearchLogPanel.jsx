@@ -1,79 +1,12 @@
 import { useEffect, useMemo, useRef } from 'react'
-import {
-  buildSearchActionTimeline,
-} from '../graph/searchTimeline'
-import { describeCandidateEdgeDecision } from '../graph/edgeDecision'
-import { describeLocationDecision } from '../graph/locationDecision'
+import { buildSearchActionTimeline } from '../graph/searchTimeline'
 import { SIMULATION_STATUS, useAppStore } from '../../store/useAppStore'
+import { describeTraceAction } from './traceNarrative'
 import './SearchLogPanel.css'
-
-function describeAction(action, actions) {
-  if (action.type === 'select-next-location') {
-    return {
-      title: `Choose the next stop from ${action.currentNodeId}`,
-      detail: `Compare ${action.selectionCandidates.length} remaining locations; the lowest reachable Dijkstra score wins.`,
-    }
-  }
-
-  if (action.type === 'expand') {
-    return {
-      title: `Expand ${action.currentNodeId}`,
-      detail:
-        action.candidateEdgeIds.length > 0
-          ? `Outgoing candidates: ${action.candidateEdgeIds.join(', ')}`
-          : 'No outgoing candidates in this trace',
-    }
-  }
-
-  if (action.type === 'consider-edge') {
-    const evaluatedAtThisPoint = actions.filter(
-      (candidateAction) =>
-        candidateAction.type === 'consider-edge' &&
-        candidateAction.frameIndex === action.frameIndex &&
-        candidateAction.actionIndex <= action.actionIndex,
-    )
-    const reason = describeCandidateEdgeDecision(
-      action.activeEdgeId,
-      evaluatedAtThisPoint,
-    )
-
-    return {
-      title: `Consider ${action.activeEdgeId}: ${action.currentNodeId} → ${action.activeNeighborId}`,
-      detail: `${action.outcome.toUpperCase()} · ${reason}`,
-    }
-  }
-
-  if (action.type === 'consider-location') {
-    return {
-      title: `Compare location ${action.activeNeighborId}`,
-      detail: `${action.outcome.toUpperCase()} · ${describeLocationDecision(action)}`,
-    }
-  }
-
-  if (action.type === 'frame-complete') {
-    if (action.selectionRule === 'lowest_candidate_score') {
-      return {
-        title: `Selected ${action.selectedNodeId} after comparing all locations`,
-        detail: `Lowest reachable score: ${action.selectedScore ?? 'not recorded'}`,
-      }
-    }
-    return {
-      title: `Finish expanding ${action.currentNodeId}`,
-      detail:
-        action.frontierNodeIds.length > 0
-          ? `Frontier: ${action.frontierNodeIds.join(', ')}`
-          : 'Frontier is empty',
-    }
-  }
-
-  return {
-    title: 'Search playback complete',
-    detail: 'The final route can now be displayed',
-  }
-}
 
 export default function SearchLogPanel({ className = '' }) {
   const result = useAppStore((state) => state.routeResult)
+  const graphNodes = useAppStore((state) => state.graphData.nodes)
   const graphEdges = useAppStore((state) => state.graphData.edges)
   const edgeFeatures = graphEdges?.features ?? []
   const simulation = useAppStore((state) => state.simulation)
@@ -82,6 +15,15 @@ export default function SearchLogPanel({ className = '' }) {
   const actions = useMemo(
     () => buildSearchActionTimeline(result, edgeFeatures),
     [edgeFeatures, result],
+  )
+  const locationNames = useMemo(
+    () => new Map(
+      (graphNodes?.features ?? []).map(({ properties = {} }) => [
+        String(properties.node_id),
+        properties.name_vi ?? properties.name_en ?? properties.node_id,
+      ]),
+    ),
+    [graphNodes],
   )
   const visibleActions =
     simulation.status === SIMULATION_STATUS.IDLE
@@ -127,7 +69,11 @@ export default function SearchLogPanel({ className = '' }) {
         <ol className="search-log-panel__list">
           {visibleActions.map((action, index) => {
             const isActive = index === visibleActions.length - 1
-            const event = describeAction(action, actions)
+            const event = describeTraceAction(action, actions, {
+              algorithm: result?.algorithm,
+              edgeCostDetails: result?.edge_cost_details,
+              locationNames,
+            })
 
             return (
               <li
@@ -140,7 +86,7 @@ export default function SearchLogPanel({ className = '' }) {
                 </span>
                 <span className="search-log-panel__event">
                   <strong>{event.title}</strong>
-                  <small>{event.detail}</small>
+                  <p>{event.detail}</p>
                 </span>
               </li>
             )

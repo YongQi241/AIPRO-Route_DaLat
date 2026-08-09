@@ -9,6 +9,13 @@ import pandas as pd
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "generated"
 
+OPTIMIZATION_PROFILES = {
+    "shortest": (0.80, 0.15, 0.03, 0.02),
+    "fastest": (0.10, 0.75, 0.10, 0.05),
+    "balanced": (0.20, 0.50, 0.15, 0.15),
+    "safest": (0.10, 0.25, 0.10, 0.55),
+}
+
 
 def parse_bool(series: pd.Series) -> pd.Series:
     """
@@ -138,17 +145,10 @@ def load_scenario(
         edges["effective_congestion"] / 5.0
     )
 
-    profiles = {
-        "shortest": (0.80, 0.15, 0.03, 0.02),
-        "fastest": (0.10, 0.75, 0.10, 0.05),
-        "balanced": (0.20, 0.50, 0.15, 0.15),
-        "safest": (0.10, 0.25, 0.10, 0.55),
-    }
-
-    if optimization not in profiles:
+    if optimization not in OPTIMIZATION_PROFILES:
         raise ValueError("Unknown optimization profile.")
 
-    alpha, beta, gamma, delta = profiles[
+    alpha, beta, gamma, delta = OPTIMIZATION_PROFILES[
         optimization
     ]
 
@@ -194,8 +194,18 @@ def build_graph(
             distance_km=float(edge.distance_km),
             base_time_min=float(edge.base_time_min),
             adjusted_time_min=float(edge.adjusted_time_min),
+            time_multiplier=float(edge.time_multiplier),
             congestion=float(edge.effective_congestion),
+            base_congestion=float(edge.congestion_level),
+            rain_risk=float(edge.rain_risk),
+            fog_risk=float(edge.fog_risk),
+            construction_penalty=float(edge.construction_penalty),
+            base_risk=float(edge.risk_score),
             risk=float(edge.total_risk),
+            distance_norm=float(edge.distance_norm),
+            time_norm=float(edge.time_norm),
+            congestion_norm=float(edge.congestion_norm),
+            risk_norm=float(edge.risk_norm),
             route_cost=float(edge.route_cost),
             road_type=edge.road_type,
         )

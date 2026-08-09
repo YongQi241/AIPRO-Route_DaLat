@@ -49,6 +49,7 @@ def hill_climbing_search(
         if current == goal_node:
             break
 
+        current_score = float(estimate(graph, current, goal_node))
         candidates = []
         for neighbor in graph.successors(current):
             if neighbor in visited:
@@ -62,6 +63,11 @@ def hill_climbing_search(
         frontier_steps.append(
             {
                 "current": current,
+                "current_values": {
+                    "h_cost": round(current_score, 6),
+                    "priority": round(current_score, 6),
+                },
+                "selection_rule": "lowest_neighbor_h_cost",
                 "frontier": [
                     {"node": node, "priority": round(score, 6), "h_cost": round(score, 6)}
                     for score, node in candidates
@@ -71,7 +77,6 @@ def hill_climbing_search(
         )
 
         if candidates:
-            current_score = float(estimate(graph, current, goal_node))
             best_score, next_node = candidates[0]
             if best_score >= current_score:
                 escape_moves += 1

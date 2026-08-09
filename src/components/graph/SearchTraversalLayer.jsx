@@ -15,7 +15,7 @@ function resolveEdges(edgeLookup, edgeIds, kind) {
     .filter(Boolean)
 }
 
-function EdgePaths({ edge, keyPrefix }) {
+function EdgePaths({ edge, keyPrefix, onEdgeHover }) {
   return edge.paths.map((path) => (
     <path
       key={`${keyPrefix}-${edge.highlightIndex}-${path.id}`}
@@ -25,12 +25,9 @@ function EdgePaths({ edge, keyPrefix }) {
       ].join(' ')}
       d={path.value}
       aria-label={`${edge.fromNode} to ${edge.toNode}: ${edge.reason ?? 'inferred path'}`}
-    >
-      <title>
-        {edge.fromNode} → {edge.toNode} ({edge.edgeId}):{' '}
-        {edge.reason ?? 'Inferred path to current node.'}
-      </title>
-    </path>
+      onPointerEnter={() => onEdgeHover?.(edge)}
+      onPointerLeave={() => onEdgeHover?.(null)}
+    />
   ))
 }
 
@@ -41,6 +38,7 @@ export default function SearchTraversalLayer({
   candidateEdgeIds = [],
   evaluatedCandidateActions = [],
   finalPathEdgeIds = [],
+  onEdgeHover,
 }) {
   const highlights = useMemo(() => {
     if (!project) return { branch: [], trace: [] }
@@ -119,6 +117,7 @@ export default function SearchTraversalLayer({
             key={`branch-${edge.edgeId}`}
             edge={edge}
             keyPrefix="branch"
+            onEdgeHover={onEdgeHover}
           />
         ))}
       </g>
@@ -128,6 +127,7 @@ export default function SearchTraversalLayer({
             key={`trace-${edge.edgeId}`}
             edge={edge}
             keyPrefix="trace"
+            onEdgeHover={onEdgeHover}
           />
         ))}
       </g>

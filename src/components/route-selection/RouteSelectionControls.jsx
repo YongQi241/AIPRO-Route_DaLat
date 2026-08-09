@@ -4,6 +4,7 @@ import {
   isMultiLocationAlgorithm,
 } from '../../services/routeRequest'
 import { useAppStore } from '../../store/useAppStore'
+import ScenarioFormulaPanel from './ScenarioFormulaPanel'
 import './RouteSelectionControls.css'
 
 const DEFAULT_SCENARIOS = [
@@ -33,6 +34,7 @@ export default function RouteSelectionControls({
   onSolve,
   disabled = false,
   className = '',
+  scenarioCostModel = null,
 }) {
   const [intermediateDraft, setIntermediateDraft] = useState('')
 
@@ -187,6 +189,11 @@ export default function RouteSelectionControls({
           Find route
         </button>
       </fieldset>
+
+      <ScenarioFormulaPanel
+        selection={routeSelection}
+        costModel={scenarioCostModel}
+      />
 
       <div
         className={`route-selection__intermediate${

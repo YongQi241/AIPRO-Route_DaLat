@@ -8,6 +8,7 @@ export default function FinalRouteLayer({
   pathEdgeIds = [],
   segments = [],
   visible = false,
+  onEdgeHover,
 }) {
   const orderedRoute = useMemo(() => {
     if (!visible || !project || pathEdgeIds.length === 0) return []
@@ -77,14 +78,10 @@ export default function FinalRouteLayer({
                 .join(' ')}
               d={path.value}
               style={{ '--route-index': edge.routeIndex }}
-            >
-              <title>
-                Segment {edge.routeIndex + 1}: {edge.edgeId} · {edge.fromNode} →
-                {edge.toNode}
-                {` · congestion ${congestion}`}
-                {risk > 0 ? ` · risk ${risk}` : ''}
-              </title>
-            </path>
+              aria-label={`Segment ${edge.routeIndex + 1}: ${edge.edgeId}, ${edge.fromNode} to ${edge.toNode}`}
+              onPointerEnter={() => onEdgeHover?.(edge)}
+              onPointerLeave={() => onEdgeHover?.(null)}
+            />
           )
         }),
       )}

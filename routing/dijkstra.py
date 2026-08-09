@@ -87,6 +87,11 @@ def dijkstra_search(
             frontier_steps.append(
                 {
                     "current": current,
+                    "current_values": {
+                        "g_cost": round(current_distance, 6),
+                        "priority": round(current_distance, 6),
+                    },
+                    "selection_rule": "lowest_g_cost",
                     "frontier": _frontier_snapshot(
                         frontier,
                         settled,
@@ -112,6 +117,11 @@ def dijkstra_search(
         frontier_steps.append(
             {
                 "current": current,
+                "current_values": {
+                    "g_cost": round(current_distance, 6),
+                    "priority": round(current_distance, 6),
+                },
+                "selection_rule": "lowest_g_cost",
                 "frontier": _frontier_snapshot(
                     frontier,
                     settled,

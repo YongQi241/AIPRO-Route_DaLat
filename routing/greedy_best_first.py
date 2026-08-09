@@ -83,6 +83,11 @@ def greedy_best_first_search(
                 {
                     "current": current,
                     "current_h": round(current_h, 6),
+                    "current_values": {
+                        "h_cost": round(current_h, 6),
+                        "priority": round(current_h, 6),
+                    },
+                    "selection_rule": "lowest_h_cost",
                     "frontier": _frontier_snapshot(frontier),
                     "visited": visited_order.copy(),
                 }
@@ -111,6 +116,11 @@ def greedy_best_first_search(
             {
                 "current": current,
                 "current_h": round(current_h, 6),
+                "current_values": {
+                    "h_cost": round(current_h, 6),
+                    "priority": round(current_h, 6),
+                },
+                "selection_rule": "lowest_h_cost",
                 "frontier": _frontier_snapshot(frontier),
                 "visited": visited_order.copy(),
             }

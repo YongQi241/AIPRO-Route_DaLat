@@ -97,12 +97,12 @@
   font-size: 0.72rem;
 }
 
-.search-log-panel__event small {
-  overflow: hidden;
+.search-log-panel__event p {
+  margin: 0;
   color: #64748b;
   font-size: 0.66rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.45;
+  white-space: normal;
 }
 
 .search-log-panel__empty {

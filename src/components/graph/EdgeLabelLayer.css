@@ -10,5 +10,7 @@
   stroke: rgb(255 255 255 / 94%);
   stroke-linejoin: round;
   stroke-width: 3px;
+  cursor: help;
+  pointer-events: all;
   user-select: none;
 }

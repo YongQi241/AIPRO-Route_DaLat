@@ -11,6 +11,14 @@
     opacity 180ms ease;
 }
 
+.road-network-layer__edge-hitbox {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 12;
+  cursor: help;
+  pointer-events: stroke;
+}
+
 .road-network-layer__edge--congested {
   stroke: #fdba74;
 }

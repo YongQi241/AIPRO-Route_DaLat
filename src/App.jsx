@@ -8,11 +8,13 @@ import BottomPanelTabs from './components/panels/BottomPanelTabs'
 import RouteSelectionControls from './components/route-selection/RouteSelectionControls'
 import { useGraphData } from './hooks/useGraphData'
 import { useRouteSolver } from './hooks/useRouteSolver'
+import { useScenarioEdgeCosts } from './hooks/useScenarioEdgeCosts'
 import { useAppStore } from './store/useAppStore'
 
 export default function App() {
   useGraphData()
   const { isSolving, runRouteSearch } = useRouteSolver()
+  const scenarioCostModel = useScenarioEdgeCosts()
   const nodes = useAppStore((state) => state.graphData.nodes)
   const locations = useMemo(() => {
     if (!nodes?.features) return []
@@ -32,11 +34,12 @@ export default function App() {
             locations={locations}
             onSolve={runRouteSearch}
             disabled={isSolving}
+            scenarioCostModel={scenarioCostModel}
           />
           <StatusMessage />
         </>
       }
-      workspace={<GraphWorkspace />}
+      workspace={<GraphWorkspace scenarioCostModel={scenarioCostModel} />}
       sidebar={<AlgorithmSidebar />}
       bottomPanel={<BottomPanelTabs />}
     />

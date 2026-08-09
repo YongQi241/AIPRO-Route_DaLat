@@ -211,7 +211,13 @@ function buildFrameActions({
           node: currentNodeId,
           ...frame.current_values,
         })
-      : null,
+      : frame.current_h != null
+        ? normalizeTraceEntry({
+            node: currentNodeId,
+            h_cost: frame.current_h,
+            priority: frame.current_h,
+          })
+        : null,
   })
 
   appendAction(actions, { ...base, type: 'expand' })
