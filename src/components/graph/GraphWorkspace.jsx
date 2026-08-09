@@ -2,15 +2,16 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import { SIMULATION_STATUS, useAppStore } from '../../store/useAppStore'
 import FinalRouteLayer from './FinalRouteLayer'
 import { getLineCoordinates } from './graphGeometry'
+import { GRAPH_LEGEND_ITEMS } from './graphLegend'
 import RoadNetworkLayer from './RoadNetworkLayer'
-import SearchAnimationLayer, {
-  getSearchAnimationFrame,
-} from './SearchAnimationLayer'
+import SearchAnimationLayer from './SearchAnimationLayer'
 import SearchTraversalLayer from './SearchTraversalLayer'
 import { createTopologyLayout } from './topologyLayout'
 import {
-  getActiveSearchBranchEdgeIds,
-  getConfirmedRoutePrefix,
+  buildSearchActionTimeline,
+  getInferredSearchBranchEdgeIds,
+  getSearchAction,
+  shouldShowFinalPath,
 } from './searchTimeline'
 import './GraphWorkspace.css'
 
@@ -96,23 +97,29 @@ export default function GraphWorkspace({ className = '' }) {
 
   const nodeFeatures = graphData.nodes?.features ?? []
   const edgeFeatures = graphData.edges?.features ?? []
-  const frame = useMemo(
-    () => getSearchAnimationFrame(result, simulation.currentStep),
-    [result, simulation.currentStep],
+  const actionTimeline = useMemo(
+    () => buildSearchActionTimeline(result, edgeFeatures),
+    [edgeFeatures, result],
   )
-  const confirmedRoute = useMemo(
-    () => getConfirmedRoutePrefix(result, frame),
-    [frame, result],
-  )
-  const activeSearchEdgeIds = useMemo(
-    () =>
-      getActiveSearchBranchEdgeIds(
-        result,
-        simulation.currentStep,
-        edgeFeatures,
-      ),
-    [edgeFeatures, result, simulation.currentStep],
-  )
+  const action = getSearchAction(actionTimeline, simulation.currentStep)
+  const isSearchVisible =
+    simulation.status !== SIMULATION_STATUS.IDLE &&
+    simulation.status !== SIMULATION_STATUS.COMPLETED
+  const visibleAction = isSearchVisible ? action : null
+  const activeSearchEdgeIds = useMemo(() => {
+    if (!isSearchVisible) return []
+
+    return getInferredSearchBranchEdgeIds(
+      result,
+      action.frameIndex,
+      edgeFeatures,
+    )
+  }, [
+    action.frameIndex,
+    edgeFeatures,
+    isSearchVisible,
+    result,
+  ])
 
   const treeLayout = useMemo(
     () =>
@@ -181,12 +188,12 @@ export default function GraphWorkspace({ className = '' }) {
   }, [edgeFeatures, layoutMode, nodeFeatures, treeLayout.positions])
 
   const isSuccessful = result?.status === 'success'
-  const showFinalPath =
-    isSuccessful &&
-    (simulation.status === SIMULATION_STATUS.COMPLETED ||
-      frame.totalSteps === 0)
+  const showFinalPath = shouldShowFinalPath(
+    result,
+    simulation.status,
+    actionTimeline.length,
+  )
   const visiblePathEdges = showFinalPath ? (result?.path_edges ?? []) : []
-  const visiblePathNodes = showFinalPath ? (result?.path_nodes ?? []) : []
   const rootClassName = ['graph-workspace', className]
     .filter(Boolean)
     .join(' ')
@@ -327,8 +334,13 @@ export default function GraphWorkspace({ className = '' }) {
           </p>
         </div>
         <div className="graph-workspace__progress" aria-live="polite">
-          Step {Math.min(simulation.currentStep + 1, frame.totalSteps || 0)}
-          <span>/ {frame.totalSteps}</span>
+          Action{' '}
+          {isSearchVisible
+            ? Math.min(simulation.currentStep + 1, actionTimeline.length)
+            : simulation.status === SIMULATION_STATUS.COMPLETED
+              ? actionTimeline.length
+              : 0}
+          <span>/ {actionTimeline.length}</span>
         </div>
       </div>
 
@@ -414,12 +426,9 @@ export default function GraphWorkspace({ className = '' }) {
             <SearchTraversalLayer
               features={displayEdgeFeatures}
               project={drawing.project}
-              edgeIds={activeSearchEdgeIds}
-            />
-            <SearchTraversalLayer
-              features={edgeFeatures}
-              project={drawing.project}
-              edgeIds={activeSearchEdgeIds}
+              branchEdgeIds={activeSearchEdgeIds}
+              candidateEdgeIds={visibleAction?.candidateEdgeIds ?? []}
+              activeEdgeId={visibleAction?.activeEdgeId}
             />
             <FinalRouteLayer
               features={displayEdgeFeatures}
@@ -432,25 +441,25 @@ export default function GraphWorkspace({ className = '' }) {
             <SearchAnimationLayer
               nodes={drawing.nodes}
               result={result}
+              action={visibleAction}
+              totalActions={actionTimeline.length}
               showFinalPath={showFinalPath}
-              confirmedPathNodeIds={visiblePathNodes}
-              latestConfirmedNodeId={confirmedRoute.latestConfirmedNodeId}
             />
           </g>
         </svg>
       </div>
 
       <ul className="graph-workspace__legend" aria-label="Chú thích đồ thị">
-        {[
-          ['unvisited', 'Unvisited'],
-          ['frontier', 'Frontier'],
-          ['visited', 'Visited'],
-          ['current', 'Current'],
-          ['search-path', 'Active search path'],
-          ['final', 'Final path'],
-        ].map(([state, label]) => (
+        {GRAPH_LEGEND_ITEMS.map(({ type, state, label }) => (
           <li key={state}>
-            <span className={`graph-workspace__legend-dot--${state}`} />
+            <span
+              className={[
+                'graph-workspace__legend-swatch',
+                'graph-workspace__legend-swatch--' + type,
+                'graph-workspace__legend-swatch--' + state,
+              ].join(' ')}
+              aria-hidden="true"
+            />
             {label}
           </li>
         ))}

@@ -44,13 +44,6 @@
   white-space: nowrap;
 }
 
-.playback-toolbar__button--load {
-  color: #fff;
-  border-color: #2563eb;
-  background: #2563eb;
-  font-weight: 650;
-}
-
 .playback-toolbar__icon-button {
   display: inline-grid;
   place-items: center;
@@ -64,11 +57,6 @@
 .playback-toolbar__speed-select:hover {
   border-color: #2563eb;
   background: #eff6ff;
-}
-
-.playback-toolbar__button--load:not(:disabled):hover {
-  color: #fff;
-  background: #1d4ed8;
 }
 
 .playback-toolbar__button:not(:disabled):active,

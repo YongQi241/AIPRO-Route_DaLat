@@ -430,3 +430,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Local Python virtual environment (not part of the frontend source)
+.venv/

@@ -11,7 +11,7 @@ import { useRouteSolver } from './hooks/useRouteSolver'
 import { useAppStore } from './store/useAppStore'
 
 export default function App() {
-  const { isLoading, loadGraphData } = useGraphData()
+  useGraphData()
   const { isSolving, runRouteSearch } = useRouteSolver()
   const nodes = useAppStore((state) => state.graphData.nodes)
   const locations = useMemo(() => {
@@ -27,10 +27,7 @@ export default function App() {
     <AppShell
       topBar={
         <>
-          <PlaybackToolbar
-            onLoad={loadGraphData}
-            loadDisabled={isLoading}
-          />
+          <PlaybackToolbar />
           <RouteSelectionControls
             locations={locations}
             onSolve={runRouteSearch}

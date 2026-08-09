@@ -4,13 +4,32 @@
 
 .search-traversal-layer__edge {
   fill: none;
-  stroke: #22d3ee;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 3.25;
   vector-effect: non-scaling-stroke;
+}
+
+.search-traversal-layer__edge--branch {
+  stroke: #22d3ee;
+  stroke-width: 3.25;
   filter: url("#search-traversal-glow");
   animation: search-traversal-pulse 800ms ease-in-out infinite alternate;
+}
+
+.search-traversal-layer__edge--candidate {
+  stroke: #67e8f9;
+  stroke-width: 2;
+  stroke-dasharray: 4 5;
+  stroke-opacity: 0.42;
+}
+
+.search-traversal-layer__edge--active {
+  stroke: #06b6d4;
+  stroke-width: 4.5;
+  stroke-dasharray: 12 5;
+  stroke-opacity: 1;
+  filter: url("#search-traversal-glow");
+  animation: search-relaxation-flow 560ms linear infinite;
 }
 
 @keyframes search-traversal-pulse {
@@ -22,6 +41,12 @@
   to {
     stroke-opacity: 0.82;
     stroke-width: 4;
+  }
+}
+
+@keyframes search-relaxation-flow {
+  to {
+    stroke-dashoffset: -17;
   }
 }
 
