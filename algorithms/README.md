@@ -84,7 +84,9 @@ from algorithms import solve
 
 It dispatches to either:
 
-- a single start-to-goal algorithm, or
+- a single start-to-goal algorithm;
+- an ordered route through intermediate stops for BFS, DFS, UCS, Dijkstra,
+  and A*;
 - Nearest Neighbor for a fast approximate multi-location order.
 - Hill Climbing for local point-to-point search.
 - Brute Force TSP for an exact multi-location order of up to eight targets.
@@ -116,6 +118,25 @@ if result["status"] == "success":
 else:
     print(result["message"])
 ```
+
+Core algorithms can also visit intermediate locations in the exact supplied
+order:
+
+```python
+result = solve(
+    algorithm="astar",
+    start_node="DL01",
+    goal_node="DL15",
+    visit_nodes=["DL03", "DL07"],
+    scenario_id="S0",
+    optimization="balanced",
+)
+```
+
+This produces the fixed visit order `DL01 -> DL03 -> DL07 -> DL15`. Each leg
+is solved by the selected algorithm, then the paths, traces, segments, and
+metrics are combined. The core does not reorder or globally optimize these
+intermediate locations.
 
 Supported single-route algorithm names and aliases:
 

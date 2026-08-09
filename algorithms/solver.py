@@ -15,6 +15,7 @@ from .graph_loader import DATA_DIR
 from .greedy_best_first import greedy_best_first_search
 from .hill_climbing import hill_climbing_search
 from .multi_location import nearest_neighbor_route
+from .ordered_route import solve_ordered_route
 from .ucs import ucs_search
 
 
@@ -51,6 +52,14 @@ SINGLE_ROUTE_ALGORITHMS = {
 }
 
 MULTI_ROUTE_ALGORITHMS = {"nearest_neighbor", "brute_force_tsp"}
+
+ORDERED_ROUTE_ALGORITHMS = {
+    "bfs",
+    "dfs",
+    "ucs",
+    "dijkstra",
+    "astar",
+}
 
 
 def normalize_algorithm(algorithm: str) -> str:
@@ -100,6 +109,7 @@ def solve_route(
     data_dir: str | Path = DATA_DIR,
     weight: str | None = None,
     maximum_speed_kph: float = 60.0,
+    intermediate_nodes: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     Solve one start-to-destination route for the GUI.
@@ -107,8 +117,8 @@ def solve_route(
     Supported algorithms:
         bfs, dfs, ucs, dijkstra, astar / a*, greedy / gbfs
 
-    Nearest Neighbor is a multi-location method; call
-    solve_multi_location(...) or solve(...) with visit_nodes instead.
+    Core algorithms can visit intermediate_nodes in the supplied order.
+    Nearest Neighbor and Exact TSP choose a multi-location order instead.
     """
 
     normalized_algorithm = normalize_algorithm(algorithm)
@@ -139,58 +149,79 @@ def solve_route(
             "optimization": optimization,
         }
 
-        if normalized_algorithm == "bfs":
-            result = bfs_search(
+        def solve_leg(leg_start: str, leg_goal: str) -> dict[str, Any]:
+            if normalized_algorithm == "bfs":
+                return bfs_search(
+                    graph,
+                    leg_start,
+                    leg_goal,
+                    **common,
+                )
+
+            if normalized_algorithm == "dfs":
+                return dfs_search(
+                    graph,
+                    leg_start,
+                    leg_goal,
+                    **common,
+                )
+
+            if normalized_algorithm == "ucs":
+                return ucs_search(
+                    graph,
+                    leg_start,
+                    leg_goal,
+                    weight=selected_weight,
+                    **common,
+                )
+
+            if normalized_algorithm == "dijkstra":
+                return dijkstra_search(
+                    graph,
+                    leg_start,
+                    leg_goal,
+                    weight=selected_weight,
+                    **common,
+                )
+
+            if normalized_algorithm == "astar":
+                return astar_search(
+                    graph,
+                    leg_start,
+                    leg_goal,
+                    weight=selected_weight,
+                    maximum_speed_kph=maximum_speed_kph,
+                    **common,
+                )
+
+            if normalized_algorithm == "greedy":
+                return greedy_best_first_search(
+                    graph, leg_start, leg_goal, **common,
+                )
+
+            return hill_climbing_search(
+                graph, leg_start, leg_goal, **common,
+            )
+
+        ordered_stops = list(intermediate_nodes or [])
+        if ordered_stops:
+            if normalized_algorithm not in ORDERED_ROUTE_ALGORITHMS:
+                raise ValueError(
+                    "Ordered intermediate locations are supported by BFS, "
+                    "DFS, UCS, Dijkstra, and A*."
+                )
+
+            return solve_ordered_route(
                 graph,
                 start_node,
                 goal_node,
-                **common,
-            )
-            return result
-
-        if normalized_algorithm == "dfs":
-            return dfs_search(
-                graph,
-                start_node,
-                goal_node,
+                ordered_stops,
+                algorithm=normalized_algorithm,
+                solve_leg=solve_leg,
                 **common,
             )
 
-        if normalized_algorithm == "ucs":
-            return ucs_search(
-                graph,
-                start_node,
-                goal_node,
-                **common,
-            )
-
-        if normalized_algorithm == "dijkstra":
-            return dijkstra_search(
-                graph,
-                start_node,
-                goal_node,
-                weight=selected_weight,
-                **common,
-            )
-
-        if normalized_algorithm == "astar":
-            return astar_search(
-                graph,
-                start_node,
-                goal_node,
-                weight=selected_weight,
-                maximum_speed_kph=maximum_speed_kph,
-                **common,
-            )
-
-        if normalized_algorithm == "greedy":
-            return greedy_best_first_search(
-                graph, start_node, goal_node, **common,
-            )
-
-        return hill_climbing_search(
-            graph, start_node, goal_node, **common,
-        )
+        return solve_leg(start_node, goal_node)
 
     except (
         FileNotFoundError,
@@ -299,7 +330,8 @@ def solve(
     """
     Unified dispatcher for GUI integration.
 
-    Single-route algorithms require goal_node.
+    Single-route algorithms require goal_node. Core algorithms accept
+    visit_nodes as fixed-order intermediate locations.
     Nearest Neighbor requires visit_nodes.
     """
 
@@ -338,6 +370,21 @@ def solve(
             message=f"Algorithm {algorithm!r} requires goal_node.",
         )
 
+    ordered_stops = list(visit_nodes or [])
+    if ordered_stops and normalized_algorithm not in ORDERED_ROUTE_ALGORITHMS:
+        return _single_error_result(
+            status="invalid_input",
+            algorithm=algorithm,
+            scenario_id=scenario_id,
+            optimization=optimization,
+            start_node=start_node,
+            goal_node=goal_node,
+            message=(
+                "Intermediate stops are supported by BFS, DFS, UCS, "
+                "Dijkstra, A*, Nearest Neighbor, and Exact TSP."
+            ),
+        )
+
     return solve_route(
         start_node=start_node,
         goal_node=goal_node,
@@ -347,6 +394,7 @@ def solve(
         data_dir=data_dir,
         weight=weight,
         maximum_speed_kph=maximum_speed_kph,
+        intermediate_nodes=ordered_stops,
     )
 
 

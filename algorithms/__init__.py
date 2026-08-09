@@ -19,6 +19,7 @@ from .graph_loader import build_graph, load_graph, load_scenario
 from .greedy_best_first import greedy_best_first_search
 from .hill_climbing import hill_climbing_search
 from .multi_location import multi_location_route, nearest_neighbor_route
+from .ordered_route import solve_ordered_route
 from .solver import solve, solve_multi_location, solve_route
 from .ucs import ucs_search
 
@@ -41,6 +42,7 @@ __all__ = [
     "path_edges",
     "reconstruct_path",
     "require_nonnegative_weight",
+    "solve_ordered_route",
     "solve",
     "solve_multi_location",
     "solve_route",
