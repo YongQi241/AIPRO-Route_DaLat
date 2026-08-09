@@ -1,4 +1,5 @@
 const DEFAULT_API_URL = '/api/routes/solve'
+const MOCK_RESULT_URL = new URL('../../data/mock-result.json', import.meta.url)
 
 const ALGORITHM_LABELS = {
   bfs: 'BFS',

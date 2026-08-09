@@ -8,13 +8,9 @@ function resolveNodeState(
   visitedNodeIds,
   finalPathNodeIds,
   showFinalPath,
-  confirmedPathNodeIds,
-  latestConfirmedNodeId,
 ) {
-  if (nodeId === latestConfirmedNodeId) return 'latest-confirmed'
   if (showFinalPath && finalPathNodeIds.has(nodeId)) return 'final'
   if (nodeId === currentNodeId) return 'current'
-  if (confirmedPathNodeIds.has(nodeId)) return 'confirmed'
   if (frontierNodeIds.has(nodeId)) return 'frontier'
   if (visitedNodeIds.has(nodeId)) return 'visited'
   return 'unvisited'
@@ -25,10 +21,9 @@ export default function GraphNodeLayer({
   currentNodeId = null,
   frontierNodeIds = [],
   visitedNodeIds = [],
+  evaluatedNodeId = null,
   finalPathNodeIds = [],
   showFinalPath = false,
-  confirmedPathNodeIds = [],
-  latestConfirmedNodeId = null,
 }) {
   const frontierSet = useMemo(
     () => new Set(frontierNodeIds),
@@ -42,11 +37,6 @@ export default function GraphNodeLayer({
     () => new Set(finalPathNodeIds),
     [finalPathNodeIds],
   )
-  const confirmedPathSet = useMemo(
-    () => new Set(confirmedPathNodeIds),
-    [confirmedPathNodeIds],
-  )
-
   return (
     <g className="graph-node-layer" aria-label="Các địa điểm">
       {nodes.map((node) => {
@@ -57,8 +47,6 @@ export default function GraphNodeLayer({
           visitedSet,
           finalPathSet,
           showFinalPath,
-          confirmedPathSet,
-          latestConfirmedNodeId,
         )
 
         return (
@@ -69,6 +57,13 @@ export default function GraphNodeLayer({
             data-node-state={nodeState}
             transform={`translate(${node.x} ${node.y})`}
           >
+            {node.id === evaluatedNodeId && (
+              <circle
+                className="graph-node-layer__evaluation-ring"
+                r="11"
+                aria-hidden="true"
+              />
+            )}
             {nodeState === 'current' && (
               <circle
                 className="graph-node-layer__pulse"
@@ -78,7 +73,7 @@ export default function GraphNodeLayer({
             )}
             <circle
               className="graph-node-layer__marker"
-              r={nodeState === 'latest-confirmed' ? 8 : 5}
+              r="5"
             >
               <title>
                 {node.id}: {node.name} · {nodeState}

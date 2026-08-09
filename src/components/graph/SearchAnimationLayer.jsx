@@ -1,16 +1,13 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { SIMULATION_STATUS, useAppStore } from '../../store/useAppStore'
 import GraphNodeLayer from './GraphNodeLayer'
-import { getSearchAnimationFrame } from './searchTimeline'
-
-export { getSearchAnimationFrame } from './searchTimeline'
 
 export default function SearchAnimationLayer({
   nodes = [],
   result = null,
+  action = null,
+  totalActions = 0,
   showFinalPath = false,
-  confirmedPathNodeIds = [],
-  latestConfirmedNodeId = null,
 }) {
   const simulation = useAppStore((state) => state.simulation)
   const setCurrentStep = useAppStore((state) => state.setCurrentStep)
@@ -18,23 +15,19 @@ export default function SearchAnimationLayer({
     (state) => state.completeSimulation,
   )
 
-  const frame = useMemo(
-    () => getSearchAnimationFrame(result, simulation.currentStep),
-    [result, simulation.currentStep],
-  )
-
   useEffect(() => {
     if (simulation.status !== SIMULATION_STATUS.PLAYING) return undefined
 
-    if (frame.totalSteps === 0) {
+    if (totalActions === 0) {
       completeSimulation()
       return undefined
     }
 
     const timerId = window.setTimeout(() => {
-      const isLastStep = simulation.currentStep >= frame.totalSteps - 1
+      const lastAction = totalActions - 1
+      const isFinishing = simulation.currentStep >= lastAction
 
-      if (isLastStep) {
+      if (isFinishing) {
         completeSimulation()
       } else {
         setCurrentStep(simulation.currentStep + 1)
@@ -44,23 +37,22 @@ export default function SearchAnimationLayer({
     return () => window.clearTimeout(timerId)
   }, [
     completeSimulation,
-    frame.totalSteps,
     setCurrentStep,
     simulation.currentStep,
     simulation.speed,
     simulation.status,
+    totalActions,
   ])
 
   return (
     <GraphNodeLayer
       nodes={nodes}
-      currentNodeId={frame.currentNodeId}
-      frontierNodeIds={frame.frontierNodeIds}
-      visitedNodeIds={frame.visitedNodeIds}
+      currentNodeId={action?.currentNodeId}
+      frontierNodeIds={action?.frontierNodeIds}
+      visitedNodeIds={action?.visitedNodeIds}
+      evaluatedNodeId={action?.activeNeighborId}
       finalPathNodeIds={result?.path_nodes}
       showFinalPath={showFinalPath}
-      confirmedPathNodeIds={confirmedPathNodeIds}
-      latestConfirmedNodeId={latestConfirmedNodeId}
     />
   )
 }

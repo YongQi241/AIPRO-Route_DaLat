@@ -151,7 +151,11 @@
   font-size: 0.75rem;
 }
 
-.graph-workspace__legend li span {
+.graph-workspace__legend-swatch {
+  flex: none;
+}
+
+.graph-workspace__legend-swatch--node {
   width: 10px;
   height: 10px;
   border: 2px solid #64748b;
@@ -159,30 +163,50 @@
   background: #fff;
 }
 
-.graph-workspace__legend-dot--frontier {
+.graph-workspace__legend-swatch--frontier {
   border-color: #d97706 !important;
   background: #fef3c7 !important;
 }
 
-.graph-workspace__legend-dot--visited {
+.graph-workspace__legend-swatch--visited {
   border-color: #2563eb !important;
   background: #dbeafe !important;
 }
 
-.graph-workspace__legend-dot--current {
+.graph-workspace__legend-swatch--current {
   border-color: #c2410c !important;
   background: #f97316 !important;
 }
 
-.graph-workspace__legend-dot--search-path {
-  border-color: #0891b2 !important;
-  background: #06b6d4 !important;
-  box-shadow: 0 0 5px rgb(6 182 212 / 70%);
-}
-
-.graph-workspace__legend-dot--final {
+.graph-workspace__legend-swatch--final-node {
   border-color: #15803d !important;
   background: #22c55e !important;
+}
+
+.graph-workspace__legend-swatch--edge {
+  width: 25px;
+  height: 0;
+  border-top: 3px solid;
+}
+
+.graph-workspace__legend-swatch--candidate {
+  border-color: #67e8f9;
+  border-top-style: dashed;
+  opacity: 0.7;
+}
+
+.graph-workspace__legend-swatch--active {
+  border-color: #06b6d4;
+  filter: drop-shadow(0 0 2px rgb(6 182 212 / 70%));
+}
+
+.graph-workspace__legend-swatch--route {
+  border-color: #2563eb;
+}
+
+.graph-workspace__legend-swatch--warning {
+  border-color: #f97316;
+  border-top-style: dashed;
 }
 
 .graph-workspace__message {

@@ -1,7 +1,10 @@
 import { useMemo } from 'react'
-import { getSearchAnimationFrame } from '../graph/SearchAnimationLayer'
+import {
+  buildSearchActionTimeline,
+  getSearchAction,
+} from '../graph/searchTimeline'
 import { MULTI_LOCATION_ALGORITHMS } from '../../services/routeRequest'
-import { useAppStore } from '../../store/useAppStore'
+import { SIMULATION_STATUS, useAppStore } from '../../store/useAppStore'
 import './CurrentTaskPanel.css'
 
 const STATUS_LABELS = {
@@ -9,6 +12,13 @@ const STATUS_LABELS = {
   playing: 'Searching',
   paused: 'Paused',
   completed: 'Completed',
+}
+
+const OUTCOME_LABELS = {
+  add: 'Added to frontier',
+  update: 'Frontier value updated',
+  keep: 'Existing value kept',
+  unknown: 'Result not provided',
 }
 
 function createLocationLookup(nodes) {
@@ -22,6 +32,8 @@ function createLocationLookup(nodes) {
 
 export default function CurrentTaskPanel({ className = '' }) {
   const graphNodes = useAppStore((state) => state.graphData.nodes)
+  const graphEdges = useAppStore((state) => state.graphData.edges)
+  const edgeFeatures = graphEdges?.features ?? []
   const selectedAlgorithm = useAppStore((state) => state.selectedAlgorithm)
   const routeSelection = useAppStore((state) => state.routeSelection)
   const result = useAppStore((state) => state.routeResult)
@@ -31,31 +43,36 @@ export default function CurrentTaskPanel({ className = '' }) {
     () => createLocationLookup(graphNodes),
     [graphNodes],
   )
-  const frame = useMemo(
-    () => getSearchAnimationFrame(result, simulation.currentStep),
-    [result, simulation.currentStep],
+  const timeline = useMemo(
+    () => buildSearchActionTimeline(result, edgeFeatures),
+    [edgeFeatures, result],
   )
+  const action =
+    simulation.status === SIMULATION_STATUS.IDLE
+      ? null
+      : getSearchAction(timeline, simulation.currentStep)
+  const visibleActionCount =
+    timeline.length === 0 || simulation.status === SIMULATION_STATUS.IDLE
+      ? 0
+      : Math.min(simulation.currentStep + 1, timeline.length)
   const progress =
-    frame.totalSteps > 0
-      ? Math.min(
-          100,
-          Math.round(((simulation.currentStep + 1) / frame.totalSteps) * 100),
-        )
+    timeline.length > 0
+      ? Math.round((visibleActionCount / timeline.length) * 100)
       : 0
 
   const displayName = (nodeId) =>
     nodeId ? (locationLookup.get(String(nodeId)) ?? nodeId) : 'Not selected'
-  const currentNodeName = frame.currentNodeId
-    ? displayName(frame.currentNodeId)
+  const currentNodeName = action?.currentNodeId
+    ? displayName(action.currentNodeId)
     : 'Waiting'
   const usesIntermediateLocations = MULTI_LOCATION_ALGORITHMS.has(
     selectedAlgorithm,
   )
-  const requestedStops = result?.visit_nodes ?? (
-    usesIntermediateLocations
+  const requestedStops =
+    result?.visit_nodes ??
+    (usesIntermediateLocations
       ? [...routeSelection.visitNodes, routeSelection.goalNode].filter(Boolean)
-      : []
-  )
+      : [])
   const requestedStopLabels = [...new Set(requestedStops)]
     .map((nodeId) => displayName(nodeId))
     .join(' → ')
@@ -119,17 +136,32 @@ export default function CurrentTaskPanel({ className = '' }) {
           <dt>Current node</dt>
           <dd>{currentNodeName}</dd>
         </div>
+        <div>
+          <dt>Active edge</dt>
+          <dd>{action?.activeEdgeId ?? '—'}</dd>
+        </div>
+        <div>
+          <dt>Evaluating node</dt>
+          <dd>
+            {action?.activeNeighborId
+              ? `${displayName(action.activeNeighborId)} (${action.activeNeighborId})`
+              : '—'}
+          </dd>
+        </div>
+        <div>
+          <dt>Relaxation result</dt>
+          <dd>{OUTCOME_LABELS[action?.outcome] ?? '—'}</dd>
+        </div>
       </dl>
 
       <div
         className="current-task-panel__progress"
-        aria-label={`Tiến trình mô phỏng ${progress}%`}
+        aria-label={`Simulation progress ${progress}%`}
       >
         <div>
-          <span>Search progress</span>
+          <span>Search actions</span>
           <strong>
-            {Math.min(simulation.currentStep + 1, frame.totalSteps || 0)} /{' '}
-            {frame.totalSteps}
+            {visibleActionCount} / {timeline.length}
           </strong>
         </div>
         <div

@@ -2,32 +2,73 @@ import { useMemo } from 'react'
 import { createDrawableEdges } from './graphGeometry'
 import './SearchTraversalLayer.css'
 
+function resolveEdges(edgeLookup, edgeIds, kind) {
+  return edgeIds
+    .map((edgeId, highlightIndex) => {
+      const edge = edgeLookup.get(String(edgeId))
+      return edge ? { ...edge, highlightIndex, kind } : null
+    })
+    .filter(Boolean)
+}
+
+function EdgePaths({ edge, keyPrefix }) {
+  return edge.paths.map((path) => (
+    <path
+      key={`${keyPrefix}-${edge.highlightIndex}-${path.id}`}
+      className={[
+        'search-traversal-layer__edge',
+        `search-traversal-layer__edge--${edge.kind}`,
+      ].join(' ')}
+      d={path.value}
+    >
+      <title>
+        {edge.kind === 'candidate'
+          ? 'Possible directed successor'
+          : edge.kind === 'active'
+            ? 'Active edge relaxation'
+            : 'Inferred path to current node'}
+        : {edge.fromNode} → {edge.toNode} ({edge.edgeId})
+      </title>
+    </path>
+  ))
+}
+
 export default function SearchTraversalLayer({
   features = [],
   project,
-  edgeIds = [],
+  branchEdgeIds = [],
+  candidateEdgeIds = [],
+  activeEdgeId = null,
 }) {
-  const branchEdges = useMemo(() => {
-    if (!project || edgeIds.length === 0) return []
+  const highlights = useMemo(() => {
+    if (!project) return { branch: [], candidate: [], active: [] }
 
     const edgeLookup = new Map(
       createDrawableEdges(features, project).map((edge) => [edge.edgeId, edge]),
     )
 
-    return edgeIds
-      .map((edgeId, branchIndex) => {
-        const edge = edgeLookup.get(String(edgeId))
-        return edge ? { ...edge, branchIndex } : null
-      })
-      .filter(Boolean)
-  }, [edgeIds, features, project])
+    return {
+      branch: resolveEdges(edgeLookup, branchEdgeIds, 'branch'),
+      candidate: resolveEdges(edgeLookup, candidateEdgeIds, 'candidate'),
+      active:
+        activeEdgeId == null
+          ? []
+          : resolveEdges(edgeLookup, [activeEdgeId], 'active'),
+    }
+  }, [activeEdgeId, branchEdgeIds, candidateEdgeIds, features, project])
 
-  if (branchEdges.length === 0) return null
+  if (
+    highlights.branch.length === 0 &&
+    highlights.candidate.length === 0 &&
+    highlights.active.length === 0
+  ) {
+    return null
+  }
 
   return (
     <g
       className="search-traversal-layer"
-      aria-label="Active search branch"
+      aria-label="Inferred relaxation playback"
     >
       <defs>
         <filter
@@ -45,19 +86,33 @@ export default function SearchTraversalLayer({
         </filter>
       </defs>
 
-      {branchEdges.flatMap((edge) =>
-        edge.paths.map((path) => (
-          <path
-            key={`search-${edge.branchIndex}-${path.id}`}
-            className="search-traversal-layer__edge"
-            d={path.value}
-          >
-            <title>
-              Search branch: {edge.fromNode} → {edge.toNode} ({edge.edgeId})
-            </title>
-          </path>
-        )),
-      )}
+      <g aria-label="Path to current node">
+        {highlights.branch.map((edge) => (
+          <EdgePaths
+            key={`branch-${edge.edgeId}`}
+            edge={edge}
+            keyPrefix="branch"
+          />
+        ))}
+      </g>
+      <g aria-label="Candidate outgoing edges">
+        {highlights.candidate.map((edge) => (
+          <EdgePaths
+            key={`candidate-${edge.edgeId}`}
+            edge={edge}
+            keyPrefix="candidate"
+          />
+        ))}
+      </g>
+      <g aria-label="Active edge relaxation">
+        {highlights.active.map((edge) => (
+          <EdgePaths
+            key={`active-${edge.edgeId}`}
+            edge={edge}
+            keyPrefix="active"
+          />
+        ))}
+      </g>
     </g>
   )
 }

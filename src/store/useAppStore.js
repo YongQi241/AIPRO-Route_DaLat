@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { buildSearchActionTimeline } from '../components/graph/searchTimeline.js'
 
 export const SIMULATION_STATUS = Object.freeze({
   IDLE: 'idle',
@@ -30,8 +31,12 @@ const initialRouteSelection = {
   optimization: 'balanced',
 }
 
-export function getAnimationStepCount(result) {
-  return result?.frontier_steps?.length || result?.visited_order?.length || 0
+export function getAnimationStepCount(result, edgeFeatures = []) {
+  return buildSearchActionTimeline(result, edgeFeatures).length
+}
+
+function getStateEdgeFeatures(state) {
+  return state.graphData.edges?.features ?? []
 }
 
 export const useAppStore = create((set) => ({
@@ -50,6 +55,7 @@ export const useAppStore = create((set) => ({
     message: null,
   },
   simulation: initialSimulationState,
+  hasRevealedFinalResult: false,
 
   setGraphData: ({ nodes, edges }) =>
     set({
@@ -135,14 +141,17 @@ export const useAppStore = create((set) => ({
   resetRouteSelection: () => set({ routeSelection: initialRouteSelection }),
 
   setRouteResult: (routeResult) =>
-    set({
+    set((state) => ({
       routeResult,
       requestState: {
         status: routeResult?.status ?? REQUEST_STATUS.ERROR,
         message: routeResult?.message ?? null,
       },
       simulation: initialSimulationState,
-    }),
+      hasRevealedFinalResult:
+        routeResult?.status === REQUEST_STATUS.SUCCESS &&
+        getAnimationStepCount(routeResult, getStateEdgeFeatures(state)) === 0,
+    })),
 
   clearRouteResult: () =>
     set({
@@ -152,22 +161,29 @@ export const useAppStore = create((set) => ({
         message: null,
       },
       simulation: initialSimulationState,
+      hasRevealedFinalResult: false,
     }),
 
   setRouteRequestLoading: () =>
     set({
+      routeResult: null,
       requestState: {
         status: REQUEST_STATUS.LOADING,
         message: 'Calculating route…',
       },
+      simulation: initialSimulationState,
+      hasRevealedFinalResult: false,
     }),
 
   setRouteRequestError: (message) =>
     set({
+      routeResult: null,
       requestState: {
         status: REQUEST_STATUS.ERROR,
         message,
       },
+      simulation: initialSimulationState,
+      hasRevealedFinalResult: false,
     }),
 
   dismissStatusMessage: () =>
@@ -180,7 +196,10 @@ export const useAppStore = create((set) => ({
 
   play: () =>
     set((state) => {
-      const totalSteps = getAnimationStepCount(state.routeResult)
+      const totalSteps = getAnimationStepCount(
+        state.routeResult,
+        getStateEdgeFeatures(state),
+      )
       if (state.routeResult?.status !== REQUEST_STATUS.SUCCESS || !totalSteps) {
         return state
       }
@@ -222,7 +241,13 @@ export const useAppStore = create((set) => ({
           0,
           Math.min(
             Number(currentStep) || 0,
-            Math.max(0, getAnimationStepCount(state.routeResult) - 1),
+            Math.max(
+              0,
+              getAnimationStepCount(
+                state.routeResult,
+                getStateEdgeFeatures(state),
+              ) - 1,
+            ),
           ),
         ),
       },
@@ -230,7 +255,10 @@ export const useAppStore = create((set) => ({
 
   nextAction: () =>
     set((state) => {
-      const totalSteps = getAnimationStepCount(state.routeResult)
+      const totalSteps = getAnimationStepCount(
+        state.routeResult,
+        getStateEdgeFeatures(state),
+      )
       if (state.routeResult?.status !== REQUEST_STATUS.SUCCESS || !totalSteps) {
         return state
       }
@@ -248,12 +276,60 @@ export const useAppStore = create((set) => ({
               ? SIMULATION_STATUS.COMPLETED
               : SIMULATION_STATUS.PAUSED,
         },
+        hasRevealedFinalResult:
+          state.hasRevealedFinalResult || currentStep === lastStep,
+      }
+    }),
+
+  firstAction: () =>
+    set((state) => {
+      const totalSteps = getAnimationStepCount(
+        state.routeResult,
+        getStateEdgeFeatures(state),
+      )
+      if (
+        state.routeResult?.status !== REQUEST_STATUS.SUCCESS ||
+        !totalSteps ||
+        state.simulation.currentStep <= 0
+      ) {
+        return state
+      }
+
+      return {
+        simulation: {
+          ...state.simulation,
+          currentStep: 0,
+          status: SIMULATION_STATUS.PAUSED,
+        },
+      }
+    }),
+
+  lastAction: () =>
+    set((state) => {
+      const totalSteps = getAnimationStepCount(
+        state.routeResult,
+        getStateEdgeFeatures(state),
+      )
+      if (state.routeResult?.status !== REQUEST_STATUS.SUCCESS || !totalSteps) {
+        return state
+      }
+
+      return {
+        simulation: {
+          ...state.simulation,
+          currentStep: totalSteps - 1,
+          status: SIMULATION_STATUS.COMPLETED,
+        },
+        hasRevealedFinalResult: true,
       }
     }),
 
   previousAction: () =>
     set((state) => {
-      const totalSteps = getAnimationStepCount(state.routeResult)
+      const totalSteps = getAnimationStepCount(
+        state.routeResult,
+        getStateEdgeFeatures(state),
+      )
       if (
         state.routeResult?.status !== REQUEST_STATUS.SUCCESS ||
         !totalSteps ||
@@ -277,6 +353,16 @@ export const useAppStore = create((set) => ({
         ...state.simulation,
         status: SIMULATION_STATUS.COMPLETED,
       },
+      hasRevealedFinalResult:
+        state.hasRevealedFinalResult ||
+        state.routeResult?.status === REQUEST_STATUS.SUCCESS,
+    })),
+
+  revealFinalResult: () =>
+    set((state) => ({
+      hasRevealedFinalResult:
+        state.hasRevealedFinalResult ||
+        state.routeResult?.status === REQUEST_STATUS.SUCCESS,
     })),
 
   resetSimulation: () =>

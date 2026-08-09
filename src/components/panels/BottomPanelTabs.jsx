@@ -1,7 +1,12 @@
-import { useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { useAppStore } from '../../store/useAppStore'
 import RouteExplanation from '../results/RouteExplanation'
 import RouteResultPanel from '../results/RouteResultPanel'
 import SegmentDetails from '../results/SegmentDetails'
+import {
+  getKeyboardTabIndex,
+  isResultTabLocked,
+} from './bottomPanelTabsState'
 import CurrentTaskPanel from './CurrentTaskPanel'
 import SearchLogPanel from './SearchLogPanel'
 import './BottomPanelTabs.css'
@@ -18,34 +23,51 @@ const TABS = [
   },
 ]
 
+const TAB_IDS = TABS.map(({ id }) => id)
+
 export default function BottomPanelTabs({ className = '' }) {
   const [activeTab, setActiveTab] = useState(TABS[0].id)
+  const hasRevealedFinalResult = useAppStore(
+    (state) => state.hasRevealedFinalResult,
+  )
   const instanceId = useId()
   const tabRefs = useRef([])
-  const activeIndex = Math.max(
+  const requestedIndex = Math.max(
     0,
     TABS.findIndex(({ id }) => id === activeTab),
   )
+  const activeIndex = isResultTabLocked(
+    TABS[requestedIndex].id,
+    hasRevealedFinalResult,
+  )
+    ? 0
+    : requestedIndex
   const active = TABS[activeIndex]
   const ActivePanel = active.Component
 
+  useEffect(() => {
+    if (activeTab !== active.id) setActiveTab(active.id)
+  }, [active.id, activeTab])
+
   const selectTab = (index, moveFocus = false) => {
-    const safeIndex = (index + TABS.length) % TABS.length
-    setActiveTab(TABS[safeIndex].id)
-    if (moveFocus) tabRefs.current[safeIndex]?.focus()
+    const tab = TABS[index]
+    if (!tab || isResultTabLocked(tab.id, hasRevealedFinalResult)) return
+
+    setActiveTab(tab.id)
+    if (moveFocus) tabRefs.current[index]?.focus()
   }
 
   const handleKeyDown = (event) => {
-    const keyTargets = {
-      ArrowRight: activeIndex + 1,
-      ArrowLeft: activeIndex - 1,
-      Home: 0,
-      End: TABS.length - 1,
-    }
-    if (!(event.key in keyTargets)) return
+    const nextIndex = getKeyboardTabIndex(
+      event.key,
+      activeIndex,
+      TAB_IDS,
+      hasRevealedFinalResult,
+    )
+    if (nextIndex == null) return
 
     event.preventDefault()
-    selectTab(keyTargets[event.key], true)
+    selectTab(nextIndex, true)
   }
 
   const rootClassName = ['bottom-panel-tabs', className]
@@ -62,16 +84,24 @@ export default function BottomPanelTabs({ className = '' }) {
       >
         {TABS.map(({ id, label }, index) => {
           const isActive = id === active.id
+          const isLocked = isResultTabLocked(id, hasRevealedFinalResult)
 
           return (
             <button
-              id={`${instanceId}-${id}-tab`}
+              id={instanceId + '-' + id + '-tab'}
               className={isActive ? 'bottom-panel-tabs__tab--active' : ''}
               type="button"
               role="tab"
               aria-selected={isActive}
-              aria-controls={`${instanceId}-${id}-panel`}
+              aria-disabled={isLocked}
+              aria-controls={instanceId + '-' + id + '-panel'}
               tabIndex={isActive ? 0 : -1}
+              disabled={isLocked}
+              title={
+                isLocked
+                  ? 'Available after the search simulation is completed'
+                  : label
+              }
               ref={(element) => {
                 tabRefs.current[index] = element
               }}
@@ -86,10 +116,10 @@ export default function BottomPanelTabs({ className = '' }) {
       </div>
 
       <div
-        id={`${instanceId}-${active.id}-panel`}
+        id={instanceId + '-' + active.id + '-panel'}
         className="bottom-panel-tabs__content"
         role="tabpanel"
-        aria-labelledby={`${instanceId}-${active.id}-tab`}
+        aria-labelledby={instanceId + '-' + active.id + '-tab'}
       >
         <ActivePanel />
       </div>
