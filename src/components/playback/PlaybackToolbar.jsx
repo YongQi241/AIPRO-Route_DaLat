@@ -7,12 +7,19 @@ import {
 import './PlaybackToolbar.css'
 
 const SPEED_OPTIONS = [0.5, 1, 1.5, 2]
+const STATUS_LABELS = {
+  idle: 'Chưa bắt đầu',
+  ready: 'Sẵn sàng',
+  playing: 'Đang phát',
+  paused: 'Đã tạm dừng',
+  completed: 'Hoàn tất',
+}
 
 /**
  * Controls the visualization timeline. Route calculation remains outside this
  * component; it only invokes timeline actions from the global store.
  */
-export default function PlaybackToolbar({ className = '' }) {
+export default function PlaybackToolbar({ className = '', compact = false }) {
   const status = useAppStore((state) => state.simulation.status)
   const speed = useAppStore((state) => state.simulation.speed)
   const currentStep = useAppStore((state) => state.simulation.currentStep)
@@ -42,7 +49,11 @@ export default function PlaybackToolbar({ className = '' }) {
   const canGoLast =
     hasAnimation &&
     (currentStep < lastStep || status !== SIMULATION_STATUS.COMPLETED)
-  const toolbarClassName = ['playback-toolbar', className]
+  const toolbarClassName = [
+    'playback-toolbar',
+    compact && 'playback-toolbar--compact',
+    className,
+  ]
     .filter(Boolean)
     .join(' ')
 
@@ -50,7 +61,7 @@ export default function PlaybackToolbar({ className = '' }) {
     <div
       className={toolbarClassName}
       role="toolbar"
-      aria-label="Simulation controls"
+      aria-label="Điều khiển mô phỏng"
     >
       <div className="playback-toolbar__group">
         <button
@@ -58,10 +69,11 @@ export default function PlaybackToolbar({ className = '' }) {
           type="button"
           onClick={firstAction}
           disabled={!canGoFirst}
-          aria-label="Go to the first search action"
-          title="First action"
+          aria-label="Đi tới thao tác tìm kiếm đầu tiên"
+          title="Thao tác đầu tiên"
         >
-          <span aria-hidden="true">{'\u2502\u2190'}</span> First action
+          <span aria-hidden="true">{'\u2502\u2190'}</span>
+          {!compact && ' Thao tác đầu'}
         </button>
 
         <button
@@ -69,10 +81,11 @@ export default function PlaybackToolbar({ className = '' }) {
           type="button"
           onClick={previousAction}
           disabled={!canGoPrevious}
-          aria-label="Previous search action"
-          title="Previous action"
+          aria-label="Thao tác tìm kiếm trước đó"
+          title="Thao tác trước"
         >
-          <span aria-hidden="true">{'\u2190'}</span> Previous action
+          <span aria-hidden="true">{'\u2190'}</span>
+          {!compact && ' Thao tác trước'}
         </button>
 
         <span className="playback-toolbar__divider" aria-hidden="true" />
@@ -82,8 +95,8 @@ export default function PlaybackToolbar({ className = '' }) {
           type="button"
           onClick={play}
           disabled={isPlaying || !hasAnimation}
-          aria-label="Play simulation"
-          title="Play"
+          aria-label="Phát mô phỏng"
+          title="Phát"
         >
           <span aria-hidden="true">{'\u25b6'}</span>
         </button>
@@ -93,8 +106,8 @@ export default function PlaybackToolbar({ className = '' }) {
           type="button"
           onClick={pause}
           disabled={!isPlaying}
-          aria-label="Pause simulation"
-          title="Pause"
+          aria-label="Tạm dừng mô phỏng"
+          title="Tạm dừng"
         >
           <span aria-hidden="true">{'\u2161'}</span>
         </button>
@@ -104,10 +117,11 @@ export default function PlaybackToolbar({ className = '' }) {
           type="button"
           onClick={nextAction}
           disabled={!canGoNext}
-          aria-label="Next search action"
-          title="Next action"
+          aria-label="Thao tác tìm kiếm tiếp theo"
+          title="Thao tác tiếp"
         >
-          Next action <span aria-hidden="true">{'\u2192'}</span>
+          {!compact && 'Thao tác tiếp '}
+          <span aria-hidden="true">{'\u2192'}</span>
         </button>
 
         <button
@@ -115,10 +129,11 @@ export default function PlaybackToolbar({ className = '' }) {
           type="button"
           onClick={lastAction}
           disabled={!canGoLast}
-          aria-label="Go to the last search action"
-          title="Last action"
+          aria-label="Đi tới thao tác tìm kiếm cuối cùng"
+          title="Thao tác cuối"
         >
-          Last action <span aria-hidden="true">{'\u2192\u2502'}</span>
+          {!compact && 'Thao tác cuối '}
+          <span aria-hidden="true">{'\u2192\u2502'}</span>
         </button>
 
         <button
@@ -127,7 +142,9 @@ export default function PlaybackToolbar({ className = '' }) {
           onClick={resetSimulation}
           disabled={!canReset}
         >
-          Reset
+          <span aria-hidden={compact ? 'true' : undefined}>
+            {compact ? '\u21ba' : 'Đặt lại'}
+          </span>
         </button>
       </div>
 
@@ -136,14 +153,14 @@ export default function PlaybackToolbar({ className = '' }) {
           className="playback-toolbar__speed-label"
           htmlFor="playback-speed"
         >
-          Speed
+          Tốc độ
         </label>
         <select
           id="playback-speed"
           className="playback-toolbar__speed-select"
           value={speed}
           onChange={(event) => setSpeed(Number(event.target.value))}
-          aria-label="Simulation speed"
+          aria-label="Tốc độ mô phỏng"
         >
           {SPEED_OPTIONS.map((option) => (
             <option key={option} value={option}>
@@ -158,7 +175,7 @@ export default function PlaybackToolbar({ className = '' }) {
           }
           aria-live="polite"
         >
-          {status}
+          {STATUS_LABELS[status] ?? status}
         </output>
       </div>
     </div>

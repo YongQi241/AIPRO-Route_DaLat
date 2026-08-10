@@ -1,30 +1,57 @@
-\chapter{Limitations and Future Work}
+% !TeX root = ../main.tex
+% !TeX program = pdflatex
+% !TeX encoding = UTF-8
+
+\chapter{Hạn chế và hướng phát triển}
 \label{chap:limitations}
 
-\section{Difficulties and Challenges Encountered During Development}
+\section{Khó khăn trong quá trình phát triển}
 
-\fillin{List the real difficulties your group faced. Some common ones for this type of project are listed below as a starting point.}
+Khó khăn chính là thống nhất dữ liệu giữa công cụ tạo mạng đường, backend và
+frontend. ID của đỉnh và cạnh phải ổn định để trace thuật toán khớp chính xác
+với hình vẽ. Nhóm cũng phải thiết kế một định dạng kết quả chung cho nhiều
+thuật toán có cách quản lý frontier khác nhau, đồng thời bảo đảm giao diện phát
+lại được toàn bộ quá trình tìm kiếm.
+
+Một thách thức khác là xây dựng chi phí có ý nghĩa khi khoảng cách, thời gian,
+ùn tắc và rủi ro có thang đo khác nhau. Việc chuẩn hóa và chọn bốn bộ trọng số
+giúp người dùng hiểu tiêu chí tối ưu, nhưng vẫn cần kiểm thử nhiều trường hợp để
+tránh kết quả trái trực giác. Chức năng đa điểm còn phải cân bằng giữa nghiệm
+chính xác của Brute Force và tốc độ của Nearest Neighbor.
+
+\section{Hạn chế của dữ liệu, hàm chi phí và thuật toán}
 
 \begin{itemize}[itemsep=2pt]
-  \item Collecting realistic distance, time, and congestion values for a real area was time consuming, since public map services do not always expose exact travel time or congestion figures directly.
-  \item Choosing weights for the cost function that produced sensible looking routes required several rounds of testing and adjustment.
-  \item Keeping the GUI responsive while a search algorithm is running on a larger graph required attention to how the interface updates.
-  \item Coordinating the work between members so that the graph structure, the algorithms, and the GUI all agreed on the same data format.
+  \item \textbf{Tập dữ liệu:} chỉ có 25 địa điểm và 114 cạnh giữa các điểm quan
+  tâm, không phải toàn bộ mạng giao lộ Đà Lạt. Hình học hiển thị cạnh được đơn
+  giản thành đoạn thẳng.
+  \item \textbf{Điều kiện giao thông:} năm kịch bản được sinh mô phỏng và cố
+  định trong mỗi lần chạy, không cập nhật theo thời gian thực. Đóng đường, mưa,
+  sương mù và thi công là giá trị giả lập.
+  \item \textbf{Hàm chi phí:} chuẩn hóa min--max phụ thuộc tập cạnh còn mở của
+  từng kịch bản. Các trọng số được định trước và chưa cho phép người dùng tự
+  điều chỉnh; chi phí cũng chưa phản ánh độ dốc, phí đường hoặc loại phương tiện.
+  \item \textbf{Heuristic:} khi tối ưu \texttt{route\_cost} hoặc rủi ro, A* dùng
+  heuristic 0 để bảo đảm không đánh giá vượt, vì vậy không mở rộng ít đỉnh hơn UCS.
+  \item \textbf{Đa điểm:} Nearest Neighbor không bảo đảm tối ưu toàn cục; Brute
+  Force cho nghiệm chính xác nhưng tăng theo giai thừa và bị giới hạn tám đích.
+  \item \textbf{Đánh giá hiệu năng:} dataset nhỏ và bảng thời gian mới dựa trên
+  một lần chạy, nên chưa đủ để kết luận về tốc độ trên mạng đường quy mô lớn.
 \end{itemize}
 
-\section{Limitations of the Dataset, Cost Function, and Algorithms}
+\section{Hướng phát triển}
 
 \begin{itemize}[itemsep=2pt]
-  \item \textbf{Dataset.} The dataset only covers a limited number of locations chosen by the group, so it does not represent the full road network of the chosen area, and some real road segments and shortcuts are missing.
-  \item \textbf{Cost function.} Congestion values are treated as fixed rather than changing dynamically through the day, so the model does not reflect how traffic conditions evolve during an actual trip. \fillin{Add any other simplification specific to your cost function.}
-  \item \textbf{Algorithms.} The multi location optimization method used, if it is an approximate method such as nearest neighbor with local improvement, does not guarantee the true optimal visiting order once the number of stops becomes large. \fillin{Add any other limitation you observed while testing, for example a case where an algorithm performed unexpectedly badly.}
-\end{itemize}
-
-\section{Suggestions for Future Extensions}
-
-\begin{itemize}[itemsep=2pt]
-  \item \textbf{Real time traffic data.} Connecting the program to a live traffic data source would let congestion values update automatically instead of relying on fixed values entered by the group.
-  \item \textbf{Map API integration.} Using a mapping service application programming interface would allow the program to pull real road geometry and travel time directly, removing the need to manually collect edge data, and would let the map display look closer to a real navigation app.
-  \item \textbf{Support for multiple vehicles.} Extending the multi location optimization to split the set of stops among several vehicles, each with its own route, would make the project closer to a real delivery planning system rather than a single vehicle route finder.
-  \item \fillin{Add any other extension your group would like to pursue, for example accounting for one way street changes at different times of day, adding a walking or motorbike specific cost model, or letting the user set custom weights for the cost function from the GUI.}
+  \item Tích hợp API bản đồ và giao thông thời gian thực để cập nhật tốc độ,
+  ùn tắc, đóng đường và hình học tuyến.
+  \item Mở rộng mạng đến cấp giao lộ, bổ sung độ dốc và xây dựng profile riêng
+  cho ô tô, xe máy, xe đạp và đi bộ.
+  \item Cho phép người dùng chỉnh trọng số, lưu cấu hình và so sánh nhiều tuyến
+  ứng viên trên cùng một màn hình.
+  \item Dùng các phương pháp như 2-opt, genetic algorithm hoặc ant colony để
+  cải thiện bài toán đa điểm lớn; xa hơn là mở rộng sang nhiều phương tiện.
+  \item Thực hiện benchmark lặp lại trên nhiều cặp nguồn--đích và nhiều quy mô
+  đồ thị, báo cáo trung bình, độ lệch chuẩn và chất lượng nghiệm.
+  \item Triển khai backend/frontend trên hạ tầng công khai và bổ sung cache,
+  giám sát lỗi cùng kiểm thử tích hợp đầu cuối.
 \end{itemize}

@@ -16,7 +16,7 @@ test('explains why Nearest Neighbor selected the lowest score', () => {
       newValues: { priority: 2 },
       selectionCandidates: candidates,
     }),
-    /lowest reachable score among 2 options/,
+    /điểm 2 thấp nhất trong 2 phương án/,
   )
 })
 
@@ -29,13 +29,13 @@ test('compares a rejected location with the selected option', () => {
       selectedScore: 2,
       selectionCandidates: candidates,
     }),
-    'Not selected because its score 5 is higher than B at 2 by 3.',
+    'Loại: 5 > 2 của nút B (chênh 3).',
   )
 })
 
 test('explains an unreachable location', () => {
   assert.match(
     describeLocationDecision({ outcome: 'unreachable' }),
-    /no directed route/,
+    /không có tuyến có hướng/,
   )
 })

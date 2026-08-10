@@ -1,3 +1,8 @@
+% !TeX root = ../main.tex
+% !TeX program = pdflatex
+% !TeX encoding = UTF-8
+% Biên dịch tài liệu gốc bằng pdfLaTeX.
+
 \chapter{So Sánh Thuật Toán}
 \label{chap:algorithm-comparison}
 
@@ -8,13 +13,14 @@ Gọi $b$ là hệ số rẽ nhánh của đồ thị và $d$ là độ sâu c�
 \begin{table}[h!]
 \centering
 \caption{So sánh lý thuyết của các thuật toán được triển khai}
-\begin{tabular}{lccccc}
+\scriptsize
+\begin{tabular}{p{3.0cm}p{3.0cm}p{2.8cm}p{1.8cm}p{3.0cm}}
 \toprule
 Thuật toán & Độ Phức Tạp Thời Gian & Sử Dụng Bộ Nhớ & Hoàn Chỉnh & Tối Ưu \\
 \midrule
-Breadth First Search & $O(b^d)$ & $O(b^d)$ & Yes & Only for equal costs \\
-Depth First Search & $O(b^m)$ & $O(bm)$ & With a visited set & No \\
-Uniform Cost Search & $O(b^{1 + \lfloor C^*/\epsilon \rfloor})$ & $O(b^{1 + \lfloor C^*/\epsilon \rfloor})$ & Yes & Yes \\
+Breadth First Search & $O(b^d)$ & $O(b^d)$ & Có & Chỉ khi chi phí cạnh bằng nhau \\
+Depth First Search & $O(b^m)$ & $O(bm)$ & Có, trên đồ thị hữu hạn & Không \\
+Uniform Cost Search & $O(b^{1 + \lfloor C^*/\epsilon \rfloor})$ & $O(b^{1 + \lfloor C^*/\epsilon \rfloor})$ & Có & Có \\
 A* Search & $O(b^d)$ & $O(b^d)$ & Có & Có \\
 Greedy BFS & $O(b^m)$ & $O(b^m)$ & Không & Không \\
 Hill Climbing & $O(\infty)$ & $O(1)$ & Không & Không \\
@@ -26,34 +32,46 @@ Hill Climbing & $O(\infty)$ & $O(1)$ & Không & Không \\
 
 \section{Hiệu Suất Thực Tế Trên Tập Dữ Liệu}
 
-Đã chạy các thuật toán trên cùng một tập hợp điểm xuất phát (DL01) và đích (DL15) từ dữ liệu của nhóm với kết quả đo được như sau (chiến thuật balanced):
+Các thuật toán được chạy trên cùng yêu cầu từ DL01 đến DL15, kịch bản S0 và
+profile \texttt{balanced}. Thời gian chỉ là kết quả của một lần đo nên có thể
+dao động theo phần cứng; chi phí, số đỉnh và số cạnh có thể tái lập từ dataset.
 
 \begin{table}[h!]
 \centering
 \caption{Hiệu suất đo được trên tập dữ liệu dự án}
-\begin{tabular}{lcccc}
+\scriptsize
+\begin{tabular}{p{3.2cm}p{2.7cm}p{2.7cm}p{2.3cm}p{2.4cm}}
 \toprule
 Thuật toán & Chi Phí Đường Đi & Số Đỉnh Đã Duyệt & Thời Gian (ms) & Số Cạnh Của Đường Đi \\
 \midrule
-Breadth First Search & \fillin{value} & \fillin{value} & \fillin{value} & \fillin{value} \\
-Depth First Search & \fillin{value} & \fillin{value} & \fillin{value} & \fillin{value} \\
-Uniform Cost Search & \fillin{value} & \fillin{value} & \fillin{value} & \fillin{value} \\
-A* Search & 9.33 & 12 & 0.46 & 4 \\
-Greedy BFS & 9.33 & 5 & 0.04 & 4 \\
-Hill Climbing & 9.33 & 5 & 0.03 & 4 \\
+Breadth First Search & 1,119433 & 21 & 0,043 & 4 \\
+Depth First Search & 0,468295 & 6 & 0,027 & 5 \\
+Uniform Cost Search & 0,444738 & 17 & 0,317 & 4 \\
+A* Search & 0,444738 & 17 & 0,737 & 4 \\
+Greedy BFS & 0,451392 & 5 & 0,142 & 4 \\
+Hill Climbing & 0,451392 & 5 & 0,098 & 4 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \section{Chất Lượng Lộ Trình, Số Đỉnh Đã Duyệt và Thời Gian Xử Lý}
 
-Dựa vào bảng kết quả đo được, có thể thấy với cặp điểm xuất phát và đích cụ thể này, cả ba thuật toán đều tìm được lộ trình với chi phí đường đi (9.33) và số cạnh (4) hoàn toàn giống nhau. Điều này cho thấy trong một số trường hợp địa hình đồ thị thuận lợi, các thuật toán tìm kiếm cục bộ hoặc tham lam vẫn có khả năng đi thẳng đến đích và tìm ra đường đi tốt nhất. Tuy nhiên, sự khác biệt lớn nhất nằm ở không gian tìm kiếm và tốc độ xử lý. A* đã phải duyệt nhiều đỉnh nhất (12 đỉnh) và tốn nhiều thời gian nhất (0.46 ms) do thuật toán này phải đánh giá toàn diện không gian trạng thái xung quanh dựa trên chi phí thực tế nhằm đảm bảo tính tối ưu tuyệt đối. Trong khi đó, Greedy BFS và Hill Climbing hướng thẳng về đích nhờ hàm heuristic, chỉ duyệt đúng 5 đỉnh nằm trên chính lộ trình cuối cùng với thời gian thực thi cực nhỏ (0.04 ms và 0.03 ms). Dưới đây là một số phân tích sâu hơn về đặc điểm lý thuyết giải thích cho kết quả thực tế này:
+UCS và A* tìm cùng tuyến DL01--DL22--DL21--DL03--DL15 với chi phí thấp nhất
+0,444738. Với trọng số \texttt{route\_cost}, A* dùng heuristic 0 để không đánh
+giá vượt chi phí còn lại nên hành vi gần với UCS. Greedy và Hill Climbing chỉ
+duyệt năm đỉnh và nhanh hơn trong lần đo, nhưng tuyến qua DL04 có chi phí
+0,451392, cao hơn khoảng 1,50\%. BFS trả tuyến có cùng số cạnh nhưng chi phí lớn
+hơn nhiều vì BFS tối ưu số bước chứ không tối ưu trọng số. DFS phụ thuộc thứ tự
+láng giềng và tìm một tuyến năm cạnh mà không có bảo đảm tối ưu.
 
 \begin{itemize}[itemsep=2pt]
-  \item \textbf{Thiếu đánh giá của BFS, DFS và USC}
-  \item \textbf{A*:} Luôn đảm bảo tìm ra đường đi có tổng chi phí thấp nhất. So với Greedy hay Hill Climbing, số lượng đỉnh phải duyệt có thể nhiều hơn để đảm bảo tính tối ưu, nhưng vẫn hiệu quả nhờ hàm heuristic.
+  \item \textbf{BFS và DFS:} không sử dụng trọng số cạnh; BFS chỉ bảo đảm
+  đường ít cạnh nhất, còn DFS phụ thuộc mạnh vào thứ tự duyệt.
+  \item \textbf{UCS và A*:} bảo đảm chi phí tối ưu khi chi phí cạnh không
+  âm và heuristic của A* là chấp nhận được.
   \item \textbf{Greedy BFS:} Thường có số đỉnh duyệt ít hơn và thời gian chạy nhanh hơn A*, nhưng chi phí đường đi thường cao hơn vì nó không quan tâm đến $g(n)$, dễ dẫn đến các đường đi vòng.
-  \item \textbf{Hill Climbing:} Số lượng đỉnh duyệt cực kì ít (bằng đúng độ dài đường đi nếu không bị kẹt), chạy rất nhanh. Tuy nhiên khả năng tìm được đường đến đích trên đồ thị giao thông thực tế khá thấp vì rất dễ đi vào ngõ cụt.
+  \item \textbf{Hill Climbing:} duyệt ít đỉnh trong trường hợp này nhưng
+  không bảo đảm hoàn chỉnh hoặc tối ưu và có thể cần quay lui khi gặp cực trị cục bộ.
 \end{itemize}
 
 \section{Ảnh Hưởng Của Tình Trạng Kẹt Xe Đến Lộ Trình}

@@ -120,7 +120,7 @@
       "risk": 0
     }
   ],
-  "explanation": "Demo result for frontend testing. It visualizes the predefined route DL01 → DL06 → DL19 → DL09 using real edges from the sample GeoJSON. This fixture does not claim algorithmic optimality and should be replaced by the Algorithm member's factual explanation.",
-  "optimality_note": "Demo fixture only — no optimality guarantee is asserted.",
-  "message": "Frontend demo result loaded for DL01 → DL09."
+  "explanation": "Kết quả minh họa để kiểm thử giao diện. Kết quả trực quan hóa tuyến định sẵn DL01 → DL06 → DL19 → DL09 bằng các cạnh thật từ GeoJSON mẫu. Dữ liệu mẫu này không khẳng định tính tối ưu của thuật toán.",
+  "optimality_note": "Chỉ là dữ liệu minh họa — không có bảo đảm tối ưu.",
+  "message": "Đã tải kết quả minh họa cho tuyến DL01 → DL09."
 }

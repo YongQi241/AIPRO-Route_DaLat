@@ -5,29 +5,35 @@ import {
 } from '../graph/searchTimeline'
 import { MULTI_LOCATION_ALGORITHMS } from '../../services/routeRequest'
 import { SIMULATION_STATUS, useAppStore } from '../../store/useAppStore'
+import {
+  formatAlgorithmLabel,
+  formatNodeNumber,
+  formatOptimizationLabel,
+} from '../results/resultFormatting'
 import './CurrentTaskPanel.css'
 
 const STATUS_LABELS = {
-  idle: 'Ready',
-  playing: 'Searching',
-  paused: 'Paused',
-  completed: 'Completed',
+  idle: 'Sẵn sàng',
+  ready: 'Sẵn sàng',
+  playing: 'Đang tìm kiếm',
+  paused: 'Đã tạm dừng',
+  completed: 'Hoàn tất',
 }
 
 const OUTCOME_LABELS = {
-  add: 'Added to frontier',
-  update: 'Frontier value updated',
-  keep: 'Existing value kept',
-  selected: 'Selected as next stop',
-  rejected: 'Higher score rejected',
-  unreachable: 'Location unreachable',
+  add: 'Đã thêm vào biên tìm kiếm',
+  update: 'Đã cập nhật giá trị biên',
+  keep: 'Giữ nguyên giá trị hiện có',
+  selected: 'Đã chọn làm điểm dừng tiếp theo',
+  rejected: 'Loại vì điểm số cao hơn',
+  unreachable: 'Không thể đến địa điểm',
 }
 
 function createLocationLookup(nodes) {
   return new Map(
     (nodes?.features ?? []).map(({ properties = {} }) => [
       String(properties.node_id),
-      properties.name_vi ?? properties.name_en ?? properties.node_id,
+      formatNodeNumber(properties.node_id),
     ]),
   )
 }
@@ -63,10 +69,10 @@ export default function CurrentTaskPanel({ className = '' }) {
       : 0
 
   const displayName = (nodeId) =>
-    nodeId ? (locationLookup.get(String(nodeId)) ?? nodeId) : 'Not selected'
+    nodeId ? (locationLookup.get(String(nodeId)) ?? nodeId) : 'Chưa chọn'
   const currentNodeName = action?.currentNodeId
     ? displayName(action.currentNodeId)
-    : 'Waiting'
+    : 'Đang chờ'
   const usesIntermediateLocations = MULTI_LOCATION_ALGORITHMS.has(
     selectedAlgorithm,
   )
@@ -86,8 +92,8 @@ export default function CurrentTaskPanel({ className = '' }) {
     <section className={rootClassName} aria-labelledby="current-task-title">
       <header className="current-task-panel__header">
         <div>
-          <span>Simulation</span>
-          <h2 id="current-task-title">Current task</h2>
+          <span>Mô phỏng</span>
+          <h2 id="current-task-title">Tác vụ hiện tại</h2>
         </div>
         <output
           className={`current-task-panel__status current-task-panel__status--${simulation.status}`}
@@ -99,69 +105,67 @@ export default function CurrentTaskPanel({ className = '' }) {
 
       <div className="current-task-panel__route">
         <div>
-          <span>Start</span>
+          <span>Điểm xuất phát</span>
           <strong>{displayName(routeSelection.startNode)}</strong>
-          {routeSelection.startNode && <small>{routeSelection.startNode}</small>}
         </div>
         <span className="current-task-panel__route-arrow" aria-hidden="true">
           →
         </span>
         <div>
-          <span>Destination</span>
+          <span>Điểm đến</span>
           <strong>{displayName(routeSelection.goalNode)}</strong>
-          {routeSelection.goalNode && <small>{routeSelection.goalNode}</small>}
         </div>
       </div>
 
       <dl className="current-task-panel__details">
         <div>
-          <dt>Algorithm</dt>
-          <dd>{result?.algorithm ?? selectedAlgorithm.toUpperCase()}</dd>
+          <dt>Thuật toán</dt>
+          <dd>{formatAlgorithmLabel(result?.algorithm ?? selectedAlgorithm)}</dd>
         </div>
         <div>
-          <dt>Scenario</dt>
+          <dt>Kịch bản</dt>
           <dd>{result?.scenario_id ?? routeSelection.scenarioId}</dd>
         </div>
         <div>
           <dt>Optimization</dt>
-          <dd>{result?.optimization ?? routeSelection.optimization}</dd>
+          <dd>{formatOptimizationLabel(result?.optimization ?? routeSelection.optimization)}</dd>
         </div>
         <div>
-          <dt>Intermediate route</dt>
+          <dt>Tuyến trung gian</dt>
           <dd>
             {usesIntermediateLocations || result?.visit_nodes
-              ? requestedStopLabels || 'No stops selected'
-              : 'Not used by this algorithm'}
+              ? requestedStopLabels || 'Chưa chọn điểm dừng'
+              : 'Thuật toán này không sử dụng'}
           </dd>
         </div>
         <div>
-          <dt>Current node</dt>
+          <dt>Nút hiện tại</dt>
           <dd>{currentNodeName}</dd>
         </div>
         <div>
-          <dt>Active edge</dt>
+          <dt>Cạnh đang xét</dt>
           <dd>{action?.activeEdgeId ?? '—'}</dd>
         </div>
         <div>
-          <dt>Evaluating node</dt>
+          <dt>Nút đang đánh giá</dt>
           <dd>
             {action?.activeNeighborId
-              ? `${displayName(action.activeNeighborId)} (${action.activeNeighborId})`
+              ? displayName(action.activeNeighborId)
               : '—'}
           </dd>
         </div>
         <div>
-          <dt>Relaxation result</dt>
+          <dt>Kết quả nới lỏng</dt>
           <dd>{OUTCOME_LABELS[action?.outcome] ?? '—'}</dd>
         </div>
       </dl>
 
       <div
         className="current-task-panel__progress"
-        aria-label={`Simulation progress ${progress}%`}
+        aria-label={`Tiến độ mô phỏng ${progress}%`}
       >
         <div>
-          <span>Search actions</span>
+          <span>Thao tác tìm kiếm</span>
           <strong>
             {visibleActionCount} / {timeline.length}
           </strong>

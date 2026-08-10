@@ -10,7 +10,7 @@ let pendingGraphRequest = null
 
 function validateFeatureCollection(data, label, idField) {
   if (data?.type !== 'FeatureCollection' || !Array.isArray(data.features)) {
-    throw new Error(`${label} is not a valid GeoJSON FeatureCollection.`)
+    throw new Error(`${label} không phải là GeoJSON FeatureCollection hợp lệ.`)
   }
 
   const missingIdentifier = data.features.some(
@@ -18,7 +18,7 @@ function validateFeatureCollection(data, label, idField) {
   )
 
   if (missingIdentifier) {
-    throw new Error(`${label} contains a feature without ${idField}.`)
+    throw new Error(`${label} chứa một đối tượng không có ${idField}.`)
   }
 
   return data
@@ -29,7 +29,7 @@ async function fetchGeoJson(url, label, idField) {
 
   if (!response.ok) {
     throw new Error(
-      `Unable to load ${label} (${response.status} ${response.statusText}).`,
+      `Không thể tải ${label} (${response.status} ${response.statusText}).`,
     )
   }
 
@@ -40,8 +40,8 @@ async function fetchGeoJson(url, label, idField) {
 function requestGraphData() {
   if (!pendingGraphRequest) {
     pendingGraphRequest = Promise.all([
-      fetchGeoJson(GRAPH_DATA_URLS.nodes, 'nodes GeoJSON', 'node_id'),
-      fetchGeoJson(GRAPH_DATA_URLS.edges, 'edges GeoJSON', 'edge_id'),
+      fetchGeoJson(GRAPH_DATA_URLS.nodes, 'các nút GeoJSON', 'node_id'),
+      fetchGeoJson(GRAPH_DATA_URLS.edges, 'các cạnh GeoJSON', 'edge_id'),
     ]).finally(() => {
       pendingGraphRequest = null
     })
@@ -69,7 +69,7 @@ export function useGraphData({ autoLoad = true } = {}) {
       return { nodes, edges }
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Unable to load graph data.'
+        error instanceof Error ? error.message : 'Không thể tải dữ liệu đồ thị.'
       setGraphDataError(message)
       return null
     }

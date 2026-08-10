@@ -1,3 +1,5 @@
+import { formatNodeNumber } from '../results/resultFormatting.js'
+
 export function createNodeConnectionLookup(edgeFeatures = []) {
   const lookup = new Map()
 
@@ -25,8 +27,8 @@ export function createNodeConnectionLookup(edgeFeatures = []) {
 
 export function describeNodeConnections(node) {
   const connections = node?.connections ?? []
-  const heading = `${node?.id ?? 'Unknown'}: ${node?.name ?? 'Unknown location'}`
-  if (connections.length === 0) return `${heading}\nNo connected edges.`
+  const heading = formatNodeNumber(node?.id ?? 'Không xác định')
+  if (connections.length === 0) return `${heading}\nKhông có cạnh kết nối.`
 
   const outgoing = connections.filter(
     ({ direction }) => direction === 'outgoing',
@@ -34,16 +36,18 @@ export function describeNodeConnections(node) {
   const incoming = connections.filter(
     ({ direction }) => direction === 'incoming',
   )
-  const formatOutgoing = ({ edgeId, toNode }) => `${edgeId} → ${toNode}`
-  const formatIncoming = ({ edgeId, fromNode }) => `${edgeId} ← ${fromNode}`
+  const formatOutgoing = ({ edgeId, toNode }) =>
+    `${edgeId} → ${formatNodeNumber(toNode)}`
+  const formatIncoming = ({ edgeId, fromNode }) =>
+    `${edgeId} ← ${formatNodeNumber(fromNode)}`
 
   return [
     heading,
-    `Outgoing (${outgoing.length}): ${
-      outgoing.length > 0 ? outgoing.map(formatOutgoing).join(', ') : 'none'
+    `Đi ra (${outgoing.length}): ${
+      outgoing.length > 0 ? outgoing.map(formatOutgoing).join(', ') : 'không có'
     }`,
-    `Incoming (${incoming.length}): ${
-      incoming.length > 0 ? incoming.map(formatIncoming).join(', ') : 'none'
+    `Đi vào (${incoming.length}): ${
+      incoming.length > 0 ? incoming.map(formatIncoming).join(', ') : 'không có'
     }`,
   ].join('\n')
 }

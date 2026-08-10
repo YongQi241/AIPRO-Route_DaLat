@@ -181,7 +181,7 @@ async function loadLocalData() {
     localDataRequest = Promise.all(
       [EDGE_DATA_URL, CONDITION_DATA_URL].map(async (url) => {
         const response = await fetch(url)
-        if (!response.ok) throw new Error(`Unable to load ${url}.`)
+        if (!response.ok) throw new Error(`Không thể tải ${url}.`)
         return parseCsv(await response.text())
       }),
     ).catch((error) => {
@@ -203,12 +203,12 @@ async function requestApi(scenarioId, optimization, signal) {
   try {
     payload = text ? JSON.parse(text) : null
   } catch {
-    throw new Error(`Cost endpoint returned invalid JSON (${response.status}).`)
+    throw new Error(`Điểm cuối chi phí trả về JSON không hợp lệ (${response.status}).`)
   }
   if (!response.ok || payload?.status !== 'success') {
     throw new Error(
       payload?.message ??
-        `Unable to load scenario edge costs (${response.status}).`,
+        `Không thể tải chi phí cạnh theo kịch bản (${response.status}).`,
     )
   }
   return payload
@@ -225,7 +225,7 @@ export async function fetchScenarioEdgeCosts(
     if (apiError.name === 'AbortError') throw apiError
     const [edges, conditions] = await loadLocalData()
     if (signal?.aborted) {
-      throw new DOMException('The request was aborted.', 'AbortError')
+      throw new DOMException('Yêu cầu đã bị hủy.', 'AbortError')
     }
     return calculateScenarioEdgeCosts(
       edges,

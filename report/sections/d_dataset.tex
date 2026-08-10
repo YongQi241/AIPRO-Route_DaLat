@@ -1,65 +1,104 @@
-\chapter{Dataset}
+% !TeX root = ../main.tex
+% !TeX program = pdflatex
+% !TeX encoding = UTF-8
+
+\chapter{Tập dữ liệu}
 \label{chap:dataset}
 
-\section{Source of Data or Data Creation Method}
+\section{Nguồn và phương pháp tạo dữ liệu}
 
-\fillin{Explain where the data came from. Common options include: manually collected from Google Maps by recording distances and typical travel times between chosen locations, exported from OpenStreetMap for a chosen area, or manually created by the group to represent a simplified but realistic version of a real district.}
+Danh sách đầu vào gồm 25 địa điểm du lịch và đầu mối giao thông tại Đà Lạt,
+được lưu trong \texttt{data/nodes.geojson}. Script \texttt{build\_edges.py}
+dùng OSMnx để tải mạng đường lái xe từ OpenStreetMap, ghép mỗi địa điểm vào
+đỉnh đường gần nhất và tính tuyến giữa các cặp địa điểm được chọn. Một cây
+khung nhỏ nhất bảo đảm toàn bộ mạng liên thông; mỗi địa điểm còn được nối với
+ba láng giềng địa lý gần nhất để tạo các tuyến thay thế.
 
-\fillin{If data was collected from an online map service, mention the date it was collected on, since travel time and congestion values depend on when they were recorded. If the data was synthetically created, explain the logic used to assign realistic values.}
+Khoảng cách và loại đường được lấy từ mạng OpenStreetMap. Thời gian cơ sở được
+tính từ khoảng cách và vận tốc mô hình theo loại đường (15--50 km/h), không
+phải dữ liệu giao thông trực tiếp. Script \texttt{generate\_edge\_conditions.py}
+dùng seed 2026 để sinh điều kiện có thể tái lập cho năm kịch bản S0--S4. Vì vậy
+các mức ùn tắc và rủi ro là dữ liệu mô phỏng, không phải quan sát thời gian thực.
 
-\section{List of Locations Used}
+Sau tiền xử lý, backend dùng 25 đỉnh, 114 cạnh có hướng và 570 bản ghi điều
+kiện (114 cạnh nhân với 5 kịch bản). Các file CSV và GeoJSON sinh ra dùng chung
+\texttt{node\_id} và \texttt{edge\_id} để backend và frontend đồng bộ.
 
-The table below lists every location, that is every node, used in the graph for this project. Replace the placeholder rows with the real locations chosen by the group.
+\section{Danh sách địa điểm}
+
+\begin{longtable}{p{1.2cm}p{7.0cm}p{4.6cm}}
+\caption{Các địa điểm trong tập dữ liệu}\label{tab:locations}\\
+\toprule
+ID & Tên địa điểm & Loại \\
+\midrule
+\endfirsthead
+\toprule
+ID & Tên địa điểm & Loại \\
+\midrule
+\endhead
+DL01 & Nhà lao thiếu nhi Đà Lạt & Bảo tàng \\
+DL02 & Ga Đà Lạt & Di sản \\
+DL03 & Crazy House & Kiến trúc \\
+DL04 & Museum Madam De Dalat & Bảo tàng \\
+DL05 & Bảo tàng Lâm Đồng & Bảo tàng \\
+DL06 & Thung Lũng Tình Yêu & Khu du lịch \\
+DL07 & Thác Datanla & Thác nước \\
+DL08 & Devil Mountain Tourist Area & Khu du lịch \\
+DL09 & Làng Cu Lần & Khu du lịch \\
+DL10 & Vườn dâu Công nghệ cao Bình Yên & Vườn \\
+DL11 & Thác Prenn & Thác nước \\
+DL12 & Đường hầm điêu khắc & Điểm tham quan \\
+DL13 & Dinh III Bảo Đại & Di sản \\
+DL14 & Vườn Hoa Cẩm Tú Cầu & Vườn \\
+DL15 & Nhà thờ Cam Ly & Công trình tôn giáo \\
+DL16 & Hồ Tuyền Lâm & Hồ \\
+DL17 & Khu du lịch sinh thái Cao Nguyên Hoa Đà Lạt & Công viên chủ đề \\
+DL18 & Làng Cổ Tích & Điểm tham quan \\
+DL19 & Làng Đồng trụ LangBiang & Văn hóa \\
+DL20 & Thác Ankroet & Thác nước \\
+DL21 & Chợ Đà Lạt & Chợ \\
+DL22 & Hồ Xuân Hương & Hồ \\
+DL23 & Quảng trường Lâm Viên & Địa danh \\
+DL24 & Thiền viện Trúc Lâm Đà Lạt & Công trình tôn giáo \\
+DL25 & Bến xe Liên tỉnh Đà Lạt & Giao thông \\
+\bottomrule
+\end{longtable}
+
+\section{Khoảng cách, thời gian, ùn tắc và loại đường}
+
+Khoảng cách được lưu theo km với ba chữ số thập phân; thời gian cơ sở được lưu
+theo phút. Mỗi kịch bản gán mức ùn tắc nguyên từ 1 (thông thoáng) đến 5 (ùn tắc
+nặng), hệ số thời gian, rủi ro mưa, sương mù, thi công và trạng thái đóng/mở cho
+từng cạnh. Giá trị thay đổi theo kịch bản nhưng cố định trong một lần tìm đường.
 
 \begin{table}[h!]
 \centering
-\caption{List of locations in the dataset}
-\begin{tabular}{clp{6cm}}
+\caption{Một số cạnh đầu tiên trong dữ liệu gốc}
+\small
+\begin{tabular}{p{1.1cm}p{2.6cm}rrp{4.4cm}}
 \toprule
-ID & Location Name & Description \\
+Cạnh & Hướng & Khoảng cách (km) & Thời gian (phút) & Loại đường \\
 \midrule
-N01 & \fillin{location name} & \fillin{short description, for example a landmark, intersection, or ward} \\
-N02 & \fillin{location name} & \fillin{short description} \\
-N03 & \fillin{location name} & \fillin{short description} \\
-N04 & \fillin{location name} & \fillin{short description} \\
-N05 & \fillin{location name} & \fillin{short description} \\
+E001 & DL01 $\rightarrow$ DL02 & 2,320 & 3,56 & residential, secondary \\
+E002 & DL02 $\rightarrow$ DL01 & 2,320 & 3,56 & residential, secondary \\
+E003 & DL01 $\rightarrow$ DL05 & 2,207 & 4,24 & residential, secondary, trunk \\
+E005 & DL01 $\rightarrow$ DL06 & 6,008 & 9,10 & residential, secondary \\
+E007 & DL01 $\rightarrow$ DL14 & 7,289 & 15,20 & primary, residential, secondary, trunk, unclassified \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Description of Distance, Time, Congestion, and Road Type Values}
-
-\begin{itemize}[itemsep=3pt]
-  \item \textbf{Distance.} Recorded in kilometers, rounded to one decimal place, taken as the actual road distance between two connected locations rather than the straight line distance.
-  \item \textbf{Time.} Recorded in minutes, representing the expected travel time under normal traffic conditions, before any congestion adjustment is applied.
-  \item \textbf{Congestion.} Recorded as a value from \fillin{state your scale, for example 1 to 5}, where a low value means free flowing traffic and a high value means heavy congestion. \fillin{Explain whether this value is fixed per edge or whether it changes with time of day in your implementation.}
-  \item \textbf{Road type.} Recorded as one of a small set of categories, for example main road, secondary road, or alley, used to apply the road type penalty described in the cost function.
-\end{itemize}
-
-An excerpt of the raw edge data used in the graph is shown below as an example of the table format. Replace the values with your actual dataset.
-
-\begin{table}[h!]
-\centering
-\caption{Sample of edge data}
-\begin{tabular}{cccccc}
-\toprule
-From & To & Distance (km) & Time (min) & Congestion & Road Type \\
-\midrule
-N01 & N02 & \fillin{value} & \fillin{value} & \fillin{value} & \fillin{value} \\
-N02 & N03 & \fillin{value} & \fillin{value} & \fillin{value} & \fillin{value} \\
-N03 & N04 & \fillin{value} & \fillin{value} & \fillin{value} & \fillin{value} \\
-N01 & N04 & \fillin{value} & \fillin{value} & \fillin{value} & \fillin{value} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\section{Assumptions Made by the Group}
-
-\fillin{List every simplifying assumption made while building the dataset, since a graph model of a real city always leaves something out. Examples of common assumptions are listed below, edit them to match what your group actually did.}
+\section{Các giả định và đơn giản hóa}
 
 \begin{itemize}[itemsep=2pt]
-  \item Congestion levels are treated as fixed values rather than changing continuously through the day.
-  \item Traffic lights and intersection wait times are not modeled separately and are assumed to be already reflected in the base travel time.
-  \item Only the road segments that were manually recorded are included, so the graph is a simplified subset of the real road network rather than a complete map.
-  \item Weather conditions and temporary road closures are not taken into account.
+  \item Tập dữ liệu chỉ nối các địa điểm đã chọn, không chứa mọi giao lộ của thành
+  phố như những đỉnh tìm kiếm độc lập.
+  \item Vận tốc theo loại đường là giả định mô hình, không phải giới hạn tốc độ
+  được công bố hoặc số đo từ thiết bị GPS.
+  \item Ùn tắc, thời tiết, thi công và đóng đường được sinh giả lập bằng seed cố
+  định; chúng không thay đổi trong thời gian một chuyến đi.
+  \item Thời gian chờ đèn giao thông và tại giao lộ không được mô hình riêng.
+  \item Hình học cạnh hiện được xuất thành đoạn thẳng giữa hai địa điểm để giao
+  diện nhẹ hơn, trong khi khoảng cách và thời gian vẫn dựa trên tuyến đường đã
+  tính từ OpenStreetMap.
 \end{itemize}

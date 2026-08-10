@@ -188,8 +188,8 @@ def optimization_weight(optimization: str) -> str:
         return "route_cost"
 
     raise ValueError(
-        "Unknown optimization. Choose shortest/distance, fastest/time, "
-        "balanced/cost, or safest."
+        "Tiêu chí tối ưu không xác định. Hãy chọn shortest/distance, "
+        "fastest/time, balanced/cost hoặc safest."
     )
 
 
@@ -258,14 +258,13 @@ def solve_route(
     try:
         if normalized_algorithm in MULTI_ROUTE_ALGORITHMS:
             raise ValueError(
-                "Multi-location algorithms require intermediate or "
-                "destination locations."
+                "Thuật toán đa địa điểm cần địa điểm trung gian hoặc điểm đến."
             )
 
         if normalized_algorithm not in SINGLE_ROUTE_ALGORITHMS:
             raise ValueError(
-                "Unknown algorithm. Choose BFS, DFS, UCS, Dijkstra, A*, "
-                "Greedy Best-First, or Hill Climbing."
+                "Thuật toán không xác định. Hãy chọn BFS, DFS, UCS, Dijkstra, "
+                "A*, Tham Lam ưu tiên tốt nhất hoặc Leo đồi."
             )
 
         loader_optimization = normalize_optimization(optimization)
@@ -384,8 +383,8 @@ def solve_multi_location(
     try:
         if normalized_algorithm not in MULTI_ROUTE_ALGORITHMS:
             raise ValueError(
-                "Choose Nearest Neighbor or Exact TSP for a "
-                "multi-location route."
+                "Hãy chọn Láng giềng gần nhất hoặc TSP chính xác cho tuyến "
+                "đa địa điểm."
             )
 
         loader_optimization = normalize_optimization(optimization)
@@ -461,7 +460,7 @@ def solve(
                 optimization=optimization,
                 start_node=start_node,
                 visit_nodes=[],
-                message=f"{algorithm} requires visit_nodes.",
+                message=f"{algorithm} cần trường visit_nodes.",
             )
 
         return solve_multi_location(
@@ -483,7 +482,7 @@ def solve(
             optimization=optimization,
             start_node=start_node,
             goal_node="",
-            message=f"Algorithm {algorithm!r} requires goal_node.",
+            message=f"Thuật toán {algorithm!r} cần trường goal_node.",
         )
 
     return solve_route(
@@ -522,11 +521,11 @@ def _single_error_result(
         "metrics": {},
         "segments": [],
         "explanation": (
-            "The route request or dataset configuration is invalid."
+            "Yêu cầu định tuyến hoặc cấu hình tập dữ liệu không hợp lệ."
             if status == "invalid_input"
-            else "An unexpected error occurred while computing the route."
+            else "Đã xảy ra lỗi không mong đợi khi tính tuyến đường."
         ),
-        "optimality_note": "No route was computed.",
+        "optimality_note": "Chưa tính được tuyến đường.",
         "message": message,
     }
 
@@ -557,9 +556,8 @@ def _multi_error_result(
         "segments": [],
         "legs": [],
         "explanation": (
-            "The multi-location request or dataset configuration is "
-            "invalid."
+            "Yêu cầu đa địa điểm hoặc cấu hình tập dữ liệu không hợp lệ."
         ),
-        "optimality_note": "No route was computed.",
+        "optimality_note": "Chưa tính được tuyến đường.",
         "message": message,
     }

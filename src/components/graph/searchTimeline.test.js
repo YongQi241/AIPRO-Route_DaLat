@@ -95,6 +95,7 @@ test('keeps directed candidate order and produces ADD, UPDATE, and KEEP', () => 
       ['E_BD', 'keep'],
     ],
   )
+  assert.equal(bActions[0].retainedEdgeId, 'E_AC')
   assert.ok(!bActions.some((action) => action.activeEdgeId === 'E_CB'))
 })
 

@@ -1,10 +1,10 @@
 .edge-hover-card {
   position: absolute;
   z-index: 4;
-  right: 14px;
-  bottom: 14px;
-  width: min(520px, calc(100% - 28px));
+  width: min(420px, calc(100% - 28px));
+  max-height: min(420px, calc(100% - 28px));
   padding: 12px;
+  overflow: auto;
   border: 1px solid #cbd5e1;
   border-radius: 12px;
   color: #334155;
@@ -12,6 +12,11 @@
   box-shadow: 0 12px 30px rgb(15 23 42 / 18%);
   font-size: 0.72rem;
   pointer-events: none;
+  transform: translate(-50%, 12px);
+}
+
+.edge-hover-card--above {
+  transform: translate(-50%, calc(-100% - 12px));
 }
 
 .edge-hover-card header,

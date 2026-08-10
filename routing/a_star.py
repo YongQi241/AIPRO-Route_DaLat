@@ -76,7 +76,7 @@ def travel_time_heuristic(
     """
 
     if maximum_speed_kph <= 0:
-        raise ValueError("maximum_speed_kph must be greater than zero.")
+        raise ValueError("maximum_speed_kph phải lớn hơn 0.")
 
     direct_distance = straight_line_distance_heuristic(
         graph,
@@ -150,8 +150,8 @@ def a_star_search(
 
     if weight not in SUPPORTED_WEIGHTS:
         raise ValueError(
-            f"Unsupported A* weight: {weight}. "
-            f"Choose one of {sorted(SUPPORTED_WEIGHTS)}"
+            f"Trọng số A* không được hỗ trợ: {weight}. "
+            f"Hãy chọn một trong {sorted(SUPPORTED_WEIGHTS)}"
         )
 
     require_nonnegative_weight(graph, weight)
@@ -219,6 +219,12 @@ def a_star_search(
             edge_weight = float(graph[current][neighbor][weight])
             tentative_g = g_score[current] + edge_weight
             previous_g = g_score.get(neighbor)
+            previous_parent = parent.get(neighbor)
+            previous_edge_id = (
+                None
+                if previous_parent is None
+                else str(graph[previous_parent][neighbor]["edge_id"])
+            )
             neighbor_h = float(
                 heuristic_function(graph, neighbor, goal_node)
             )
@@ -254,6 +260,7 @@ def a_star_search(
                     "node": str(neighbor),
                     "outcome": outcome,
                     "previous_values": previous_values,
+                    "previous_edge_id": previous_edge_id,
                     "candidate_values": candidate_values,
                 }
             )
@@ -294,14 +301,14 @@ def a_star_search(
         optimization=optimization,
         started_at=started_at,
         explanation=(
-            f"A* combined cumulative {weight} with the "
-            f"{heuristic_name} estimate to guide the search."
+            f"A* kết hợp {weight} tích lũy với giá trị ước lượng "
+            f"{heuristic_name} để dẫn hướng tìm kiếm."
         ),
         optimality_note=(
-            "A* is optimal when the supplied heuristic never "
-            "overestimates the remaining selected weight. The default "
-            "heuristics are designed to be safe under the documented "
-            "speed assumption; route_cost and risk use a zero heuristic."
+            "A* tối ưu khi hàm ước lượng không bao giờ đánh giá quá cao "
+            "trọng số còn lại. Các hàm ước lượng mặc định được thiết kế an "
+            "toàn theo giả định tốc độ đã nêu; route_cost và risk dùng hàm "
+            "ước lượng bằng 0."
         ),
         weight_used=weight,
     )

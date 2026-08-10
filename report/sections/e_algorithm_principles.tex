@@ -1,31 +1,51 @@
+% !TeX root = ../main.tex
+% !TeX program = pdflatex
+% !TeX encoding = UTF-8
+% Biên dịch tài liệu gốc bằng pdfLaTeX.
+
 \chapter{Nguyên Lý Thuật Toán}
 \label{chap:algorithm-principles}
 
 Chương này giải thích lý thuyết đằng sau mỗi thuật toán tìm kiếm được triển khai trong đồ án.
 
-\section{Breadth First Search}
+\section{Tìm kiếm theo chiều rộng (Breadth First Search)}
 
-Breadth First Search, or BFS, explores the graph level by level. It keeps a queue of nodes to visit, always following a first in first out order, so all nodes at the current distance, measured in number of edges, are explored before any node one step further away is considered.
+BFS duyệt đồ thị theo từng mức bằng hàng đợi FIFO. Vì mọi đỉnh cách điểm xuất
+phát cùng số cạnh được xét trước mức tiếp theo, BFS tìm được đường có ít cạnh
+nhất mà không xét đến trọng số.
 
-\textbf{Example.} Starting at A with the goal D, BFS first visits the direct neighbors of A, which are B, C, and D, in the order they were added to the graph. Since D is a direct neighbor of A in this example, BFS reaches it after exploring only the first level, even though the direct edge from A to D is longer in distance than the path through B or C.
+\textbf{Ví dụ.} Từ A đến D, BFS lần lượt đưa B, C và D vào hàng đợi. D được
+tìm thấy ở mức đầu tiên dù cạnh A--D có thể dài hơn một tuyến đi qua đỉnh trung
+gian.
 
-\textbf{Completeness and optimality.} BFS is complete, meaning it is guaranteed to find a goal if one exists, as long as the graph has a finite branching factor. BFS is optimal only when every edge has the same cost, since it always returns the path with the fewest edges rather than the path with the lowest total cost. For this project, where edges have different weighted costs, BFS is used mainly as a baseline for comparison rather than as the main route finding method.
+\textbf{Tính hoàn chỉnh và tối ưu.} BFS hoàn chỉnh trên đồ thị hữu hạn nhưng
+chỉ tối ưu khi mọi cạnh có cùng chi phí. Trong đồ án, BFS là đường cơ sở để so
+sánh vì trọng số các cạnh không bằng nhau.
 
-\section{Depth First Search}
+\section{Tìm kiếm theo chiều sâu (Depth First Search)}
 
-Depth First Search, or DFS, explores as far as possible along each branch before backtracking. It uses a stack, either explicitly or through recursion, so the most recently discovered node is always the next one expanded.
+DFS đi sâu nhất có thể theo một nhánh rồi mới quay lui. Thuật toán dùng ngăn
+xếp nên đỉnh mới được phát hiện gần nhất sẽ được mở rộng trước.
 
-\textbf{Example.} Starting at A, DFS might go to B first, then from B to D, reaching the goal quickly if the first branch happens to lead there. If instead the first branch chosen from A leads to a dead end or a long detour, DFS will follow it fully before backtracking to try another neighbor of A.
+\textbf{Ví dụ.} Từ A, DFS có thể chọn B rồi đến D rất nhanh nếu nhánh đầu tiên
+dẫn đến đích. Nếu nhánh đó là ngõ cụt hoặc đường vòng, DFS vẫn đi hết nhánh
+trước khi trở lại thử một láng giềng khác của A.
 
-\textbf{Completeness and optimality.} DFS is complete on finite graphs as long as cycles are handled with a visited set, but it is not complete in general on infinite search spaces. DFS is not optimal, since the first path it finds to the goal depends on the order in which neighbors are explored rather than on the cost of the path. DFS is included in this project mainly to show, by contrast, how a route finding method that ignores cost can return a noticeably worse path than the informed methods described later.
+\textbf{Tính hoàn chỉnh và tối ưu.} Khi có tập đỉnh đã thăm, DFS hoàn chỉnh
+trên đồ thị hữu hạn nhưng không tối ưu. Tuyến đầu tiên phụ thuộc thứ tự láng
+giềng thay vì chi phí, nên kết quả có thể kém đáng kể.
 
-\section{Uniform Cost Search}
+\section{Tìm kiếm chi phí đồng nhất (Uniform Cost Search)}
 
-Uniform Cost Search, or UCS, expands the node with the lowest cumulative path cost so far, using a priority queue instead of a plain queue or stack. This makes UCS the natural choice for the route finding problem, since it directly minimizes the cost function defined in Chapter~\ref{chap:problem-modeling}, which already combines distance, time, and congestion.
+UCS mở rộng đỉnh có chi phí tích lũy nhỏ nhất bằng hàng đợi ưu tiên. Do đó,
+thuật toán tối ưu trực tiếp hàm chi phí ở Chương~\ref{chap:problem-modeling}.
 
-\textbf{Example.} Using the weights on the example graph, UCS starting at A compares the path A to D directly, with cost 6.4, against the path A to B to D, with cost $4.2 + 2.5 = 6.7$, and the path A to C to D, with cost $3.1 + 5.0 = 8.1$. UCS expands nodes in order of increasing cumulative cost and correctly identifies the direct edge A to D as the cheapest path in this small example.
+\textbf{Ví dụ.} Trên Hình~\ref{fig:example-graph}, UCS so sánh A--D có chi
+phí 6,4 với A--B--D có chi phí $4,2+2,5=6,7$ và A--C--D có chi phí
+$3,1+5,0=8,1$. Vì mở rộng theo chi phí tăng dần, UCS chọn A--D.
 
-\textbf{Completeness and optimality.} UCS is complete and optimal, provided all edge costs are non negative, which is always true for the distance and time based costs used in this project. This makes UCS a reliable baseline against which the informed methods below can be compared.
+\textbf{Tính hoàn chỉnh và tối ưu.} UCS hoàn chỉnh và tối ưu khi mọi chi phí
+cạnh không âm, điều kiện luôn đúng với các trọng số của đồ án.
 
 \section{Tìm Kiếm A* (A Star Search)}
 
@@ -66,13 +86,14 @@ Trong đó, $\phi$ là vĩ độ, $\lambda$ là kinh độ và $r$ là bán kín
 \begin{table}[h!]
 \centering
 \caption{Tính hoàn chỉnh và tối ưu của từng thuật toán}
-\begin{tabular}{lcc}
+\small
+\begin{tabular}{p{4.2cm}p{3.6cm}p{5.0cm}}
 \toprule
 Thuật toán & Hoàn chỉnh & Tối ưu \\
 \midrule
-Breadth First Search & Yes & Only for equal edge costs \\
-Depth First Search & Yes, with a visited set & No \\
-Uniform Cost Search & Yes & Yes, for non negative costs \\
+Breadth First Search & Có & Chỉ khi chi phí cạnh bằng nhau \\
+Depth First Search & Có, với tập đã thăm & Không \\
+Uniform Cost Search & Có & Có, với chi phí không âm \\
 A* (A Star Search) & Có (với Heuristic hợp lệ) & Có \\
 Greedy Best-First Search & Không & Không \\
 Hill Climbing & Không (Dễ kẹt ngõ cụt) & Không \\

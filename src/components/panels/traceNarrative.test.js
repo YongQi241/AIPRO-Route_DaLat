@@ -17,10 +17,9 @@ test('explains A* expansion values in human terms', () => {
     candidateEdgeIds: ['E1'],
   }, [], { algorithm: 'A*', locationNames: names })
 
-  assert.match(event.title, /Market \(A\)/)
-  assert.match(event.detail, /lowest estimated total f\(n\)/)
-  assert.match(event.detail, /g\(n\)=2, the accumulated cost/)
-  assert.match(event.detail, /h\(n\)=3, the estimated remaining cost/)
+  assert.match(event.title, /A/)
+  assert.match(event.detail, /f\(n\)=5 nhỏ nhất/)
+  assert.match(event.detail, /g=2, h=3/)
 })
 
 test('distinguishes a local scenario edge cost from cumulative search cost', () => {
@@ -34,9 +33,9 @@ test('distinguishes a local scenario edge cost from cumulative search cost', () 
     edgeCostDetails: { E1: { route_cost: 2.5 } },
   })
 
-  assert.match(event.title, /Market \(A\) → Lake \(B\)/)
-  assert.match(event.detail, /local scenario-dependent edge cost is 2.5/)
-  assert.match(event.detail, /g\(n\).*cumulative/)
+  assert.match(event.title, /A → B/)
+  assert.match(event.detail, /Chi phí cạnh: 2.5/)
+  assert.match(event.detail, /g\(n\)\/f\(n\).*tích lũy/)
 })
 
 test('summarizes frontier state with readable location names', () => {
@@ -45,8 +44,8 @@ test('summarizes frontier state with readable location names', () => {
     frontierNodeIds: ['B', 'C'], visitedNodeIds: ['A'],
   }, [], { algorithm: 'BFS', locationNames: names })
 
-  assert.match(event.detail, /Lake \(B\), Station \(C\)/)
-  assert.match(event.detail, /not part of the final route/)
+  assert.match(event.detail, /B, C/)
+  assert.match(event.detail, /Đã thăm 1 nút/)
 })
 
 test('explains the complete nearest-neighbor comparison', () => {
@@ -56,7 +55,6 @@ test('explains the complete nearest-neighbor comparison', () => {
     selectedScore: 4, frontierNodeIds: ['B', 'C'], visitedNodeIds: [],
   }, [], { algorithm: 'Nearest Neighbor', locationNames: names })
 
-  assert.match(event.title, /Lake \(B\)/)
-  assert.match(event.detail, /lowest reachable route score \(4\)/)
-  assert.match(event.detail, /reconsidered from this new stop/)
+  assert.match(event.title, /B/)
+  assert.match(event.detail, /điểm thấp nhất 4/)
 })

@@ -22,6 +22,14 @@ function getNodeNotation(nodeId) {
   return numericPart ?? String(nodeId)
 }
 
+const NODE_STATE_LABELS = {
+  final: 'thuộc tuyến cuối',
+  current: 'hiện tại',
+  frontier: 'trên biên',
+  visited: 'đã thăm',
+  unvisited: 'chưa thăm',
+}
+
 export default function GraphNodeLayer({
   nodes = [],
   currentNodeId = null,
@@ -64,7 +72,7 @@ export default function GraphNodeLayer({
             transform={`translate(${node.x} ${node.y})`}
             tabIndex="0"
             role="img"
-            aria-label={`${hoverDescription.replaceAll('\n', '. ')}; ${nodeState}`}
+            aria-label={`${hoverDescription.replaceAll('\n', '. ')}; ${NODE_STATE_LABELS[nodeState]}`}
           >
             <title>{hoverDescription}</title>
             {node.id === evaluatedNodeId && (

@@ -140,13 +140,12 @@ def greedy_best_first_search(
         optimization=optimization,
         started_at=started_at,
         explanation=(
-            "Greedy Best-First Search repeatedly expanded the frontier "
-            "node with the smallest estimated remaining distance to the "
-            "destination."
+            "Tìm kiếm Tham Lam ưu tiên tốt nhất liên tục mở rộng nút biên "
+            "có quãng đường còn lại ước tính tới đích nhỏ nhất."
         ),
         optimality_note=(
-            "No optimality guarantee: the priority contains only h(n) "
-            "and ignores the cost already travelled."
+            "Không bảo đảm tối ưu: độ ưu tiên chỉ chứa h(n) và bỏ qua chi "
+            "phí đã đi."
         ),
         weight_used="heuristic_only",
     )
@@ -162,7 +161,7 @@ def _heuristic_value(
 ) -> float:
     value = float(heuristic(graph, current, goal))
     if value < 0:
-        raise ValueError("Greedy heuristic values must be nonnegative.")
+        raise ValueError("Giá trị ước lượng Tham Lam phải không âm.")
     return value
 
 

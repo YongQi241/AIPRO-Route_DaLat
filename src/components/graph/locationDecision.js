@@ -1,3 +1,5 @@
+import { formatNodeNumber } from '../results/resultFormatting.js'
+
 function toFiniteNumber(value) {
   const number = Number(value)
   return value == null || value === '' || !Number.isFinite(number)
@@ -8,7 +10,7 @@ function toFiniteNumber(value) {
 function formatNumber(value) {
   return toFiniteNumber(value)?.toLocaleString(undefined, {
     maximumFractionDigits: 6,
-  }) ?? 'unknown'
+  }) ?? 'không xác định'
 }
 
 export function describeLocationDecision(action) {
@@ -19,19 +21,19 @@ export function describeLocationDecision(action) {
   ).length
 
   if (action?.outcome === 'unreachable') {
-    return 'Not selected because no directed route from the current stop was reachable.'
+    return 'Loại: không có tuyến có hướng.'
   }
 
   if (action?.outcome === 'selected') {
-    return `Selected with score ${formatNumber(score)} because it is the lowest reachable score among ${reachableCount} option${reachableCount === 1 ? '' : 's'}.`
+    return `Chọn: điểm ${formatNumber(score)} thấp nhất trong ${reachableCount} phương án.`
   }
 
   if (score != null && selectedScore != null) {
     if (score === selectedScore) {
-      return `Not selected despite tying at ${formatNumber(score)}; the deterministic node-ID tie-break chose ${action.selectedNodeId}.`
+      return `Loại do phá hòa; chọn nút ${formatNodeNumber(action.selectedNodeId)} cùng điểm ${formatNumber(score)}.`
     }
-    return `Not selected because its score ${formatNumber(score)} is higher than ${action.selectedNodeId} at ${formatNumber(selectedScore)} by ${formatNumber(score - selectedScore)}.`
+    return `Loại: ${formatNumber(score)} > ${formatNumber(selectedScore)} của nút ${formatNodeNumber(action.selectedNodeId)} (chênh ${formatNumber(score - selectedScore)}).`
   }
 
-  return `Not selected; ${action?.selectedNodeId ?? 'another reachable location'} had the better recorded score.`
+  return `Loại: nút ${action?.selectedNodeId ? formatNodeNumber(action.selectedNodeId) : 'khác'} có điểm tốt hơn.`
 }

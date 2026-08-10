@@ -54,8 +54,8 @@ def dijkstra_search(
 
     if weight not in SUPPORTED_WEIGHTS:
         raise ValueError(
-            f"Unsupported Dijkstra weight: {weight}. "
-            f"Choose one of {sorted(SUPPORTED_WEIGHTS)}"
+            f"Trọng số Dijkstra không được hỗ trợ: {weight}. "
+            f"Hãy chọn một trong {sorted(SUPPORTED_WEIGHTS)}"
         )
 
     require_nonnegative_weight(graph, weight)
@@ -92,6 +92,7 @@ def dijkstra_search(
                         "priority": round(current_distance, 6),
                     },
                     "selection_rule": "lowest_g_cost",
+                    "relaxations": [],
                     "frontier": _frontier_snapshot(
                         frontier,
                         settled,
@@ -102,9 +103,24 @@ def dijkstra_search(
             )
             break
 
+        relaxations: list[dict] = []
         for neighbor in graph.successors(current):
             edge_weight = float(graph[current][neighbor][weight])
             candidate = current_distance + edge_weight
+            previous_distance = distance.get(neighbor)
+            previous_parent = parent.get(neighbor)
+            previous_edge_id = (
+                None
+                if previous_parent is None
+                else str(graph[previous_parent][neighbor]["edge_id"])
+            )
+            outcome = (
+                "add"
+                if previous_distance is None
+                else "update"
+                if candidate < previous_distance
+                else "keep"
+            )
 
             if candidate < distance.get(neighbor, float("inf")):
                 distance[neighbor] = candidate
@@ -114,6 +130,27 @@ def dijkstra_search(
                     (candidate, next(tie_breaker), neighbor),
                 )
 
+            relaxations.append(
+                {
+                    "edge_id": str(graph[current][neighbor]["edge_id"]),
+                    "node": str(neighbor),
+                    "outcome": outcome,
+                    "previous_values": (
+                        None
+                        if previous_distance is None
+                        else {
+                            "g_cost": round(float(previous_distance), 6),
+                            "priority": round(float(previous_distance), 6),
+                        }
+                    ),
+                    "previous_edge_id": previous_edge_id,
+                    "candidate_values": {
+                        "g_cost": round(candidate, 6),
+                        "priority": round(candidate, 6),
+                    },
+                }
+            )
+
         frontier_steps.append(
             {
                 "current": current,
@@ -122,6 +159,7 @@ def dijkstra_search(
                     "priority": round(current_distance, 6),
                 },
                 "selection_rule": "lowest_g_cost",
+                "relaxations": relaxations,
                 "frontier": _frontier_snapshot(
                     frontier,
                     settled,
@@ -145,12 +183,12 @@ def dijkstra_search(
         optimization=optimization,
         started_at=started_at,
         explanation=(
-            f"Dijkstra expanded nodes in increasing cumulative "
-            f"{weight} and selected the minimum-{weight} route."
+            f"Dijkstra mở rộng các nút theo {weight} tích lũy tăng dần và "
+            f"chọn tuyến có {weight} nhỏ nhất."
         ),
         optimality_note=(
-            f"Optimal for {weight} because every selected edge "
-            "weight is nonnegative."
+            f"Tối ưu theo {weight} vì trọng số của mọi cạnh được chọn đều "
+            "không âm."
         ),
         weight_used=weight,
     )

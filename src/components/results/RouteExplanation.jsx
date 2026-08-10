@@ -1,6 +1,11 @@
 import { useMemo } from 'react'
 import { useAppStore } from '../../store/useAppStore'
-import { createNodeNameLookup, formatNumber } from './resultFormatting'
+import {
+  createNodeNameLookup,
+  formatAlgorithmLabel,
+  formatNumber,
+  formatOptimizationLabel,
+} from './resultFormatting'
 import { buildRouteReasoning } from './routeReasoning'
 import './RouteExplanation.css'
 
@@ -15,15 +20,15 @@ function Figure({ label, value, unit = '' }) {
 
 function TraceStatistics({ trace }) {
   const figures = [
-    ['Recorded actions', trace.recordedActions],
-    ['Nodes expanded', trace.expansions],
-    ['Roads checked', trace.edgeChecks],
-    ['New frontier entries', trace.added],
-    ['Improved entries', trace.improved],
-    ['Existing routes retained', trace.retainedExisting],
-    ['Location comparisons', trace.locationComparisons],
-    ['Unreachable locations', trace.unreachableLocations],
-    ['Peak frontier size', trace.peakFrontier],
+    ['Thao tác đã ghi nhận', trace.recordedActions],
+    ['Nút đã mở rộng', trace.expansions],
+    ['Đường đã xét', trace.edgeChecks],
+    ['Mục mới trên biên', trace.added],
+    ['Mục được cải thiện', trace.improved],
+    ['Tuyến hiện có được giữ lại', trace.retainedExisting],
+    ['Lần so sánh địa điểm', trace.locationComparisons],
+    ['Địa điểm không thể đến', trace.unreachableLocations],
+    ['Kích thước biên lớn nhất', trace.peakFrontier],
   ].filter(([, value]) => value > 0)
 
   return <dl className="route-explanation__stats">
@@ -36,19 +41,19 @@ function ScenarioFormula({ formula, contributions }) {
   const weights = formula.weights ?? {}
   return (
     <section className="route-explanation__section">
-      <h3>Scenario-cost calculation across the selected route</h3>
+      <h3>Tính chi phí kịch bản trên toàn tuyến đã chọn</h3>
       <p>{formula.expression}</p>
       <code>
         α={formatNumber(weights.distance, 3)}, β={formatNumber(weights.time, 3)},{' '}
         γ={formatNumber(weights.congestion, 3)}, δ={formatNumber(weights.risk, 3)}
       </code>
       <dl className="route-explanation__contributions">
-        <Figure label="Distance contribution" value={contributions.distance} />
-        <Figure label="Time contribution" value={contributions.time} />
-        <Figure label="Congestion contribution" value={contributions.congestion} />
-        <Figure label="Risk contribution" value={contributions.risk} />
+        <Figure label="Đóng góp của quãng đường" value={contributions.distance} />
+        <Figure label="Đóng góp của thời gian" value={contributions.time} />
+        <Figure label="Đóng góp của ùn tắc" value={contributions.congestion} />
+        <Figure label="Đóng góp của rủi ro" value={contributions.risk} />
       </dl>
-      <small>Contributions are summed once for every occurrence of an edge in the final route.</small>
+      <small>Các thành phần đóng góp được cộng cho mỗi lần một cạnh xuất hiện trong tuyến cuối cùng.</small>
     </section>
   )
 }
@@ -57,19 +62,19 @@ function SelectionRounds({ rounds }) {
   if (rounds.length === 0) return null
   return (
     <section className="route-explanation__section">
-      <h3>Stop-by-stop considerations</h3>
+      <h3>Đánh giá theo từng điểm dừng</h3>
       <ol className="route-explanation__rounds">
         {rounds.map((round) => <li key={round.index}>
-          <strong>Round {round.index}: from {round.from}, choose {round.selected}</strong>
-          <span>Winning score: {formatNumber(round.selectedScore, 6)}</span>
+          <strong>Vòng {round.index}: từ {round.from}, chọn {round.selected}</strong>
+          <span>Điểm số tốt nhất: {formatNumber(round.selectedScore, 6)}</span>
           <ul>
             {round.candidates.map((candidate) => <li
               className={candidate.selected ? 'is-selected' : ''}
               key={candidate.node}
             >
               <span>{candidate.node}</span>
-              <b>{candidate.reachable ? formatNumber(candidate.score, 6) : 'Unreachable'}</b>
-              <small>{candidate.selected ? 'Lowest reachable score' : candidate.reachable ? 'Higher score; deferred' : 'No directed route'}</small>
+              <b>{candidate.reachable ? formatNumber(candidate.score, 6) : 'Không thể đến'}</b>
+              <small>{candidate.selected ? 'Điểm số khả dụng thấp nhất' : candidate.reachable ? 'Điểm số cao hơn; tạm hoãn' : 'Không có đường đi có hướng'}</small>
             </li>)}
           </ul>
         </li>)}
@@ -82,27 +87,27 @@ function SegmentConsiderations({ segments }) {
   if (segments.length === 0) return null
   return (
     <section className="route-explanation__section">
-      <h3>Selected-road figures and conditions</h3>
+      <h3>Chỉ số và điều kiện của các đường đã chọn</h3>
       <ol className="route-explanation__segments">
         {segments.map((segment) => {
           const detail = segment.detail
           return <li key={`${segment.edgeId}-${segment.index}`}>
             <header>
               <span>{segment.index}</span>
-              <div><strong>{segment.from} → {segment.to}</strong><small>Edge {segment.edgeId}</small></div>
+              <div><strong>{segment.from} → {segment.to}</strong><small>Cạnh {segment.edgeId}</small></div>
             </header>
             <dl>
-              <Figure label="Distance" value={segment.distance} unit="km" />
-              <Figure label="Adjusted time" value={segment.time} unit="min" />
-              <Figure label="Scenario cost" value={segment.cost} />
-              <Figure label="Congestion" value={segment.congestion} unit="/ 5" />
-              <Figure label="Risk" value={segment.risk} />
-              {detail?.time_multiplier != null && <Figure label="Time factor" value={detail.time_multiplier} unit="×" />}
+              <Figure label="Quãng đường" value={segment.distance} unit="km" />
+              <Figure label="Thời gian điều chỉnh" value={segment.time} unit="phút" />
+              <Figure label="Chi phí kịch bản ×100" value={segment.cost} />
+              <Figure label="Ùn tắc" value={segment.congestion} unit="/ 5" />
+              <Figure label="Rủi ro" value={segment.risk} />
+              {detail?.time_multiplier != null && <Figure label="Hệ số thời gian" value={detail.time_multiplier} unit="×" />}
             </dl>
             <p>
-              This road contributes the figures above to the complete route.
-              {detail?.construction_penalty > 0 ? ` Construction adds ${formatNumber(detail.construction_penalty, 3)} to risk.` : ''}
-              {detail?.rain_risk > 0 || detail?.fog_risk > 0 ? ` Weather risk: rain ${formatNumber(detail.rain_risk, 3)}, fog ${formatNumber(detail.fog_risk, 3)}.` : ''}
+              Đường này đóng góp các chỉ số trên vào toàn bộ tuyến.
+              {detail?.construction_penalty > 0 ? ` Công trình làm tăng rủi ro thêm ${formatNumber(detail.construction_penalty, 3)}.` : ''}
+              {detail?.rain_risk > 0 || detail?.fog_risk > 0 ? ` Rủi ro thời tiết: mưa ${formatNumber(detail.rain_risk, 3)}, sương mù ${formatNumber(detail.fog_risk, 3)}.` : ''}
             </p>
           </li>
         })}
@@ -125,28 +130,28 @@ export default function RouteExplanation({ className = '' }) {
   return (
     <section className={rootClassName} aria-labelledby="route-explanation-title">
       <header className="route-explanation__header">
-        <div><span>Human-readable reasoning</span><h2 id="route-explanation-title">Why this route was chosen</h2></div>
+        <div><span>Giải thích thuật toán</span><h2 id="route-explanation-title">Cách thuật toán chọn tuyến đường</h2></div>
         {result && <dl className="route-explanation__context">
-          <div><dt>Algorithm</dt><dd>{result.algorithm ?? '—'}</dd></div>
-          <div><dt>Scenario</dt><dd>{result.scenario_id ?? '—'}</dd></div>
-          <div><dt>Criterion</dt><dd>{result.optimization ?? '—'}</dd></div>
+          <div><dt>Algorithm</dt><dd>{formatAlgorithmLabel(result.algorithm) || '—'}</dd></div>
+          <div><dt>Kịch bản</dt><dd>{result.scenario_id ?? '—'}</dd></div>
+          <div><dt>Optimization</dt><dd>{formatOptimizationLabel(result.optimization) || '—'}</dd></div>
         </dl>}
       </header>
 
-      {!reasoning ? <div className="route-explanation__empty"><strong>No explanation available</strong><span>Complete a search to see the decision evidence.</span></div> : (
+      {!reasoning ? <div className="route-explanation__empty"><strong>Chưa có giải thích</strong><span>Hoàn tất một lượt tìm kiếm để xem căn cứ lựa chọn.</span></div> : (
         <div className="route-explanation__body">
           <section className="route-explanation__summary">
-            <span>Selected route</span>
-            <strong>{reasoning.path.join(' → ') || 'No complete route'}</strong>
+            <span>Tuyến đường đã chọn</span>
+            <strong>{reasoning.path.join(' → ') || 'Không có tuyến hoàn chỉnh'}</strong>
             <p>{reasoning.method}</p>
             {result.explanation && <p>{result.explanation}</p>}
           </section>
 
           <section className="route-explanation__section">
-            <h3>Recorded result figures</h3>
+            <h3>Các chỉ số kết quả đã ghi nhận</h3>
             <p className="route-explanation__objective">
-              Decision objective: <strong>{reasoning.objective.label}</strong>
-              {reasoning.objective.value != null && <> · recorded value <strong>{formatNumber(reasoning.objective.value, 6)} {reasoning.objective.unit}</strong></>}
+              Mục tiêu quyết định: <strong>{reasoning.objective.label}</strong>
+              {reasoning.objective.value != null && <> · giá trị ghi nhận <strong>{formatNumber(reasoning.objective.value, 6)} {reasoning.objective.unit}</strong></>}
             </p>
             <dl className="route-explanation__figures">
               {reasoning.figures.map((figure) => <Figure key={figure.label} {...figure} />)}
@@ -154,17 +159,17 @@ export default function RouteExplanation({ className = '' }) {
           </section>
 
           <section className="route-explanation__section">
-            <h3>Considerations recorded during search</h3>
+            <h3>Các đánh giá được ghi nhận khi tìm kiếm</h3>
             <TraceStatistics trace={reasoning.trace} />
-            <p>“Added” means a destination first entered the frontier; “improved” means a cheaper route replaced its previous value; “retained” means the new candidate did not beat the existing value.</p>
-            {reasoning.permutations && <p><strong>Brute-force coverage:</strong> {formatNumber(reasoning.permutations.evaluated, 0)} feasible orders evaluated out of {formatNumber(reasoning.permutations.possible, 0)} possible permutations.</p>}
+            <p>“Đã thêm” nghĩa là một đích lần đầu được đưa vào biên; “được cải thiện” nghĩa là một tuyến rẻ hơn thay thế giá trị trước đó; “được giữ lại” nghĩa là phương án mới không tốt hơn giá trị hiện có.</p>
+            {reasoning.permutations && <p><strong>Mức độ duyệt cạn:</strong> đã đánh giá {formatNumber(reasoning.permutations.evaluated, 0)} thứ tự khả thi trong tổng số {formatNumber(reasoning.permutations.possible, 0)} hoán vị có thể.</p>}
           </section>
 
           <SelectionRounds rounds={reasoning.selectionRounds} />
           <ScenarioFormula formula={reasoning.formula} contributions={reasoning.contributions} />
           <SegmentConsiderations segments={reasoning.segments} />
 
-          {result.optimality_note && <aside><strong>What this result guarantees</strong><span>{result.optimality_note}</span></aside>}
+          {result.optimality_note && <aside><strong>Bảo đảm của kết quả</strong><span>{result.optimality_note}</span></aside>}
         </div>
       )}
     </section>

@@ -31,6 +31,7 @@ const VIEWBOX = {
 const MIN_ZOOM = 0.6
 const MAX_ZOOM = 5
 const ZOOM_STEP = 1.25
+const EDGE_CARD_MAX_WIDTH = 420
 const INITIAL_VIEWPORT = { x: 0, y: 0, scale: 1 }
 const IDENTITY_PROJECTOR = ([x, y]) => [x, y]
 
@@ -96,12 +97,17 @@ function createProjector(bounds) {
 export default function GraphWorkspace({
   className = '',
   scenarioCostModel = null,
+  playbackControls = null,
+  algorithmControls = null,
+  traceOverlay = null,
 }) {
   const dragRef = useRef(null)
+  const canvasRef = useRef(null)
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT)
   const [isPanning, setIsPanning] = useState(false)
   const [layoutMode, setLayoutMode] = useState('tree')
   const [hoveredEdge, setHoveredEdge] = useState(null)
+  const [edgeHoverPosition, setEdgeHoverPosition] = useState(null)
   const graphData = useAppStore((state) => state.graphData)
   const result = useAppStore((state) => state.routeResult)
   const routeSelection = useAppStore((state) => state.routeSelection)
@@ -149,10 +155,11 @@ export default function GraphWorkspace({
   }, [action, actionTimeline, isSearchComplete, isSearchVisible])
   const scenarioEdgeCosts = useMemo(
     () => new Map(
-      Object.entries(activeCostData?.edge_costs ?? {}).map(([edgeId, cost]) => [
-        String(edgeId),
-        Number(cost),
-      ]),
+      Object.entries(activeCostData?.edge_costs ?? {})
+        .filter(([, cost]) =>
+          cost != null && cost !== '' && Number.isFinite(Number(cost)),
+        )
+        .map(([edgeId, cost]) => [String(edgeId), Number(cost)]),
     ),
     [activeCostData?.edge_costs],
   )
@@ -313,6 +320,25 @@ export default function GraphWorkspace({
   }
 
   const handlePointerMove = (event) => {
+    if (hoveredEdge && canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect()
+      const halfCardWidth = Math.min(
+        EDGE_CARD_MAX_WIDTH,
+        Math.max(0, rect.width - 28),
+      ) / 2
+      const horizontalPadding = halfCardWidth + 14
+
+      setEdgeHoverPosition({
+        x: clamp(
+          event.clientX - rect.left,
+          horizontalPadding,
+          Math.max(horizontalPadding, rect.width - horizontalPadding),
+        ),
+        y: clamp(event.clientY - rect.top, 14, Math.max(14, rect.height - 14)),
+        placeAbove: event.clientY - rect.top > rect.height * 0.55,
+      })
+    }
+
     const drag = dragRef.current
     if (!drag || drag.pointerId !== event.pointerId) return
 
@@ -356,15 +382,38 @@ export default function GraphWorkspace({
     setViewport(INITIAL_VIEWPORT)
   }
 
-  const handleEdgeHover = useCallback((edge) => {
+  const handleEdgeHover = useCallback((edge, event) => {
     setHoveredEdge(edge)
+    if (!edge) {
+      setEdgeHoverPosition(null)
+      return
+    }
+
+    const rect = canvasRef.current?.getBoundingClientRect()
+    if (!rect || !event) return
+    const halfCardWidth = Math.min(
+      EDGE_CARD_MAX_WIDTH,
+      Math.max(0, rect.width - 28),
+    ) / 2
+    const horizontalPadding = halfCardWidth + 14
+    const pointerY = event.clientY - rect.top
+
+    setEdgeHoverPosition({
+      x: clamp(
+        event.clientX - rect.left,
+        horizontalPadding,
+        Math.max(horizontalPadding, rect.width - horizontalPadding),
+      ),
+      y: clamp(pointerY, 14, Math.max(14, rect.height - 14)),
+      placeAbove: pointerY > rect.height * 0.55,
+    })
   }, [])
 
   if (graphData.error) {
     return (
       <section className={rootClassName} aria-label="Không gian đồ thị">
         <div className="graph-workspace__message graph-workspace__message--error">
-          <strong>Unable to load graph data</strong>
+          <strong>Không thể tải dữ liệu đồ thị</strong>
           <span>{String(graphData.error)}</span>
         </div>
       </section>
@@ -376,8 +425,8 @@ export default function GraphWorkspace({
       <section className={rootClassName} aria-label="Không gian đồ thị">
         <div className="graph-workspace__message">
           <span className="graph-workspace__loader" aria-hidden="true" />
-          <strong>Loading graph data</strong>
-          <span>Reading nodes and edges GeoJSON…</span>
+          <strong>Đang tải dữ liệu đồ thị</strong>
+          <span>Đang đọc các nút và cạnh GeoJSON…</span>
         </div>
       </section>
     )
@@ -387,8 +436,8 @@ export default function GraphWorkspace({
     return (
       <section className={rootClassName} aria-label="Không gian đồ thị">
         <div className="graph-workspace__message">
-          <strong>No graph data loaded</strong>
-          <span>Load nodes and edges GeoJSON to display the road network.</span>
+          <strong>Chưa tải dữ liệu đồ thị</strong>
+          <span>Hãy tải các nút và cạnh GeoJSON để hiển thị mạng lưới đường.</span>
         </div>
       </section>
     )
@@ -398,26 +447,39 @@ export default function GraphWorkspace({
     <section className={rootClassName} aria-label="Không gian đồ thị">
       <div className="graph-workspace__header">
         <div>
-          <h1>Đà Lạt road network</h1>
+          <h1>Mạng lưới đường Đà Lạt</h1>
           <p>
-            {drawing.nodes.length} locations · {edgeFeatures.length} directed
-            edges · {layoutMode === 'tree'
-              ? 'even graph layout'
-              : 'geographic map'}
+            {drawing.nodes.length} địa điểm · {edgeFeatures.length} cạnh có
+            hướng · {layoutMode === 'tree'
+              ? 'bố cục đồ thị giãn đều'
+              : 'bản đồ địa lý'}
           </p>
         </div>
-        <div className="graph-workspace__progress" aria-live="polite">
-          Action{' '}
-          {isSearchVisible
-            ? Math.min(simulation.currentStep + 1, actionTimeline.length)
-            : simulation.status === SIMULATION_STATUS.COMPLETED
-              ? actionTimeline.length
-              : 0}
-          <span>/ {actionTimeline.length}</span>
+        <div className="graph-workspace__header-controls">
+          {playbackControls}
+          <div className="graph-workspace__progress" aria-live="polite">
+            Thao tác{' '}
+            {isSearchVisible
+              ? Math.min(simulation.currentStep + 1, actionTimeline.length)
+              : simulation.status === SIMULATION_STATUS.COMPLETED
+                ? actionTimeline.length
+                : 0}
+            <span>/ {actionTimeline.length}</span>
+          </div>
         </div>
       </div>
 
-      <div className="graph-workspace__canvas">
+      <div className="graph-workspace__canvas" ref={canvasRef}>
+        {traceOverlay && (
+          <div className="graph-workspace__trace-overlay">
+            {traceOverlay}
+          </div>
+        )}
+        {algorithmControls && (
+          <div className="graph-workspace__algorithm-controls">
+            {algorithmControls}
+          </div>
+        )}
         <div
           className="graph-workspace__map-controls"
           role="toolbar"
@@ -428,25 +490,25 @@ export default function GraphWorkspace({
             className={layoutMode === 'map' ? 'is-active' : ''}
             onClick={() => changeLayout('map')}
             aria-pressed={layoutMode === 'map'}
-            title="Geographic map layout"
+            title="Bố cục bản đồ địa lý"
           >
-            Map
+            Bản đồ
           </button>
           <button
             type="button"
             className={layoutMode === 'tree' ? 'is-active' : ''}
             onClick={() => changeLayout('tree')}
             aria-pressed={layoutMode === 'tree'}
-            title="Evenly spaced graph layout"
+            title="Bố cục đồ thị giãn đều"
           >
-            Graph
+            Đồ thị
           </button>
           <button
             type="button"
             onClick={() => zoomFromCenter(ZOOM_STEP)}
             disabled={viewport.scale >= MAX_ZOOM}
             aria-label="Phóng to bản đồ"
-            title="Zoom in"
+            title="Phóng to"
           >
             +
           </button>
@@ -458,7 +520,7 @@ export default function GraphWorkspace({
             onClick={() => zoomFromCenter(1 / ZOOM_STEP)}
             disabled={viewport.scale <= MIN_ZOOM}
             aria-label="Thu nhỏ bản đồ"
-            title="Zoom out"
+            title="Thu nhỏ"
           >
             −
           </button>
@@ -472,7 +534,7 @@ export default function GraphWorkspace({
               viewport.scale === 1
             }
           >
-            Reset view
+            Đặt lại góc nhìn
           </button>
         </div>
 
@@ -537,28 +599,28 @@ export default function GraphWorkspace({
         </svg>
         <EdgeHoverCard
           edge={hoveredEdge}
+          position={edgeHoverPosition}
           detail={activeCostData?.edge_cost_details?.[hoveredEdge?.edgeId]}
           formula={activeCostData?.edge_cost_formula}
           scenarioId={routeSelection.scenarioId}
           optimization={routeSelection.optimization}
         />
+        <ul className="graph-workspace__legend" aria-label="Chú thích đồ thị">
+          {GRAPH_LEGEND_ITEMS.map(({ type, state, label }) => (
+            <li key={state}>
+              <span
+                className={[
+                  'graph-workspace__legend-swatch',
+                  'graph-workspace__legend-swatch--' + type,
+                  'graph-workspace__legend-swatch--' + state,
+                ].join(' ')}
+                aria-hidden="true"
+              />
+              {label}
+            </li>
+          ))}
+        </ul>
       </div>
-
-      <ul className="graph-workspace__legend" aria-label="Chú thích đồ thị">
-        {GRAPH_LEGEND_ITEMS.map(({ type, state, label }) => (
-          <li key={state}>
-            <span
-              className={[
-                'graph-workspace__legend-swatch',
-                'graph-workspace__legend-swatch--' + type,
-                'graph-workspace__legend-swatch--' + state,
-              ].join(' ')}
-              aria-hidden="true"
-            />
-            {label}
-          </li>
-        ))}
-      </ul>
     </section>
   )
 }

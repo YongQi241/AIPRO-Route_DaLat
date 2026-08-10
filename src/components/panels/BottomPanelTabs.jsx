@@ -8,17 +8,15 @@ import {
   isResultTabLocked,
 } from './bottomPanelTabsState'
 import CurrentTaskPanel from './CurrentTaskPanel'
-import SearchLogPanel from './SearchLogPanel'
 import './BottomPanelTabs.css'
 
 const TABS = [
-  { id: 'simulation', label: 'Simulation', Component: CurrentTaskPanel },
-  { id: 'trace', label: 'Algorithm trace', Component: SearchLogPanel },
-  { id: 'output', label: 'Output', Component: RouteResultPanel },
-  { id: 'breakdown', label: 'Breakdown', Component: SegmentDetails },
+  { id: 'simulation', label: 'Mô phỏng', Component: CurrentTaskPanel },
+  { id: 'output', label: 'Kết quả', Component: RouteResultPanel },
+  { id: 'breakdown', label: 'Chi tiết', Component: SegmentDetails },
   {
     id: 'reasoning',
-    label: 'Human-readable reasoning',
+    label: 'Giải thích thuật toán',
     Component: RouteExplanation,
   },
 ]
@@ -79,7 +77,7 @@ export default function BottomPanelTabs({ className = '' }) {
       <div
         className="bottom-panel-tabs__bar"
         role="tablist"
-        aria-label="Simulation and route information"
+        aria-label="Thông tin mô phỏng và tuyến đường"
         onKeyDown={handleKeyDown}
       >
         {TABS.map(({ id, label }, index) => {
@@ -99,7 +97,7 @@ export default function BottomPanelTabs({ className = '' }) {
               disabled={isLocked}
               title={
                 isLocked
-                  ? 'Available after the search simulation is completed'
+                  ? 'Khả dụng sau khi mô phỏng tìm kiếm hoàn tất'
                   : label
               }
               ref={(element) => {

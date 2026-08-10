@@ -1,3 +1,8 @@
+% !TeX root = ../main.tex
+% !TeX program = pdflatex
+% !TeX encoding = UTF-8
+% Biên dịch tài liệu gốc bằng pdfLaTeX.
+
 \chapter{Luồng hoạt động của chương trình}
 \label{chap:program-flow}
 
@@ -74,7 +79,7 @@ Khi chạy ở môi trường development, Vite chuyển tiếp các request b�
 \texttt{/api} đến \texttt{http://127.0.0.1:8000}. Nếu API không thể kết nối,
 không có \texttt{VITE\_ROUTE\_API\_URL} tùy chỉnh và ứng dụng không phải bản
 production, \texttt{routeService.js} mới thử đọc \texttt{data/mock-result.json}.
-Fixture này chỉ chấp nhận yêu cầu từ DL01 đến DL09, không có điểm trung gian;
+Dữ liệu mẫu này chỉ chấp nhận yêu cầu từ DL01 đến DL09, không có điểm trung gian;
 nó phục vụ kiểm thử giao diện và không chứng minh tính tối ưu của thuật toán.
 
 \section{Kiến trúc và các thành phần chính}
@@ -97,39 +102,39 @@ Thành phần & File hoặc thư mục & Trách nhiệm \\
 \midrule
 \endhead
 Ứng dụng React & \path{src/App.jsx} &
-Ghép thanh điều khiển, biểu mẫu chọn tuyến, workspace đồ thị, danh sách thuật
-toán và các tab kết quả; đồng thời kích hoạt việc nạp dữ liệu đồ thị. \\
+Ghép thanh điều khiển, biểu mẫu chọn tuyến, không gian đồ thị, danh sách thuật
+toán và các thẻ kết quả; đồng thời kích hoạt việc nạp dữ liệu đồ thị. \\
 Khung giao diện & \path{components/layout/AppShell.jsx} &
-Chia giao diện thành vùng điều khiển phía trên, workspace, sidebar và panel
-phía dưới. Ba vùng điều khiển, sidebar và panel kết quả có thể thu gọn độc lập. \\
+Chia giao diện thành vùng điều khiển phía trên, không gian làm việc, thanh bên
+và bảng phía dưới. Ba vùng điều khiển, thanh bên và bảng kết quả có thể thu gọn độc lập. \\
 Nhập yêu cầu & \path{RouteSelectionControls.jsx},
 \path{routeRequest.js} &
 Lưu điểm đầu, điểm đích, điểm trung gian, kịch bản và tiêu chí; kiểm tra hai
 đầu mút; sau đó tạo payload dùng ID node thay vì tên hiển thị. \\
 Giao tiếp API & \path{useRouteSolver.js},
 \path{routeService.js} &
-Gửi request đến \texttt{POST /api/routes/solve}, kiểm tra cấu trúc response và
-chỉ dùng fixture trong điều kiện development đã nêu ở trên. \\
+Gửi yêu cầu đến \texttt{POST /api/routes/solve}, kiểm tra cấu trúc phản hồi và
+chỉ dùng dữ liệu mẫu trong môi trường phát triển đã nêu ở trên. \\
 Trạng thái toàn cục & \path{src/store/useAppStore.js} &
 Quản lý dữ liệu đồ thị, thuật toán được chọn, thông số tuyến, kết quả API,
-trạng thái request, trạng thái mô phỏng và thời điểm công bố kết quả cuối. \\
+trạng thái yêu cầu, trạng thái mô phỏng và thời điểm công bố kết quả cuối. \\
 Timeline tìm kiếm & \path{graph/searchTimeline.js} &
-Chuyển trace backend thành các action trực quan \texttt{expand},
+Chuyển tiến trình backend thành các thao tác trực quan \texttt{expand},
 \texttt{consider-edge} và \texttt{frame-complete}; không tính lại tuyến tối ưu. \\
 Hiển thị SVG & \path{GraphWorkspace.jsx} và các layer trong
 \path{components/graph/} &
 Chiếu tọa độ lên SVG, vẽ mạng đường, trạng thái tìm kiếm, node và tuyến cuối;
-hỗ trợ hai bố cục Map/Graph, zoom và kéo bản đồ. \\
-Các panel thông tin & \path{BottomPanelTabs.jsx} và
+hỗ trợ hai bố cục Bản đồ/Đồ thị, phóng to, thu nhỏ và kéo bản đồ. \\
+Các bảng thông tin & \path{BottomPanelTabs.jsx} và
 \path{components/results/} &
-Hiển thị Simulation, Algorithm trace, Output, Breakdown và Human-readable
-reasoning. Ba tab kết quả cuối chỉ mở sau khi mô phỏng lần đầu đi đến cuối. \\
+Hiển thị Mô phỏng, Tiến trình thuật toán, Kết quả, Chi tiết và Giải thích dễ
+hiểu. Ba thẻ kết quả cuối chỉ mở sau khi mô phỏng lần đầu đi đến cuối. \\
 API Python & \path{backend/server.py} &
 Cung cấp \texttt{GET /api/health}, \texttt{GET /api/algorithms} và
 \texttt{POST /api/routes/solve}; kiểm tra payload rồi chuyển yêu cầu cho solver. \\
 Bộ điều phối thuật toán & \path{routing/solver.py} &
-Chuẩn hóa tên thuật toán/tiêu chí và gọi BFS, DFS, UCS, Dijkstra, A*, Greedy,
-Hill Climbing, Nearest Neighbor hoặc Brute Force TSP theo loại yêu cầu. \\
+Chuẩn hóa tên thuật toán/tiêu chí và gọi BFS, DFS, UCS, Dijkstra, A*, Tham Lam,
+Leo đồi, Láng giềng gần nhất hoặc TSP duyệt cạn theo loại yêu cầu. \\
 Nạp đồ thị và dữ liệu & \path{routing/graph_loader.py},
 \path{data/generated/} &
 Đọc CSV, áp dụng điều kiện S0--S4, loại cạnh bị đóng và tạo
@@ -137,11 +142,11 @@ Nạp đồ thị và dữ liệu & \path{routing/graph_loader.py},
 \bottomrule
 \end{longtable}
 
-Backend công bố chín thuật toán qua API, trong đó Greedy Best-First có trong
+Backend công bố chín thuật toán qua API, trong đó Tham Lam ưu tiên tốt nhất có trong
 backend nhưng chưa có thẻ chọn ở \texttt{AlgorithmSidebar.jsx}. Giao diện hiện
-cho chọn tám thuật toán: BFS, DFS, UCS, Dijkstra, A*, Nearest Neighbor, Hill
-Climbing và Brute Force TSP. Nearest Neighbor và Brute Force TSP là hai chế độ
-nhiều địa điểm; Brute Force TSP giới hạn tối đa tám đích.
+cho chọn tám thuật toán: BFS, DFS, UCS, Dijkstra, A*, Láng giềng gần nhất, Leo
+đồi và TSP duyệt cạn. Láng giềng gần nhất và TSP duyệt cạn là hai chế độ
+nhiều địa điểm; TSP duyệt cạn giới hạn tối đa tám đích.
 
 \section{Luồng dữ liệu giữa frontend và backend}
 
@@ -154,7 +159,7 @@ Luồng dữ liệu của một yêu cầu tìm đường diễn ra như sau:
   khác nhau. \texttt{createRouteRequest} chuyển state thành payload gồm
   \texttt{start\_node}, \texttt{goal\_node}, \texttt{visit\_nodes},
   \texttt{algorithm}, \texttt{scenario\_id} và \texttt{optimization}.
-  \item Với Nearest Neighbor hoặc Brute Force TSP, frontend hợp nhất các điểm
+  \item Với Láng giềng gần nhất hoặc TSP duyệt cạn, frontend hợp nhất các điểm
   trung gian với điểm đích thành \texttt{visit\_nodes}. Với thuật toán một đích,
   trường này được gửi dưới dạng mảng rỗng.
   \item \texttt{routeService} gửi JSON đến API. \texttt{backend/server.py}
@@ -162,14 +167,14 @@ Luồng dữ liệu của một yêu cầu tìm đường diễn ra như sau:
   \item \texttt{routing/solver.py} nạp đồ thị theo kịch bản và tiêu chí,
   sau đó gọi đúng thuật toán. Các thuật toán trả cùng một hợp đồng kết quả.
   \item \texttt{useRouteSolver} chuyển kết quả cho \texttt{useAppStore}. Nếu
-  có trace thành công, mô phỏng tự bắt đầu; nếu không có trace, kết quả được
+  có tiến trình thành công, mô phỏng tự bắt đầu; nếu không có tiến trình, kết quả được
   công bố ngay.
-  \item Khi Zustand thay đổi, React render lại các layer SVG, log, tiến độ,
+  \item Khi Zustand thay đổi, React kết xuất lại các lớp SVG, nhật ký, tiến độ,
   thông số từng đoạn và phần giải thích mà backend cung cấp.
 \end{enumerate}
 
-Đoạn dưới đây là cấu trúc rút gọn từ một response A* thực tế; trong
-\texttt{frontier} chỉ giữ lại một phần tử để minh họa cấu trúc của trace.
+Đoạn dưới đây là cấu trúc rút gọn từ một phản hồi A* thực tế; trong
+\texttt{frontier} chỉ giữ lại một phần tử để minh họa cấu trúc của tiến trình.
 
 \begin{verbatim}
 {
@@ -207,54 +212,54 @@ Mảng \texttt{segments} trong response đầy đủ chứa dữ liệu từng c
 \section{Cơ chế mô phỏng quá trình tìm kiếm}
 
 Backend trả toàn bộ kết quả sau khi thuật toán kết thúc; hệ thống không truyền
-trực tiếp từng bước trong lúc thuật toán đang chạy. Frontend dùng dữ liệu trace
+trực tiếp từng bước trong lúc thuật toán đang chạy. Frontend dùng dữ liệu tiến trình
 đã nhận để phát lại quá trình tìm kiếm:
 
 \begin{itemize}[itemsep=3pt]
-  \item \texttt{visited\_order} lưu thứ tự các node đã được mở rộng. Nếu không
+  \item \texttt{visited\_order} lưu thứ tự các nút đã được mở rộng. Nếu không
   có \texttt{frontier\_steps}, frontend dùng danh sách này làm dữ liệu dự phòng.
-  \item \texttt{frontier\_steps} chứa node hiện tại, frontier và tập đã thăm ở
-  từng frame. Khi entry có \texttt{g\_cost}, \texttt{h\_cost},
-  \texttt{f\_cost} hoặc \texttt{priority}, log có thể hiển thị các giá trị đó.
-  \item \texttt{path\_nodes} xác định thứ tự node của tuyến cuối, còn
+  \item \texttt{frontier\_steps} chứa nút hiện tại, biên và tập đã thăm ở
+  từng khung. Khi mục có \texttt{g\_cost}, \texttt{h\_cost},
+  \texttt{f\_cost} hoặc \texttt{priority}, nhật ký có thể hiển thị các giá trị đó.
+  \item \texttt{path\_nodes} xác định thứ tự nút của tuyến cuối, còn
   \texttt{path\_edges} là danh sách ID cạnh có thứ tự dùng để chọn đúng hình học
   từ GeoJSON. Frontend không nối các điểm bằng suy đoán tọa độ.
-  \item Action \texttt{expand} đánh dấu bắt đầu mở rộng node hiện tại.
+  \item Thao tác \texttt{expand} đánh dấu bắt đầu mở rộng nút hiện tại.
   \texttt{consider-edge} lần lượt làm sáng mỗi cạnh đi ra để minh họa thao tác
   xét/relax cạnh. \texttt{frame-complete} đồng bộ frontier sau khi đã xét xong
-  node. Kết quả ADD, UPDATE, KEEP hoặc UNKNOWN chỉ được suy ra từ hai snapshot
-  frontier nhằm phục vụ trình bày, không thay thế phép tính backend.
+  nút. Kết quả ADD, UPDATE, KEEP hoặc UNKNOWN chỉ được suy ra từ hai ảnh trạng
+  thái biên nhằm phục vụ trình bày, không thay thế phép tính backend.
 \end{itemize}
 
-Đối với nhánh tìm kiếm dẫn từ điểm bắt đầu đến node đang xét, frontend ưu tiên
+Đối với nhánh tìm kiếm dẫn từ điểm bắt đầu đến nút đang xét, frontend ưu tiên
 \texttt{current\_path\_edges}, \texttt{path\_edges} hoặc quan hệ parent nếu
-frame backend có cung cấp. Nếu trace không có các trường này, frontend dựng một
-nhánh minh họa từ quan hệ phát hiện node lần đầu trong các snapshot frontier và
+khung backend có cung cấp. Nếu tiến trình không có các trường này, frontend dựng một
+nhánh minh họa từ quan hệ phát hiện nút lần đầu trong các ảnh trạng thái biên và
 chỉ chấp nhận cạnh có hướng tồn tại trong GeoJSON. Nhánh minh họa này giúp người
 xem theo dõi quá trình; nó không được dùng làm tuyến kết quả và không tác động
 đến \texttt{result.path\_edges}.
 
-Zustand là nguồn state duy nhất của \texttt{simulation.status},
-\texttt{simulation.currentStep} và \texttt{simulation.speed}. First action đưa
-về action đầu; Previous action lùi một action; Next action tiến một action;
-Last action đến action cuối; Play/Pause điều khiển phát tự động; Reset đưa
-timeline về đầu nhưng giữ tốc độ đã chọn. Khoảng nghỉ mặc định giữa hai action
+Zustand là nguồn trạng thái duy nhất của \texttt{simulation.status},
+\texttt{simulation.currentStep} và \texttt{simulation.speed}. Thao tác đầu đưa
+về thao tác đầu; Thao tác trước lùi một thao tác; Thao tác tiếp tiến một thao tác;
+Thao tác cuối đến thao tác cuối; Phát/Tạm dừng điều khiển phát tự động; Đặt lại đưa
+tiến trình về đầu nhưng giữ tốc độ đã chọn. Khoảng nghỉ mặc định giữa hai thao tác
 là $700/\textit{speed}$ mili giây với các mức $0.5\times$, $1\times$,
 $1.5\times$ và $2\times$.
 
-Ba tab Output, Breakdown và Human-readable reasoning bị khóa trước lần đầu
-timeline đến cuối. Khi đã công bố, kết quả vẫn còn nếu người dùng quay lại bằng
-Previous, First hoặc Reset; nó chỉ bị xóa khi bắt đầu yêu cầu mới, xóa kết quả
-hoặc gặp lỗi request mới. Tuyến cuối cũng chỉ hiện khi mô phỏng hoàn tất, ngoại
-trừ response thành công không có timeline thì được hiện ngay.
+Ba thẻ Kết quả, Chi tiết và Giải thích dễ hiểu bị khóa trước lần đầu
+tiến trình đến cuối. Khi đã công bố, kết quả vẫn còn nếu người dùng quay lại bằng
+Thao tác trước, Thao tác đầu hoặc Đặt lại; nó chỉ bị xóa khi bắt đầu yêu cầu mới,
+xóa kết quả hoặc gặp lỗi yêu cầu mới. Tuyến cuối cũng chỉ hiện khi mô phỏng hoàn
+tất, ngoại trừ phản hồi thành công không có tiến trình thì được hiện ngay.
 
 \section{Luồng hiển thị bản đồ và đồ thị}
 
 Hook \texttt{useGraphData} tự động tải 25 node từ
 \texttt{nodes\_snapped.geojson} và 114 cạnh có hướng từ
 \texttt{edges.geojson} trong thư mục
-\path{data/generated/}. Workspace dùng SVG và xếp các
-layer theo thứ tự sau:
+\path{data/generated/}. Không gian làm việc dùng SVG và xếp các
+lớp theo thứ tự sau:
 
 \begin{enumerate}[itemsep=2pt]
   \item \texttt{RoadNetworkLayer} vẽ mạng đường nền;
@@ -265,16 +270,16 @@ layer theo thứ tự sau:
   node phía trên các đường.
 \end{enumerate}
 
-Chú thích node gồm Unvisited, Frontier, Visited, Current và Final-route node.
-Chú thích cạnh gồm Candidate edge, Active relaxation, Normal route segment và
-Warning route segment. Một đoạn của tuyến cuối được cảnh báo khi mức ùn tắc từ
-4 trở lên hoặc risk lớn hơn 0; bởi vậy tuyến cuối có thể đồng thời có đoạn xanh
+Chú thích nút gồm Chưa thăm, Trên biên, Đã thăm, Hiện tại và Nút thuộc tuyến cuối.
+Chú thích cạnh gồm Cạnh ứng viên, Cạnh đang nới lỏng, Đoạn tuyến bình thường và
+Đoạn tuyến cảnh báo. Một đoạn của tuyến cuối được cảnh báo khi mức ùn tắc từ
+4 trở lên hoặc rủi ro lớn hơn 0; bởi vậy tuyến cuối có thể đồng thời có đoạn xanh
 và đoạn cam.
 
-Chế độ Map giữ tọa độ địa lý và hình học đường thực. Chế độ Graph dùng bố cục
-topology xác định để giãn đều node nhưng vẫn giữ các kết nối có hướng. Người
+Chế độ Bản đồ giữ tọa độ địa lý và hình học đường thực. Chế độ Đồ thị dùng bố
+cục liên kết xác định để giãn đều nút nhưng vẫn giữ các kết nối có hướng. Người
 dùng có thể phóng to/thu nhỏ bằng nút hoặc con lăn chuột trong khoảng từ
-$60\%$ đến $500\%$, giữ chuột trái để kéo, nhấn đúp hoặc chọn Reset view để
-trở về góc nhìn ban đầu. Các vùng Route controls, Search strategy và Search
-details có thể thu gọn độc lập; component vẫn được mount nên lựa chọn, tab,
-timeline và trạng thái bản đồ không bị mất.
+$60\%$ đến $500\%$, giữ chuột trái để kéo, nhấn đúp hoặc chọn Đặt lại góc nhìn
+để trở về góc nhìn ban đầu. Các vùng Điều khiển tuyến đường, Chiến lược tìm kiếm
+và Chi tiết tìm kiếm có thể thu gọn độc lập; thành phần vẫn được gắn nên lựa
+chọn, thẻ, tiến trình và trạng thái bản đồ không bị mất.

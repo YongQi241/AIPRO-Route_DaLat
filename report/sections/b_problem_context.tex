@@ -1,33 +1,49 @@
-\chapter{Problem Context}
+% !TeX root = ../main.tex
+% !TeX program = pdflatex
+% !TeX encoding = UTF-8
+
+\chapter{Bối cảnh bài toán}
 \label{chap:problem-context}
 
-\section{Description of the Selected Vietnamese Traffic Scenario}
+\section{Mô tả tình huống giao thông được lựa chọn}
 
-\fillin{Describe the specific traffic scenario your group chose, for example finding a route between districts in Ho Chi Minh City during rush hour, or planning a delivery route across several wards in Hanoi.}
+Đồ án nghiên cứu bài toán tìm đường giữa các địa điểm du lịch và đầu mối giao
+thông tại thành phố Đà Lạt, tỉnh Lâm Đồng. Phạm vi dữ liệu gồm 25 địa điểm tiêu
+biểu như Ga Đà Lạt, Chợ Đà Lạt, Hồ Xuân Hương, Thung Lũng Tình Yêu, Hồ Tuyền
+Lâm và Bến xe Liên tỉnh Đà Lạt. Các địa điểm được chọn để tạo thành một mạng
+lưới có cả khu trung tâm lẫn các điểm tham quan ngoại vi, qua đó thể hiện được
+sự khác biệt về khoảng cách, loại đường, thời gian và điều kiện lưu thông.
 
-The scenario used in this project is set in \fillin{city name}, and it covers the area of \fillin{describe the area, for example a set of districts, a university campus, or an industrial zone}. The locations involved and the reason they were chosen are explained in more detail in the dataset section of this report.
+Người dùng có thể chọn điểm xuất phát, điểm đến, kịch bản giao thông và tiêu
+chí tối ưu. Ngoài bài toán một điểm đích, hệ thống còn hỗ trợ sắp xếp thứ tự
+ghé nhiều địa điểm, phù hợp với một chuyến tham quan, giao hàng hoặc thực hiện
+nhiều công việc trong cùng một hành trình.
 
-\section{Explanation of the Real World Problem Being Addressed}
+\section{Bài toán thực tế cần giải quyết}
 
-Vietnamese cities, particularly the large ones such as Ho Chi Minh City and Hanoi, face a combination of high motorbike density, narrow streets, and irregular traffic flow. A driver who only looks at the shortest distance between two points on a map often ends up on a route that is slower in practice because of congestion, one way streets, or poor road quality. The real world problem this project addresses is:
+Địa hình Đà Lạt có nhiều dốc, đường quanh co và các tuyến dẫn đến điểm du lịch
+nằm xa trung tâm. Lưu lượng giao thông còn thay đổi theo ngày thường, cuối
+tuần, giờ cao điểm và điều kiện thời tiết. Vì vậy, tuyến ngắn nhất theo khoảng
+cách chưa chắc là tuyến nhanh hoặc an toàn nhất. Đồ án tập trung giải quyết các
+yêu cầu sau:
 
 \begin{itemize}[itemsep=2pt]
-  \item How to find a route between two locations that is efficient not only in distance but also in travel time.
-  \item How to take congestion level and road type into account when more than one path exists between the same two points.
-  \item How to plan a trip that must pass through several locations in an order that reduces total time or distance, similar to a delivery run or an errand route.
+  \item Tìm tuyến hợp lệ giữa hai địa điểm trên đồ thị có hướng.
+  \item Tối ưu theo khoảng cách, thời gian hoặc chi phí tổng hợp có xét mức ùn
+  tắc và rủi ro.
+  \item Mô phỏng quá trình tìm kiếm để người học quan sát frontier, các đỉnh đã
+  duyệt và tuyến cuối cùng.
+  \item Sắp xếp thứ tự ghé nhiều địa điểm nhằm giảm tổng chi phí hành trình.
 \end{itemize}
 
-\fillin{Add any details specific to your own scenario, for example a delivery company, a ride hailing service, or a personal commute problem that motivated the choice of this scenario.}
+\section{Ý nghĩa của tối ưu hóa tuyến đường}
 
-\section{Why Route Optimization Is Useful in This Context}
+Tối ưu hóa tuyến đường giúp giảm thời gian di chuyển, nhiên liệu và chi phí vận
+hành. Khi điều kiện đường thay đổi, hệ thống có thể đánh giá lại trọng số cạnh
+để tránh các đoạn ùn tắc, mưa lớn, sương mù hoặc tạm đóng. Với nhiều điểm dừng,
+việc tối ưu thứ tự ghé thăm còn tránh những lượt đi vòng không cần thiết.
 
-Route optimization is useful here for several concrete reasons.
-
-\begin{enumerate}[itemsep=2pt]
-  \item \textbf{Time saving.} Even a small reduction in travel time per trip becomes significant when multiplied across many trips per day, which matters for delivery services and ride hailing drivers.
-  \item \textbf{Fuel and cost saving.} A shorter or less congested route reduces fuel consumption and vehicle wear.
-  \item \textbf{Congestion awareness.} Traffic in Vietnamese cities changes quickly during the day. A system that models congestion as part of the cost of a route can recommend a path that is realistic for the current conditions instead of a path that is only correct on paper.
-  \item \textbf{Scalability to multiple stops.} Many real tasks are not a single trip from A to B but a sequence of stops, so a method that also optimizes the order of visits adds real value beyond a simple point to point route.
-\end{enumerate}
-
-This project applies classic search algorithms studied in the Introduction to Artificial Intelligence course to this practical setting, treating the road network as a graph and the route finding task as a search problem, which is described in detail in the next chapter.
+Về mặt học thuật, bài toán là môi trường trực quan để so sánh các chiến lược
+tìm kiếm không thông tin, có thông tin và tìm kiếm cục bộ. Mạng đường được mô
+hình hóa thành đồ thị, còn yêu cầu tìm tuyến trở thành một bài toán tìm kiếm
+trạng thái được trình bày trong chương tiếp theo.

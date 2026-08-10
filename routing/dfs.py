@@ -96,11 +96,11 @@ def dfs_search(
         optimization=optimization,
         started_at=started_at,
         explanation=(
-            "DFS followed one branch as deeply as possible before "
-            "backtracking and returned the first route it found."
+            "DFS đi sâu nhất có thể theo một nhánh trước khi quay lui và "
+            "trả về tuyến đầu tiên tìm được."
         ),
         optimality_note=(
-            "DFS has no route-quality guarantee. Its result depends on "
-            "the directed neighbor insertion order."
+            "DFS không bảo đảm chất lượng tuyến. Kết quả phụ thuộc vào thứ "
+            "tự chèn các nút láng giềng có hướng."
         ),
     )

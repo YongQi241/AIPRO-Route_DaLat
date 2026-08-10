@@ -103,12 +103,12 @@ def summarize_path(
 
 
 _WEIGHT_LABELS = {
-    "distance_km": "distance",
-    "adjusted_time_min": "travel time",
-    "route_cost": "total cost",
-    "risk": "risk",
-    "edge_count": "number of road segments",
-    "heuristic_only": "heuristic estimate",
+    "distance_km": "quãng đường",
+    "adjusted_time_min": "thời gian di chuyển",
+    "route_cost": "tổng chi phí",
+    "risk": "rủi ro",
+    "edge_count": "số đoạn đường",
+    "heuristic_only": "giá trị ước lượng",
 }
 
 
@@ -152,16 +152,16 @@ def build_human_explanation(
 
     selected_segments, selected_metrics = summarize_path(graph, path_nodes)
     route = _path_label(graph, path_nodes)
-    objective = _WEIGHT_LABELS.get(weight_used or "", weight_used or "criterion")
+    objective = _WEIGHT_LABELS.get(weight_used or "", weight_used or "tiêu chí")
 
     benchmarks = {
-        "distance": _benchmark_path(
+        "quãng đường": _benchmark_path(
             graph, path_nodes[0], path_nodes[-1], "distance_km"
         ),
-        "travel time": _benchmark_path(
+        "thời gian di chuyển": _benchmark_path(
             graph, path_nodes[0], path_nodes[-1], "adjusted_time_min"
         ),
-        "total cost": _benchmark_path(
+        "tổng chi phí": _benchmark_path(
             graph, path_nodes[0], path_nodes[-1], "route_cost"
         ),
     }
@@ -171,17 +171,17 @@ def build_human_explanation(
     ]
     if achieved:
         quality = (
-            "It is the best route for "
+            "Đây là tuyến tốt nhất theo "
             + ", ".join(achieved[:-1])
-            + (" and " if len(achieved) > 1 else "")
+            + (" và " if len(achieved) > 1 else "")
             + achieved[-1]
-            + " in the current scenario."
+            + " trong kịch bản hiện tại."
         )
     else:
         quality = (
-            f"It is not the shortest-distance, fastest-time, or "
-            f"lowest-total-cost route; it was selected according to the "
-            f"algorithm's {objective} search behavior."
+            f"Đây không phải tuyến ngắn nhất, nhanh nhất hay có tổng chi phí "
+            f"thấp nhất; tuyến được chọn theo cách thuật toán tìm kiếm dựa "
+            f"trên {objective}."
         )
 
     congested = [
@@ -189,48 +189,48 @@ def build_human_explanation(
         if segment["congestion_level"] >= 4
     ]
     if congested:
-        congestion_text = "High congestion occurs on " + ", ".join(
+        congestion_text = "Ùn tắc cao xuất hiện trên " + ", ".join(
             f"{_node_label(graph, segment['from_node'])} → "
             f"{_node_label(graph, segment['to_node'])} "
-            f"(level {segment['congestion_level']:g}/5)"
+            f"(mức {segment['congestion_level']:g}/5)"
             for segment in congested
         ) + "."
     else:
         congestion_text = (
-            "None of its road segments has high congestion "
-            "(level 4 or 5)."
+            "Không đoạn đường nào trên tuyến có mức ùn tắc cao "
+            "(mức 4 hoặc 5)."
         )
 
     alternative_kind = next(
         (
-            label for label in ("distance", "travel time", "total cost")
+            label for label in ("quãng đường", "thời gian di chuyển", "tổng chi phí")
             if benchmarks[label] and not _same_path(path_nodes, benchmarks[label])
         ),
         None,
     )
     if alternative_kind is None:
         comparison = (
-            "The shortest-distance, fastest-time, and lowest-total-cost "
-            "benchmarks all use the same route, so there is no distinct "
-            "benchmark alternative to compare."
+            "Các mốc tuyến ngắn nhất, nhanh nhất và có tổng chi phí thấp "
+            "nhất đều dùng cùng một đường đi, nên không có phương án mốc "
+            "khác biệt để so sánh."
         )
     else:
         alternative = benchmarks[alternative_kind]
         _, alternative_metrics = summarize_path(graph, alternative)
         comparison = (
-            f"By comparison, the best route by {alternative_kind} is "
-            f"{_path_label(graph, alternative)}. It covers "
-            f"{alternative_metrics['total_distance_km']:.3f} km in "
-            f"{alternative_metrics['total_time_min']:.3f} minutes with "
-            f"total cost {alternative_metrics['total_cost']:.3f}, versus "
-            f"{selected_metrics['total_distance_km']:.3f} km, "
-            f"{selected_metrics['total_time_min']:.3f} minutes, and cost "
-            f"{selected_metrics['total_cost']:.3f} for the selected route."
+            f"Để so sánh, tuyến tốt nhất theo {alternative_kind} là "
+            f"{_path_label(graph, alternative)}. Tuyến này dài "
+            f"{alternative_metrics['total_distance_km']:.3f} km, mất "
+            f"{alternative_metrics['total_time_min']:.3f} phút và có tổng "
+            f"chi phí {alternative_metrics['total_cost'] :.3f}; trong khi "
+            f"tuyến đã chọn dài {selected_metrics['total_distance_km']:.3f} "
+            f"km, mất {selected_metrics['total_time_min']:.3f} phút và có "
+            f"chi phí {selected_metrics['total_cost']:.3f}."
         )
 
     return " ".join(
         [
-            f"The route {route} was selected. {algorithm_explanation}",
+            f"Đã chọn tuyến {route}. {algorithm_explanation}",
             quality,
             congestion_text,
             comparison,
@@ -297,10 +297,10 @@ def validate_request(
         result.update(
             status="invalid_input",
             explanation=(
-                "The request contains node IDs that do not exist "
-                "in the directed search graph."
+                "Yêu cầu chứa mã nút không tồn tại trong đồ thị tìm kiếm "
+                "có hướng."
             ),
-            message=f"Unknown node ID(s): {', '.join(missing)}",
+            message=f"Mã nút không xác định: {', '.join(missing)}",
         )
         return result
 
@@ -327,10 +327,10 @@ def validate_request(
                 "processing_time_ms": round(elapsed_ms, 3),
             },
             explanation=(
-                "The start and destination are the same location, "
-                "so no road edges are required."
+                "Điểm xuất phát và điểm đến là cùng một địa điểm nên không "
+                "cần cạnh đường nào."
             ),
-            optimality_note="The zero-edge route is optimal.",
+            optimality_note="Tuyến không có cạnh là tối ưu.",
             message=None,
         )
         return result
@@ -373,12 +373,12 @@ def finish_result(
                 "processing_time_ms": round(elapsed_ms, 3),
             },
             explanation=(
-                "The algorithm explored all reachable states but "
-                "could not reach the destination. Directed roads or "
-                "scenario closures may have disconnected the route."
+                "Thuật toán đã khám phá mọi trạng thái khả dụng nhưng không "
+                "thể tới đích. Hướng đường hoặc các đường bị đóng trong "
+                "kịch bản có thể đã làm tuyến bị gián đoạn."
             ),
             optimality_note=optimality_note,
-            message=f"No path from {start_node} to {goal_node}.",
+            message=f"Không có đường đi từ {start_node} đến {goal_node}.",
         )
         if weight_used is not None:
             result["weight_used"] = weight_used
@@ -425,13 +425,13 @@ def require_nonnegative_weight(
     for source, target, data in graph.edges(data=True):
         if weight not in data:
             raise ValueError(
-                f"Edge {source!r} -> {target!r} is missing weight "
+                f"Cạnh {source!r} -> {target!r} thiếu trọng số "
                 f"{weight!r}."
             )
 
         value = float(data[weight])
         if value < 0:
             raise ValueError(
-                f"Edge {source!r} -> {target!r} has negative "
+                f"Cạnh {source!r} -> {target!r} có trọng số âm "
                 f"{weight!r}: {value}."
             )

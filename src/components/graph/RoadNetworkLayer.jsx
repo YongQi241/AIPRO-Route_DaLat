@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { createDrawableEdges } from './graphGeometry'
+import { formatNodeNumber } from '../results/resultFormatting'
 import './RoadNetworkLayer.css'
 
 export default function RoadNetworkLayer({
@@ -30,13 +31,13 @@ export default function RoadNetworkLayer({
                 <path
                   className={className}
                   d={path.value}
-                  aria-label={`${edge.edgeId}: ${edge.fromNode} to ${edge.toNode}`}
+                  aria-label={`${edge.edgeId}: ${formatNodeNumber(edge.fromNode)} đến ${formatNodeNumber(edge.toNode)}`}
                 />
                 <path
                   className="road-network-layer__edge-hitbox"
                   d={path.value}
                   aria-hidden="true"
-                  onPointerEnter={() => onEdgeHover?.(edge)}
+                  onPointerEnter={(event) => onEdgeHover?.(edge, event)}
                   onPointerLeave={() => onEdgeHover?.(null)}
                 />
               </g>

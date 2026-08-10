@@ -5,6 +5,7 @@ import GraphWorkspace from './components/graph/GraphWorkspace'
 import AppShell from './components/layout/AppShell'
 import PlaybackToolbar from './components/playback/PlaybackToolbar'
 import BottomPanelTabs from './components/panels/BottomPanelTabs'
+import SearchLogPanel from './components/panels/SearchLogPanel'
 import RouteSelectionControls from './components/route-selection/RouteSelectionControls'
 import { useGraphData } from './hooks/useGraphData'
 import { useRouteSolver } from './hooks/useRouteSolver'
@@ -29,7 +30,6 @@ export default function App() {
     <AppShell
       topBar={
         <>
-          <PlaybackToolbar />
           <RouteSelectionControls
             locations={locations}
             onSolve={runRouteSearch}
@@ -39,8 +39,14 @@ export default function App() {
           <StatusMessage />
         </>
       }
-      workspace={<GraphWorkspace scenarioCostModel={scenarioCostModel} />}
-      sidebar={<AlgorithmSidebar />}
+      workspace={
+        <GraphWorkspace
+          scenarioCostModel={scenarioCostModel}
+          playbackControls={<PlaybackToolbar compact />}
+          algorithmControls={<AlgorithmSidebar compact />}
+          traceOverlay={<SearchLogPanel overlay />}
+        />
+      }
       bottomPanel={<BottomPanelTabs />}
     />
   )

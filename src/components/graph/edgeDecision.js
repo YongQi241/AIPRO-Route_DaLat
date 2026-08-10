@@ -1,3 +1,5 @@
+import { scaleCost } from '../results/resultFormatting.js'
+
 function toNumber(value) {
   const number = Number(value)
   return value == null || value === '' || !Number.isFinite(number)
@@ -6,9 +8,9 @@ function toNumber(value) {
 }
 
 function formatNumber(value) {
-  return toNumber(value)?.toLocaleString(undefined, {
+  return scaleCost(value)?.toLocaleString(undefined, {
     maximumFractionDigits: 3,
-  }) ?? 'unknown'
+  }) ?? 'không xác định'
 }
 
 export function getDecisionCost(values) {
@@ -25,7 +27,7 @@ export function getDecisionCost(values) {
 }
 
 function formatCost(values) {
-  if (!values) return 'cost values were not included in this trace'
+  if (!values) return 'tiến trình này không chứa giá trị chi phí'
 
   const gCost = toNumber(values.gCost)
   const hCost = toNumber(values.hCost)
@@ -39,50 +41,10 @@ function formatCost(values) {
   } else if (values.fCost != null) {
     parts.push(`f(n)=${formatNumber(total)}`)
   } else if (values.priority != null && total != null) {
-    parts.push(`priority=${formatNumber(total)}`)
+    parts.push(`độ ưu tiên=${formatNumber(total)}`)
   }
 
-  return parts.length > 0 ? parts.join(', ') : 'cost values were not included in this trace'
-}
-
-function describeComparison(action, evaluatedActions) {
-  const candidateCost = getDecisionCost(action.newValues)
-  const scored = evaluatedActions
-    .filter(
-      (candidate) =>
-        candidate?.type === 'consider-edge' &&
-        (action.frameIndex == null ||
-          candidate.frameIndex === action.frameIndex),
-    )
-    .map((candidate) => ({
-      edgeId: String(candidate.activeEdgeId ?? ''),
-      cost: getDecisionCost(candidate.newValues),
-    }))
-    .filter(({ cost }) => cost != null)
-
-  if (candidateCost == null || scored.length < 2) {
-    return scored.length === 1
-      ? 'It is the only evaluated option with a comparable cost so far.'
-      : 'The trace does not contain enough comparable edge costs yet.'
-  }
-
-  const lower = scored.filter(({ cost }) => cost < candidateCost)
-  const equal = scored.filter(
-    ({ edgeId, cost }) => edgeId !== String(action.activeEdgeId) && cost === candidateCost,
-  )
-
-  if (lower.length === 0) {
-    return equal.length === 0
-      ? `It has the lowest cost among ${scored.length} evaluated options so far.`
-      : `It ties for the lowest cost among ${scored.length} evaluated options so far.`
-  }
-
-  const best = Math.min(...scored.map(({ cost }) => cost))
-  const bestEdges = scored
-    .filter(({ cost }) => cost === best)
-    .map(({ edgeId }) => edgeId)
-    .join(', ')
-  return `${lower.length} of ${scored.length} evaluated options cost less; edge ${bestEdges} has the lowest cost, ${formatNumber(best)}.`
+  return parts.length > 0 ? parts.join(', ') : 'tiến trình này không chứa giá trị chi phí'
 }
 
 export function describeCandidateEdgeDecision(edgeId, evaluatedActions = []) {
@@ -96,36 +58,34 @@ export function describeCandidateEdgeDecision(edgeId, evaluatedActions = []) {
     )
 
   if (!action) {
-    return 'Pending: this candidate edge has not been evaluated yet.'
+    return 'Chờ xét.'
   }
 
   const candidateCost = getDecisionCost(action.newValues)
   const retainedCost = getDecisionCost(action.oldValues)
   const costDetail = formatCost(action.newValues)
-  const comparison = describeComparison(action, evaluatedActions)
+  const retainedOwner = action.retainedEdgeId
+    ? ` thuộc về đường ${action.retainedEdgeId}`
+    : ''
 
   if (action.outcome === 'add') {
-    return `Checked and retained as a new frontier option because ${costDetail}. ${comparison}`
+    return `Thêm vào biên: ${costDetail}`
   }
   if (action.outcome === 'update') {
-    const improvement =
-      candidateCost != null && retainedCost != null
-        ? `candidate total ${formatNumber(candidateCost)} is lower than the previous ${formatNumber(retainedCost)}`
-        : 'it improves the previously retained route'
-    return `Checked and retained as an improved frontier option because ${improvement} (${costDetail}). ${comparison}`
+    return candidateCost != null && retainedCost != null
+      ? `Cập nhật biên: ${formatNumber(candidateCost)} < ${formatNumber(retainedCost)}${retainedOwner}`
+      : `Cập nhật biên: ${costDetail} tốt hơn phương án cũ${retainedOwner}`
   }
   if (action.outcome === 'keep') {
-    const rejection =
-      candidateCost != null && retainedCost != null
-        ? `candidate total ${formatNumber(candidateCost)} is not lower than the retained ${formatNumber(retainedCost)}`
-        : 'it did not improve the route already retained for this destination'
-    return `Not chosen as an improvement because ${rejection} (${costDetail}). ${comparison}`
+    return candidateCost != null && retainedCost != null
+      ? `Không cập nhật: ${formatNumber(candidateCost)} ≥ ${formatNumber(retainedCost)}${retainedOwner}`
+      : `Không cập nhật: ${costDetail} không tốt hơn phương án đang giữ${retainedOwner}`
   }
   if (action.outcome === 'skip') {
-    return `Not retained by this relaxation (${costDetail}). ${comparison}`
+    return `Không giữ: ${costDetail}`
   }
 
-  return `Evaluated in traversal order (${costDetail}); this algorithm trace does not use cost to select among these outgoing edges.`
+  return `Xét theo thứ tự duyệt; không dùng chi phí (${costDetail}).`
 }
 
 export function getEvaluatedCandidateEdgeIds(actions = []) {

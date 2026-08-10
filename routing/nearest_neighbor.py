@@ -47,8 +47,8 @@ def nearest_neighbor_route(
             scenario_id=scenario_id,
             optimization=optimization,
             message=(
-                f"Unsupported nearest-neighbor weight: {weight}. "
-                f"Choose one of {sorted(SUPPORTED_WEIGHTS)}"
+                f"Trọng số Láng giềng gần nhất không được hỗ trợ: {weight}. "
+                f"Hãy chọn một trong {sorted(SUPPORTED_WEIGHTS)}"
             ),
         )
 
@@ -65,7 +65,7 @@ def nearest_neighbor_route(
             visit_nodes=ordered_targets,
             scenario_id=scenario_id,
             optimization=optimization,
-            message=f"Unknown node ID(s): {', '.join(missing)}",
+            message=f"Mã nút không xác định: {', '.join(missing)}",
         )
 
     remaining = [
@@ -255,14 +255,12 @@ def nearest_neighbor_route(
         "segments": all_segments,
         "legs": leg_results,
         "explanation": (
-            "Nearest Neighbor repeatedly selected the unvisited "
-            f"location with the lowest reachable Dijkstra {weight} "
-            "score from the current stop."
+            "Láng giềng gần nhất liên tục chọn địa điểm chưa thăm có điểm "
+            f"Dijkstra {weight} khả dụng thấp nhất từ điểm dừng hiện tại."
         ),
         "optimality_note": (
-            "This is an approximation. It optimizes each next choice "
-            "locally and does not guarantee the globally best complete "
-            "visiting order."
+            "Đây là phương pháp xấp xỉ. Nó tối ưu cục bộ từng lựa chọn tiếp "
+            "theo và không bảo đảm thứ tự ghé thăm hoàn chỉnh tốt nhất toàn cục."
         ),
         "message": None,
         "weight_used": weight,
@@ -342,8 +340,8 @@ def _invalid_result(
         "metrics": {},
         "segments": [],
         "legs": [],
-        "explanation": "The multi-location request is invalid.",
-        "optimality_note": "No route was computed.",
+        "explanation": "Yêu cầu đa địa điểm không hợp lệ.",
+        "optimality_note": "Chưa tính được tuyến đường.",
         "message": message,
     }
 
@@ -369,10 +367,10 @@ def _no_path_result(
 ) -> dict[str, Any]:
     elapsed_ms = (perf_counter() - started_at) * 1000.0
     message = (
-        f"Could not return from {current} to {start_node}."
+        f"Không thể quay lại từ {current} về {start_node}."
         if return_failure
         else (
-            f"Could not continue from {current}; unreachable targets: "
+            f"Không thể tiếp tục từ {current}; các đích không thể đến: "
             f"{remaining}"
         )
     )
@@ -400,12 +398,12 @@ def _no_path_result(
         "segments": all_segments,
         "legs": leg_results,
         "explanation": (
-            "The partial route is returned, but the directed graph has "
-            "no valid continuation to every requested location."
+            "Đã trả về tuyến một phần, nhưng đồ thị có hướng không có đường "
+            "tiếp tục hợp lệ tới mọi địa điểm được yêu cầu."
         ),
         "optimality_note": (
-            "Nearest Neighbor is approximate and has no global "
-            "optimality guarantee."
+            "Láng giềng gần nhất là phương pháp xấp xỉ và không bảo đảm tối "
+            "ưu toàn cục."
         ),
         "message": message,
         "weight_used": weight,

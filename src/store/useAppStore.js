@@ -177,7 +177,7 @@ export const useAppStore = create((set) => ({
       routeResult: null,
       requestState: {
         status: REQUEST_STATUS.LOADING,
-        message: 'Calculating route…',
+        message: 'Đang tính toán tuyến đường…',
       },
       simulation: initialSimulationState,
       hasRevealedFinalResult: false,

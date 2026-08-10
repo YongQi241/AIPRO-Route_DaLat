@@ -11,6 +11,7 @@ const EMPTY_ACTION = Object.freeze({
   currentValues: null,
   oldValues: null,
   newValues: null,
+  retainedEdgeId: null,
   selectedNodeId: null,
   selectedScore: null,
   selectionCandidates: [],
@@ -110,6 +111,7 @@ function actionBase({
     currentValues,
     oldValues: null,
     newValues: null,
+    retainedEdgeId: null,
     selectedNodeId: null,
     selectedScore: null,
     selectionCandidates: [],
@@ -243,6 +245,18 @@ function buildFrameActions({
       : afterLookup.get(toNode) ?? null
     const outcome =
       relaxation?.outcome ?? classifyRelaxation(beforeEntry, afterEntry)
+    const retainedEdgeId = beforeEntry
+      ? relaxation?.previous_edge_id ??
+        [...actions]
+          .reverse()
+          .find(
+            (candidate) =>
+              candidate.type === 'consider-edge' &&
+              candidate.activeNeighborId === toNode &&
+              (candidate.outcome === 'add' || candidate.outcome === 'update'),
+          )?.activeEdgeId ??
+        null
+      : null
 
     if (outcome === 'add' || outcome === 'update') {
       progressiveFrontier.set(
@@ -260,6 +274,7 @@ function buildFrameActions({
       outcome,
       oldValues: beforeEntry,
       newValues: afterEntry,
+      retainedEdgeId,
       frontierNodeIds: [...progressiveFrontier.keys()],
     })
   })

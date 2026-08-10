@@ -71,7 +71,7 @@ def brute_force_tsp_route(
     if best is None:
         return _empty_result(
             "no_path", start_node, targets, scenario_id, optimization,
-            "No visit order connects every requested location.",
+            "Không có thứ tự ghé thăm nào kết nối mọi địa điểm được yêu cầu.",
         )
 
     score, order, selected_legs = best
@@ -107,10 +107,10 @@ def brute_force_tsp_route(
         "segments": segments,
         "legs": selected_legs,
         "explanation": (
-            f"Brute Force TSP evaluated every feasible visit order and "
-            f"selected the minimum-{weight} route."
+            f"TSP duyệt cạn đã đánh giá mọi thứ tự ghé thăm khả thi và "
+            f"chọn tuyến có {weight} nhỏ nhất."
         ),
-        "optimality_note": "Globally optimal for the selected targets and weight.",
+        "optimality_note": "Tối ưu toàn cục theo các đích và trọng số đã chọn.",
         "message": None,
         "weight_used": weight,
         "return_to_start": return_to_start,
@@ -129,16 +129,16 @@ def _metric_for(weight: str) -> str:
 
 def _validate(graph, start, targets, weight, max_targets):
     if weight not in SUPPORTED_WEIGHTS:
-        return f"Unsupported weight: {weight}."
+        return f"Trọng số không được hỗ trợ: {weight}."
     missing = sorted(node for node in [start, *targets] if node not in graph)
     if missing:
-        return f"Unknown node ID(s): {', '.join(missing)}"
+        return f"Mã nút không xác định: {', '.join(missing)}"
     if not targets:
-        return "Brute Force TSP requires at least one visit node."
+        return "TSP duyệt cạn cần ít nhất một nút cần ghé thăm."
     if len(targets) > max_targets:
         return (
-            f"Brute Force TSP accepts at most {max_targets} targets "
-            f"({len(targets)} supplied) to prevent factorial runtime."
+            f"TSP duyệt cạn chỉ nhận tối đa {max_targets} đích "
+            f"(đã cung cấp {len(targets)}) để tránh thời gian chạy giai thừa."
         )
     return None
 
@@ -151,6 +151,6 @@ def _empty_result(status, start, targets, scenario, optimization, message):
         "path_nodes": [], "path_edges": [], "visited_order": [],
         "frontier_steps": [], "selection_steps": [], "metrics": {},
         "segments": [], "legs": [],
-        "explanation": "The exact multi-location route could not be computed.",
-        "optimality_note": "No route was computed.", "message": message,
+        "explanation": "Không thể tính tuyến đa địa điểm chính xác.",
+        "optimality_note": "Chưa tính được tuyến đường.", "message": message,
     }

@@ -1,20 +1,20 @@
-\chapter{Problem Modeling}
+% !TeX root = ../main.tex
+% !TeX program = pdflatex
+% !TeX encoding = UTF-8
+
+\chapter{Mô hình hóa bài toán}
 \label{chap:problem-modeling}
 
-\section{Description of the Graph Model}
+\section{Mô hình đồ thị}
 
-The road network is represented as a weighted, directed graph
-$G = (V, E)$, where $V$ is the set of locations and $E$ is the set of
-road segments connecting them. Each location becomes a node, and each
-usable road segment between two locations becomes an edge. Because
-many Vietnamese streets are one way, or have different travel
-conditions in each direction, the graph is directed rather than
-undirected, and two opposite edges are used whenever traffic can flow
-both ways between the same pair of locations.
+Mạng đường được biểu diễn bằng đồ thị có hướng, có trọng số $G=(V,E)$. Tập
+$V$ gồm các địa điểm và tập $E$ gồm các đoạn đường nối trực tiếp giữa chúng.
+Đồ thị có hướng cho phép mô tả đường một chiều hoặc điều kiện di chuyển khác
+nhau theo hai chiều. Nếu có thể đi theo cả hai chiều, dữ liệu lưu hai cạnh có
+hướng riêng biệt.
 
-Figure~\ref{fig:example-graph} shows a small example graph with four
-locations, used only to illustrate the model before the real dataset
-is introduced in the next chapter.
+Hình~\ref{fig:example-graph} minh họa mô hình trên một đồ thị nhỏ trước khi
+dataset thực tế được trình bày ở Chương~\ref{chap:dataset}.
 
 \begin{figure}[h!]
 \centering
@@ -27,67 +27,84 @@ is introduced in the next chapter.
   \node (B) [right of=A] {B};
   \node (C) [below of=A] {C};
   \node (D) [right of=C] {D};
-
-  \draw[edge] (A) -- node[above, font=\scriptsize] {4.2 km} (B);
-  \draw[edge] (A) -- node[left, font=\scriptsize] {3.1 km} (C);
-  \draw[edge] (B) -- node[right, font=\scriptsize] {2.5 km} (D);
-  \draw[edge] (C) -- node[below, font=\scriptsize] {5.0 km} (D);
-  \draw[edge] (A) -- node[above, sloped, font=\scriptsize] {6.4 km} (D);
+  \draw[edge] (A) -- node[above, font=\scriptsize] {4,2 km} (B);
+  \draw[edge] (A) -- node[left, font=\scriptsize] {3,1 km} (C);
+  \draw[edge] (B) -- node[right, font=\scriptsize] {2,5 km} (D);
+  \draw[edge] (C) -- node[below, font=\scriptsize] {5,0 km} (D);
+  \draw[edge] (A) -- node[above, sloped, font=\scriptsize] {6,4 km} (D);
 \end{tikzpicture}
-\caption{Simplified example of the graph model with four locations}
+\caption{Ví dụ đơn giản về mô hình đồ thị có bốn địa điểm}
 \label{fig:example-graph}
 \end{figure}
 
-\section{Nodes, Edges, Start State, Goal State, and Transition Rules}
+\section{Trạng thái và quy tắc chuyển trạng thái}
 
 \begin{itemize}[itemsep=3pt]
-  \item \textbf{Node.} A node represents a physical location such as an intersection, a landmark, or an address used in the dataset. Each node has a unique identifier and, for the map display, a pair of coordinates.
-  \item \textbf{Edge.} An edge represents a road segment that allows travel from one node directly to another. An edge carries the attributes described in Section~\ref{sec:edge-attributes}, which are used to compute its cost.
-  \item \textbf{Start state.} The start state is the node chosen as the current location of the vehicle, given as an input by the user through the GUI.
-  \item \textbf{Goal state.} The goal state is the node chosen as the destination. In the single destination case there is one goal node, and in the multi location case, described in Chapter~\ref{chap:multilocation}, the goal is to visit a whole set of nodes.
-  \item \textbf{Transition rule.} From any given node, the available actions are to move along any outgoing edge to a neighboring node. A transition is only valid if an edge exists in the graph from the current node to the target node, which naturally enforces one way streets and other real restrictions in the road network.
+  \item \textbf{Đỉnh:} một địa điểm có mã định danh, tên, loại địa điểm và tọa
+  độ địa lý.
+  \item \textbf{Cạnh:} một đoạn đường cho phép di chuyển trực tiếp từ đỉnh
+  nguồn đến đỉnh đích, kèm các thuộc tính dùng để tính chi phí.
+  \item \textbf{Trạng thái đầu:} địa điểm xuất phát do người dùng chọn.
+  \item \textbf{Trạng thái đích:} một địa điểm đích; với bài toán đa điểm, mục
+  tiêu là ghé đủ tập địa điểm yêu cầu.
+  \item \textbf{Phép chuyển:} từ đỉnh hiện tại, thuật toán chỉ được đi qua một
+  cạnh đi ra chưa bị đóng. Quy tắc này tự nhiên bảo toàn hướng lưu thông.
 \end{itemize}
 
-\section{Description of Edge Attributes}
+\section{Thuộc tính của cạnh}
 \label{sec:edge-attributes}
-
-Each edge in the graph stores the following attributes, which together describe the real world conditions of that road segment.
 
 \begin{table}[h!]
 \centering
-\caption{Edge attributes used in the graph model}
-\begin{tabular}{p{2.8cm}p{9cm}}
+\caption{Các thuộc tính chính của cạnh}
+\begin{tabular}{p{4.0cm}p{9.2cm}}
 \toprule
-Attribute & Meaning \\
+Thuộc tính & Ý nghĩa \\
 \midrule
-Distance & The physical length of the road segment, measured in kilometers. \\
-Base travel time & The time needed to travel the segment under normal, non congested conditions, measured in minutes. \\
-Congestion level & A factor that represents how crowded the road segment currently is, for example a value from 1 for free flowing traffic to 5 for heavy congestion. \\
-Road type & A category such as main road, secondary road, or alley, which affects the achievable speed and the reliability of the base travel time. \\
-Direction & Whether the segment can be used in one direction only or in both directions. \\
+\texttt{distance\_km} & Chiều dài tuyến đường thực tế, đơn vị km. \\
+\texttt{base\_time\_min} & Thời gian cơ sở suy ra từ chiều dài và vận tốc giả định, đơn vị phút. \\
+\texttt{adjusted\_time\_min} & Thời gian sau khi áp dụng hệ số của kịch bản. \\
+\texttt{congestion} & Mức ùn tắc hiệu dụng từ 1 đến 5. \\
+\texttt{risk} & Tổng rủi ro cơ sở, mưa, sương mù và thi công. \\
+\texttt{road\_type} & Các loại đường OpenStreetMap xuất hiện trên tuyến. \\
+\texttt{route\_cost} & Chi phí chuẩn hóa theo profile tối ưu được chọn. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Cost Function}
+\section{Hàm chi phí}
 
-The cost of moving along an edge is defined as a combination of travel
-time and a congestion penalty, since a route that looks short in
-distance can still be slow if it passes through a congested road.
+Với mỗi kịch bản, các đại lượng khoảng cách, thời gian hiệu dụng và rủi ro được
+chuẩn hóa min--max về $[0,1]$ trên tập cạnh còn mở; ùn tắc được chia cho 5.
+Chi phí của cạnh $e$ là
 
 \begin{equation}
-\text{cost}(e) = w_1 \cdot t(e) + w_2 \cdot c(e) \cdot t(e) + w_3 \cdot r(e)
+C(e)=\alpha d_n(e)+\beta t_n(e)+\gamma c_n(e)+\delta r_n(e),
 \end{equation}
 
-where, for an edge $e$:
+trong đó $d_n,t_n,c_n,r_n$ lần lượt là khoảng cách, thời gian, ùn tắc và rủi
+ro đã chuẩn hóa. Các bộ trọng số trong chương trình được trình bày ở
+Bảng~\ref{tab:optimization-profiles}.
 
-\begin{itemize}[itemsep=2pt]
-  \item $t(e)$ is the base travel time of the edge, in minutes.
-  \item $c(e)$ is the congestion level of the edge, normalized to a value between 0 and 1.
-  \item $r(e)$ is a penalty term associated with the road type, for example a small alley receiving a higher penalty than a main road because of lower reliability and lower safe speed.
-  \item $w_1$, $w_2$, and $w_3$ are weights chosen by the group to balance the importance of raw travel time, congestion, and road type. \fillin{state the actual weight values your group used and the reasoning behind them.}
-\end{itemize}
+\begin{table}[h!]
+\centering
+\caption{Trọng số của các profile tối ưu}
+\label{tab:optimization-profiles}
+\begin{tabular}{lcccc}
+\toprule
+Profile & $\alpha$ & $\beta$ & $\gamma$ & $\delta$ \\
+\midrule
+Shortest & 0,80 & 0,15 & 0,03 & 0,02 \\
+Fastest & 0,10 & 0,75 & 0,10 & 0,05 \\
+Balanced & 0,20 & 0,50 & 0,15 & 0,15 \\
+Safest & 0,10 & 0,25 & 0,10 & 0,55 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-The total cost of a path is the sum of the cost of every edge along that path, and this is the value every search algorithm in this project tries to minimize.
-
-\fillin{If your group used a different or more detailed cost function, replace the formula above with the exact one implemented in your code, and explain each term the same way.}
+Các trọng số đều có tổng bằng 1. Profile Shortest nhấn mạnh khoảng cách,
+Fastest nhấn mạnh thời gian, Safest ưu tiên rủi ro, còn Balanced phân bổ trọng
+số cho cả bốn yếu tố. Tổng chi phí của một tuyến bằng tổng $C(e)$ của các cạnh
+trên tuyến. Riêng lựa chọn khoảng cách hoặc thời gian trên giao diện có thể yêu
+cầu thuật toán tối ưu trực tiếp theo \texttt{distance\_km} hoặc
+\texttt{adjusted\_time\_min}.

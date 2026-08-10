@@ -25,6 +25,6 @@ test('substitutes scenario-normalized edge values into the weighted formula', ()
 test('does not calculate a cost for a scenario-closed edge', () => {
   assert.match(
     formatEdgeCostCalculation({ closed: true }, {}).substitution,
-    /edge is closed/,
+    /cạnh này bị đóng/,
   )
 })

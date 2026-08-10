@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { createDrawableEdges } from './graphGeometry'
+import { formatNodeNumber } from '../results/resultFormatting'
 import './FinalRouteLayer.css'
 
 export default function FinalRouteLayer({
@@ -78,8 +79,8 @@ export default function FinalRouteLayer({
                 .join(' ')}
               d={path.value}
               style={{ '--route-index': edge.routeIndex }}
-              aria-label={`Segment ${edge.routeIndex + 1}: ${edge.edgeId}, ${edge.fromNode} to ${edge.toNode}`}
-              onPointerEnter={() => onEdgeHover?.(edge)}
+              aria-label={`Đoạn ${edge.routeIndex + 1}: ${edge.edgeId}, ${formatNodeNumber(edge.fromNode)} đến ${formatNodeNumber(edge.toNode)}`}
+              onPointerEnter={(event) => onEdgeHover?.(edge, event)}
               onPointerLeave={() => onEdgeHover?.(null)}
             />
           )

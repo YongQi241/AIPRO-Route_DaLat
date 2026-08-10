@@ -2,16 +2,17 @@ import { useMemo } from 'react'
 import { useAppStore } from '../../store/useAppStore'
 import {
   createNodeNameLookup,
+  formatCost,
   formatMetric,
   formatNumber,
 } from './resultFormatting'
 import './RouteResultPanel.css'
 
 const STATUS_LABELS = {
-  success: 'Route found',
-  no_path: 'No route',
-  invalid_input: 'Invalid input',
-  error: 'Error',
+  success: 'Đã tìm thấy tuyến đường',
+  no_path: 'Không có tuyến đường',
+  invalid_input: 'Dữ liệu đầu vào không hợp lệ',
+  error: 'Lỗi',
 }
 
 export default function RouteResultPanel({ className = '' }) {
@@ -40,8 +41,8 @@ export default function RouteResultPanel({ className = '' }) {
     <section className={rootClassName} aria-labelledby="route-result-title">
       <header className="route-result-panel__header">
         <div>
-          <span>Output</span>
-          <h2 id="route-result-title">Route result</h2>
+          <span>Kết quả</span>
+          <h2 id="route-result-title">Kết quả tuyến đường</h2>
         </div>
         {result && (
           <output
@@ -55,24 +56,23 @@ export default function RouteResultPanel({ className = '' }) {
 
       {!result ? (
         <div className="route-result-panel__empty">
-          <strong>No result available</strong>
-          <span>Route metrics will appear after the service responds.</span>
+          <strong>Chưa có kết quả</strong>
+          <span>Các chỉ số tuyến đường sẽ xuất hiện sau khi dịch vụ phản hồi.</span>
         </div>
       ) : result.status !== 'success' ? (
         <div className="route-result-panel__failure" role="alert">
-          <strong>{STATUS_LABELS[result.status] ?? 'Route unavailable'}</strong>
-          <span>{result.message ?? result.explanation ?? 'No details provided.'}</span>
+          <strong>{STATUS_LABELS[result.status] ?? 'Không có tuyến đường'}</strong>
+          <span>{result.message ?? result.explanation ?? 'Không có thông tin chi tiết.'}</span>
         </div>
       ) : (
         <>
           <div className="route-result-panel__path">
-            <span>Selected path</span>
+            <span>Đường đi đã chọn</span>
             <ol>
               {pathLabels.map((label, index) => (
                 <li key={`${path[index]}-${index}`}>
                   <span>{index + 1}</span>
                   <strong>{label}</strong>
-                  <small>{path[index]}</small>
                 </li>
               ))}
             </ol>
@@ -80,27 +80,27 @@ export default function RouteResultPanel({ className = '' }) {
 
           <dl className="route-result-panel__metrics">
             <div>
-              <dt>Total distance</dt>
+              <dt>Tổng quãng đường</dt>
               <dd>{formatMetric(metrics.total_distance_km, 'km')}</dd>
             </div>
             <div>
-              <dt>Estimated time</dt>
+              <dt>Thời gian ước tính</dt>
               <dd>{formatMetric(metrics.total_time_min, 'min')}</dd>
             </div>
             <div>
-              <dt>Total cost</dt>
-              <dd>{formatNumber(metrics.total_cost, 3)}</dd>
+              <dt>Tổng chi phí</dt>
+              <dd>{formatCost(metrics.total_cost)}</dd>
             </div>
             <div>
-              <dt>Explored nodes</dt>
+              <dt>Số nút đã khám phá</dt>
               <dd>{formatNumber(metrics.explored_nodes, 0)}</dd>
             </div>
             <div>
-              <dt>Processing time</dt>
+              <dt>Thời gian xử lý</dt>
               <dd>{formatMetric(metrics.processing_time_ms, 'ms')}</dd>
             </div>
             <div>
-              <dt>Warning segments</dt>
+              <dt>Đoạn đường cảnh báo</dt>
               <dd>{warningSegments}</dd>
             </div>
           </dl>

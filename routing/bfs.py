@@ -73,12 +73,12 @@ def bfs_search(
         optimization=optimization,
         started_at=started_at,
         explanation=(
-            "BFS explored the directed graph level by level and selected "
-            "a route containing the fewest graph edges."
+            "BFS khám phá đồ thị có hướng theo từng mức và chọn tuyến "
+            "có ít cạnh nhất."
         ),
         optimality_note=(
-            "Optimal for edge count, but not necessarily for distance, "
-            "time, risk, or route cost."
+            "Tối ưu theo số cạnh, nhưng không nhất thiết tối ưu theo quãng "
+            "đường, thời gian, rủi ro hoặc chi phí tuyến."
         ),
         weight_used="edge_count",
     )

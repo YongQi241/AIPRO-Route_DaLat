@@ -16,7 +16,7 @@ def optimization_weight(optimization: str) -> str:
         return "adjusted_time_min"
     if profile in {"balanced", "cost", "safest"}:
         return "route_cost"
-    raise ValueError(f"Unknown optimization profile: {optimization}")
+    raise ValueError(f"Cấu hình tối ưu không xác định: {optimization}")
 
 
 def ucs_search(
@@ -45,9 +45,9 @@ def ucs_search(
             graph,
             result["path_nodes"],
             algorithm_explanation=(
-                "Uniform-Cost Search expanded nodes by increasing "
-                f"cumulative {selected_weight} and returned the "
-                "least-cost route."
+                "Tìm kiếm chi phí đồng nhất mở rộng các nút theo "
+                f"{selected_weight} tích lũy tăng dần và trả về tuyến "
+                "có chi phí thấp nhất."
             ),
             weight_used=selected_weight,
         )

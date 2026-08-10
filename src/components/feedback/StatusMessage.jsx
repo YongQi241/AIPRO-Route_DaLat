@@ -3,24 +3,24 @@ import './StatusMessage.css'
 
 const STATUS_CONTENT = {
   [REQUEST_STATUS.LOADING]: {
-    title: 'Calculating route',
-    fallback: 'Waiting for the route service to respond.',
+    title: 'Đang tính toán tuyến đường',
+    fallback: 'Đang chờ dịch vụ định tuyến phản hồi.',
   },
   [REQUEST_STATUS.SUCCESS]: {
-    title: 'Route ready',
-    fallback: 'The route result was received successfully.',
+    title: 'Tuyến đường đã sẵn sàng',
+    fallback: 'Đã nhận kết quả tuyến đường thành công.',
   },
   [REQUEST_STATUS.NO_PATH]: {
-    title: 'No route available',
-    fallback: 'No path was returned for the selected request.',
+    title: 'Không có tuyến đường',
+    fallback: 'Không tìm thấy đường đi cho yêu cầu đã chọn.',
   },
   [REQUEST_STATUS.INVALID_INPUT]: {
-    title: 'Invalid route request',
-    fallback: 'Check the selected locations and options.',
+    title: 'Yêu cầu định tuyến không hợp lệ',
+    fallback: 'Hãy kiểm tra các địa điểm và tùy chọn đã chọn.',
   },
   [REQUEST_STATUS.ERROR]: {
-    title: 'Route service error',
-    fallback: 'The route request could not be completed.',
+    title: 'Lỗi dịch vụ định tuyến',
+    fallback: 'Không thể hoàn tất yêu cầu định tuyến.',
   },
 }
 
@@ -42,8 +42,8 @@ export default function StatusMessage({ className = '' }) {
 
   const content = graphIsLoading
     ? {
-        title: 'Loading graph data',
-        fallback: 'Reading locations and road geometries.',
+        title: 'Đang tải dữ liệu đồ thị',
+        fallback: 'Đang đọc địa điểm và hình học đường đi.',
       }
     : STATUS_CONTENT[status] ?? STATUS_CONTENT[REQUEST_STATUS.ERROR]
   const message =

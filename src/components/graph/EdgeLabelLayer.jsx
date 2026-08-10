@@ -1,12 +1,7 @@
 import { useMemo } from 'react'
 import { createDrawableEdges } from './graphGeometry'
+import { formatCost } from '../results/resultFormatting'
 import './EdgeLabelLayer.css'
-
-function formatNumber(value) {
-  return Number(value).toLocaleString(undefined, {
-    maximumFractionDigits: 3,
-  })
-}
 
 export default function EdgeLabelLayer({
   features = [],
@@ -21,7 +16,7 @@ export default function EdgeLabelLayer({
   )
 
   return (
-    <g className="edge-label-layer" aria-label="Edge numbers">
+    <g className="edge-label-layer" aria-label="Số hiệu cạnh">
       {drawableEdges.flatMap((edge) =>
         edge.paths.map((path) =>
           path.label ? (
@@ -34,15 +29,15 @@ export default function EdgeLabelLayer({
               dominantBaseline="central"
               transform={`rotate(${path.label.angle} ${path.label.x} ${path.label.y})`}
               aria-hidden="true"
-              onPointerEnter={() => onEdgeHover?.(edge)}
+              onPointerEnter={(event) => onEdgeHover?.(edge, event)}
               onPointerLeave={() => onEdgeHover?.(null)}
             >
               {edge.edgeId}
               {closedEdgeIds.has(edge.edgeId)
                 ? ' · closed'
                 : edgeCosts.has(edge.edgeId)
-                  ? ` · cost=${formatNumber(edgeCosts.get(edge.edgeId))}`
-                  : ''}
+                  ? ` · cost=${formatCost(edgeCosts.get(edge.edgeId))}`
+                  : ' · không có giá trị chi phí'}
             </text>
           ) : null,
         ),

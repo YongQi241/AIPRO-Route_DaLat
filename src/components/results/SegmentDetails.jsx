@@ -38,16 +38,16 @@ export default function SegmentDetails({ className = '' }) {
     <section className={rootClassName} aria-labelledby="segment-details-title">
       <header className="segment-details__header">
         <div>
-          <span>Breakdown</span>
-          <h2 id="segment-details-title">Segment details</h2>
+          <span>Chi tiết</span>
+          <h2 id="segment-details-title">Chi tiết từng đoạn</h2>
         </div>
-        <output>{orderedSegments.length} segments</output>
+        <output>{orderedSegments.length} đoạn</output>
       </header>
 
       {orderedSegments.length === 0 ? (
         <div className="segment-details__empty">
-          <strong>No route segments</strong>
-          <span>Segment metrics will appear for a successful route.</span>
+          <strong>Chưa có đoạn đường</strong>
+          <span>Các chỉ số từng đoạn sẽ xuất hiện khi tìm được tuyến đường.</span>
         </div>
       ) : (
         <ol className="segment-details__list">
@@ -80,15 +80,15 @@ export default function SegmentDetails({ className = '' }) {
                 </div>
                 <dl>
                   <div>
-                    <dt>Distance</dt>
+                    <dt>Quãng đường</dt>
                     <dd>{formatMetric(data?.distance_km, 'km')}</dd>
                   </div>
                   <div>
-                    <dt>Time</dt>
+                    <dt>Thời gian</dt>
                     <dd>{formatMetric(data?.adjusted_time_min, 'min')}</dd>
                   </div>
                   <div>
-                    <dt>Congestion</dt>
+                    <dt>Ùn tắc</dt>
                     <dd>
                       {Number.isFinite(congestion) ? (
                         <span
@@ -102,7 +102,7 @@ export default function SegmentDetails({ className = '' }) {
                     </dd>
                   </div>
                   <div>
-                    <dt>Risk</dt>
+                    <dt>Rủi ro</dt>
                     <dd>{formatNumber(data?.risk)}</dd>
                   </div>
                 </dl>

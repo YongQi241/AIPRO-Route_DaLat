@@ -1,3 +1,5 @@
+import { scaleCost } from '../results/resultFormatting.js'
+
 function number(value, digits = 6) {
   const parsed = Number(value)
   return Number.isFinite(parsed)
@@ -8,8 +10,8 @@ function number(value, digits = 6) {
 export function formatEdgeCostCalculation(detail, formula) {
   if (!detail || detail.closed) {
     return {
-      expression: formula?.expression ?? 'Scenario route-cost formula',
-      substitution: 'Not calculated: this edge is closed in the scenario.',
+      expression: formula?.expression ?? 'Công thức chi phí tuyến theo kịch bản',
+      substitution: 'Không tính toán: cạnh này bị đóng trong kịch bản.',
       result: null,
     }
   }
@@ -24,19 +26,17 @@ export function formatEdgeCostCalculation(detail, formula) {
   ]
 
   return {
-    expression:
-      formula?.expression ??
-      'cost = α·distance_norm + β·time_norm + γ·congestion_norm + δ·risk_norm',
-    substitution: `cost = ${terms
+    expression: 'Chi phí',
+    substitution: `cost =(${terms
       .map(
         ([key, symbol]) =>
           `${symbol} ${number(weights[key], 3)} × ${number(normalized[key])}`,
       )
-      .join(' + ')}`,
+      .join(' + ')})`,
     contributions: terms
-      .map(([key]) => `${key} ${number(detail.contributions?.[key])}`)
+      .map(([key]) => `${({ distance: 'quãng đường', time: 'thời gian', congestion: 'ùn tắc', risk: 'rủi ro' })[key]} ${number(scaleCost(detail.contributions?.[key]))}`)
       .join(' + '),
-    result: number(detail.route_cost),
+    result: detail.route_cost == null ? null : number(scaleCost(detail.route_cost)),
   }
 }
 

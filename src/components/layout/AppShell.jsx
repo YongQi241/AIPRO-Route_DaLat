@@ -46,6 +46,7 @@ export default function AppShell({
 
   const rootClassName = [
     'app-shell',
+    !sidebar && 'app-shell--no-sidebar',
     isTopPanelCollapsed && 'app-shell--top-collapsed',
     isSidebarCollapsed && 'app-shell--sidebar-collapsed',
     isBottomPanelCollapsed && 'app-shell--bottom-collapsed',
@@ -64,12 +65,12 @@ export default function AppShell({
           {topBar}
         </div>
         <div className="app-shell__top-handle">
-          <span>Route controls</span>
+          <span>Điều khiển tuyến đường</span>
           <CollapseButton
             isCollapsed={isTopPanelCollapsed}
             controls="app-shell-top-controls"
-            collapseLabel="Collapse route controls"
-            expandLabel="Expand route controls"
+            collapseLabel="Thu gọn điều khiển tuyến đường"
+            expandLabel="Mở rộng điều khiển tuyến đường"
             collapseIcon={'\u25b2'}
             expandIcon={'\u25bc'}
             onToggle={() => setIsTopPanelCollapsed((value) => !value)}
@@ -80,47 +81,49 @@ export default function AppShell({
       <main className="app-shell__main">
         <section
           className="app-shell__workspace"
-          aria-label="Graph simulation workspace"
+          aria-label="Không gian mô phỏng đồ thị"
         >
           {workspace}
         </section>
 
-        <aside
-          className="app-shell__sidebar"
-          aria-label="Algorithm list"
-        >
-          <div className="app-shell__sidebar-handle">
-            <CollapseButton
-              isCollapsed={isSidebarCollapsed}
-              controls="app-shell-sidebar-content"
-              collapseLabel="Collapse search strategy"
-              expandLabel="Expand search strategy"
-              collapseIcon={'\u25b6'}
-              expandIcon={'\u25c0'}
-              onToggle={() => setIsSidebarCollapsed((value) => !value)}
-            />
-          </div>
-          <div
-            id="app-shell-sidebar-content"
-            className="app-shell__sidebar-content"
-            aria-hidden={isSidebarCollapsed}
+        {sidebar && (
+          <aside
+            className="app-shell__sidebar"
+            aria-label="Danh sách thuật toán"
           >
-            {sidebar}
-          </div>
-        </aside>
+            <div className="app-shell__sidebar-handle">
+              <CollapseButton
+                isCollapsed={isSidebarCollapsed}
+                controls="app-shell-sidebar-content"
+                collapseLabel="Thu gọn chiến lược tìm kiếm"
+                expandLabel="Mở rộng chiến lược tìm kiếm"
+                collapseIcon={'\u25b6'}
+                expandIcon={'\u25c0'}
+                onToggle={() => setIsSidebarCollapsed((value) => !value)}
+              />
+            </div>
+            <div
+              id="app-shell-sidebar-content"
+              className="app-shell__sidebar-content"
+              aria-hidden={isSidebarCollapsed}
+            >
+              {sidebar}
+            </div>
+          </aside>
+        )}
       </main>
 
       <section
         className="app-shell__bottom-panel"
-        aria-label="Search trace and route results"
+        aria-label="Tiến trình tìm kiếm và kết quả tuyến đường"
       >
         <div className="app-shell__bottom-handle">
-          <span>Search details</span>
+          <span>Chi tiết tìm kiếm</span>
           <CollapseButton
             isCollapsed={isBottomPanelCollapsed}
             controls="app-shell-bottom-content"
-            collapseLabel="Collapse search details"
-            expandLabel="Expand search details"
+            collapseLabel="Thu gọn chi tiết tìm kiếm"
+            expandLabel="Mở rộng chi tiết tìm kiếm"
             collapseIcon={'\u25bc'}
             expandIcon={'\u25b2'}
             onToggle={() => setIsBottomPanelCollapsed((value) => !value)}

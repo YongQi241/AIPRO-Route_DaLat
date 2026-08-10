@@ -28,5 +28,5 @@ export function getOptimizationFormula(optimization = 'balanced') {
 
 export function formatOptimizationFormula(formula) {
   const weights = formula.weights
-  return `cost = ${weights.distance}·distance_norm + ${weights.time}·time_norm + ${weights.congestion}·congestion_norm + ${weights.risk}·risk_norm`
+  return `cost × 100 = 100 × (${weights.distance}·distance_norm + ${weights.time}·time_norm + ${weights.congestion}·congestion_norm + ${weights.risk}·risk_norm)`
 }

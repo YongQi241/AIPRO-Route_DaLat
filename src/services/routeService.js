@@ -29,22 +29,22 @@ function createInvalidDemoResult(request) {
     metrics: {},
     segments: [],
     explanation:
-      'Demo mode contains one predefined frontend fixture and does not calculate routes.',
+      'Chế độ minh họa chỉ chứa một kết quả mẫu ở giao diện và không tự tính tuyến đường.',
     message:
-      'Demo mode supports DL01 → DL09 with no intermediate locations. Configure VITE_ROUTE_API_URL to test other requests.',
+      'Chế độ minh họa chỉ hỗ trợ DL01 → DL09 và không có điểm trung gian. Hãy cấu hình VITE_ROUTE_API_URL để thử các yêu cầu khác.',
   }
 }
 
 async function parseResponse(response, sourceLabel) {
   if (!response.ok) {
     throw new Error(
-      `${sourceLabel} returned ${response.status} ${response.statusText}.`,
+      `${sourceLabel} trả về mã ${response.status} ${response.statusText}.`,
     )
   }
 
   const result = await response.json()
   if (!result?.status || !Array.isArray(result.path_nodes)) {
-    throw new Error(`${sourceLabel} returned an invalid result contract.`)
+    throw new Error(`${sourceLabel} trả về cấu trúc kết quả không hợp lệ.`)
   }
 
   return result
@@ -59,7 +59,7 @@ async function requestBackendRoute(apiUrl, request) {
     body: JSON.stringify(request),
   })
 
-  return parseResponse(response, 'Route API')
+  return parseResponse(response, 'API định tuyến')
 }
 
 async function requestDemoRoute(request) {
@@ -71,7 +71,7 @@ async function requestDemoRoute(request) {
   if (!supportsDemoRequest) return createInvalidDemoResult(request)
 
   const response = await fetch(MOCK_RESULT_URL)
-  const fixture = await parseResponse(response, 'Demo fixture')
+  const fixture = await parseResponse(response, 'Dữ liệu mẫu minh họa')
 
   return {
     ...fixture,

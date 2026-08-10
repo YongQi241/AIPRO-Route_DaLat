@@ -21,7 +21,7 @@ test('builds exact route, trace, formula, and segment figures', () => {
     } } },
   }, names, edgeFeatures)
 
-  assert.deepEqual(reasoning.path, ['Market (A)', 'Lake (B)'])
+  assert.deepEqual(reasoning.path, ['A', 'B'])
   assert.equal(reasoning.objective.value, 0.6)
   assert.equal(reasoning.trace.expansions, 1)
   assert.equal(reasoning.trace.edgeChecks, 1)
@@ -43,7 +43,7 @@ test('preserves every nearest-neighbor candidate and selection score', () => {
     frontier_steps: [],
   }, names)
 
-  assert.equal(reasoning.selectionRounds[0].selected, 'Lake (B)')
+  assert.equal(reasoning.selectionRounds[0].selected, 'B')
   assert.deepEqual(
     reasoning.selectionRounds[0].candidates.map(({ score, selected }) => [score, selected]),
     [[2, true], [5, false]],
@@ -57,5 +57,5 @@ test('reports brute-force permutation coverage', () => {
   }, names)
 
   assert.deepEqual(reasoning.permutations, { evaluated: 6, possible: 6 })
-  assert.match(reasoning.method, /every feasible order/)
+  assert.match(reasoning.method, /mọi thứ tự khả thi/)
 })

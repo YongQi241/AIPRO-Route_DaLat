@@ -7,12 +7,19 @@ import {
   getTraceEdgeState,
 } from './edgeDecision.js'
 
-const action = (edgeId, outcome, newValues, oldValues = null) => ({
+const action = (
+  edgeId,
+  outcome,
+  newValues,
+  oldValues = null,
+  retainedEdgeId = null,
+) => ({
   type: 'consider-edge',
   activeEdgeId: edgeId,
   outcome,
   newValues,
   oldValues,
+  retainedEdgeId,
 })
 
 test('explains a retained edge with g, h, total cost, and comparison', () => {
@@ -23,9 +30,9 @@ test('explains a retained edge with g, h, total cost, and comparison', () => {
 
   const reason = describeCandidateEdgeDecision('e1', actions)
 
-  assert.match(reason, /Checked and retained as a new frontier option/)
+  assert.match(reason, /Thêm vào biên/)
   assert.match(reason, /g\(n\)=2, h\(n\)=3, f\(n\)=g\(n\)\+h\(n\)=5/)
-  assert.match(reason, /lowest cost among 2 evaluated options/)
+  assert.match(reason, /Thấp nhất trong 2 phương án/)
 })
 
 test('explains why an edge was rejected against its retained route', () => {
@@ -35,20 +42,24 @@ test('explains why an edge was rejected against its retained route', () => {
       'keep',
       { gCost: 4, hCost: 1, fCost: 5 },
       { gCost: 2, hCost: 1, fCost: 3 },
+      'e0',
     ),
     action('e2', 'add', { gCost: 2, hCost: 2, fCost: 4 }),
   ]
 
   const reason = describeCandidateEdgeDecision('e1', actions)
 
-  assert.match(reason, /Not chosen as an improvement/)
-  assert.match(reason, /candidate total 5 is not lower than the retained 3/)
-  assert.match(reason, /1 of 2 evaluated options cost less/)
-  assert.match(reason, /edge e2 has the lowest cost, 4/)
+  assert.match(reason, /Không cập nhật/)
+  assert.match(
+    reason,
+    /5 ≥ 3 thuộc về đường e0/,
+  )
+  assert.match(reason, /1\/2 phương án thấp hơn/)
+  assert.match(reason, /tốt nhất: e2=4/)
 })
 
 test('marks an unevaluated candidate edge as pending', () => {
-  assert.match(describeCandidateEdgeDecision('e2', []), /^Pending:/)
+  assert.match(describeCandidateEdgeDecision('e2', []), /^Chờ xét/)
 })
 
 test('describes traversal-order traces without inventing a cost decision', () => {
@@ -57,8 +68,8 @@ test('describes traversal-order traces without inventing a cost decision', () =>
     [action('e1', 'considered', null)],
   )
 
-  assert.match(reason, /traversal order/)
-  assert.match(reason, /does not use cost to select/)
+  assert.match(reason, /thứ tự duyệt/)
+  assert.match(reason, /không dùng chi phí/)
 })
 
 test('preserves unique candidate edge ids after playback', () => {
@@ -81,8 +92,8 @@ test('compares repeated edges only with options from the same expansion', () => 
   ]
 
   const reason = describeCandidateEdgeDecision('e1', actions)
-  assert.match(reason, /lowest cost among 2 evaluated options/)
-  assert.doesNotMatch(reason, /edge old/)
+  assert.match(reason, /Thấp nhất trong 2 phương án/)
+  assert.doesNotMatch(reason, /cạnh old/)
 })
 
 test('classifies trace edges as pending, checked, or finally chosen', () => {

@@ -7,21 +7,20 @@ import {
   isResultTabLocked,
 } from './bottomPanelTabsState.js'
 
-const tabIds = ['simulation', 'trace', 'output', 'breakdown', 'reasoning']
+const tabIds = ['simulation', 'output', 'breakdown', 'reasoning']
 
 test('result tabs lock before reveal and keyboard navigation skips them', () => {
   assert.equal(isResultTabLocked('output', false), true)
   assert.equal(isResultTabLocked('breakdown', false), true)
   assert.equal(isResultTabLocked('reasoning', false), true)
-  assert.equal(isResultTabLocked('trace', false), false)
-  assert.equal(getKeyboardTabIndex('End', 0, tabIds, false), 1)
-  assert.equal(getKeyboardTabIndex('ArrowRight', 1, tabIds, false), 0)
+  assert.equal(getKeyboardTabIndex('End', 0, tabIds, false), 0)
+  assert.equal(getKeyboardTabIndex('ArrowRight', 0, tabIds, false), 0)
 })
 
 test('all tabs become keyboard-accessible after reveal', () => {
   assert.equal(isResultTabLocked('output', true), false)
-  assert.equal(getKeyboardTabIndex('ArrowRight', 1, tabIds, true), 2)
-  assert.equal(getKeyboardTabIndex('End', 0, tabIds, true), 4)
+  assert.equal(getKeyboardTabIndex('ArrowRight', 0, tabIds, true), 1)
+  assert.equal(getKeyboardTabIndex('End', 0, tabIds, true), 3)
 })
 
 test('legend distinguishes all required node and edge states', () => {

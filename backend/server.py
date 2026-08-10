@@ -21,29 +21,29 @@ DATA_DIR = PROJECT_ROOT / "data" / "generated"
 REQUIRED_FIELDS = ("algorithm", "start_node")
 API_VERSION = "2.0"
 ALGORITHM_CAPABILITIES = [
-    {"id": "bfs", "name": "Breadth-First Search", "mode": "single_route"},
-    {"id": "dfs", "name": "Depth-First Search", "mode": "single_route"},
-    {"id": "ucs", "name": "Uniform-Cost Search", "mode": "single_route"},
+    {"id": "bfs", "name": "Tìm kiếm theo chiều rộng", "mode": "single_route"},
+    {"id": "dfs", "name": "Tìm kiếm theo chiều sâu", "mode": "single_route"},
+    {"id": "ucs", "name": "Tìm kiếm chi phí đồng nhất", "mode": "single_route"},
     {"id": "dijkstra", "name": "Dijkstra", "mode": "single_route"},
-    {"id": "astar", "name": "A* Search", "mode": "single_route"},
+    {"id": "astar", "name": "Tìm kiếm A*", "mode": "single_route"},
     {
         "id": "greedy",
-        "name": "Greedy Best-First Search",
+        "name": "Tìm kiếm Tham Lam ưu tiên tốt nhất",
         "mode": "single_route",
     },
     {
         "id": "hill_climbing",
-        "name": "Hill Climbing",
+        "name": "Leo đồi",
         "mode": "single_route",
     },
     {
         "id": "nearest_neighbor",
-        "name": "Nearest Neighbor",
+        "name": "Láng giềng gần nhất",
         "mode": "multi_location",
     },
     {
         "id": "brute_force_tsp",
-        "name": "Exact TSP (Brute Force)",
+        "name": "TSP chính xác (duyệt cạn)",
         "mode": "multi_location",
         "maximum_targets": 8,
     },
@@ -68,9 +68,9 @@ def calculate_route(payload: dict[str, Any]) -> dict[str, Any]:
             "frontier_steps": [],
             "metrics": {},
             "segments": [],
-            "explanation": "The route request is missing required fields.",
-            "optimality_note": "No route was computed.",
-            "message": f"Missing required field(s): {', '.join(missing)}.",
+            "explanation": "Yêu cầu định tuyến thiếu trường bắt buộc.",
+            "optimality_note": "Chưa tính được tuyến đường.",
+            "message": f"Thiếu trường bắt buộc: {', '.join(missing)}.",
         }
 
     visit_nodes = payload.get("visit_nodes", [])
@@ -90,8 +90,8 @@ def calculate_route(payload: dict[str, Any]) -> dict[str, Any]:
             "frontier_steps": [],
             "metrics": {},
             "segments": [],
-            "explanation": "The route request has an invalid visit_nodes field.",
-            "message": "visit_nodes must be an array of node ID strings.",
+            "explanation": "Yêu cầu định tuyến có trường visit_nodes không hợp lệ.",
+            "message": "visit_nodes phải là một mảng chuỗi mã nút.",
         }
 
     normalized_algorithm = normalize_algorithm(str(payload["algorithm"]))
@@ -110,12 +110,12 @@ def calculate_route(payload: dict[str, Any]) -> dict[str, Any]:
             "metrics": {},
             "segments": [],
             "explanation": (
-                "Intermediate locations require a multi-location algorithm."
+                "Địa điểm trung gian cần thuật toán đa địa điểm."
             ),
             "message": (
-                "Intermediate stops can only be used with Nearest Neighbor "
-                "or Exact TSP. Remove the intermediate stops or choose one "
-                "of those multi-location algorithms."
+                "Điểm dừng trung gian chỉ dùng được với Láng giềng gần nhất "
+                "hoặc TSP chính xác. Hãy xóa các điểm trung gian hoặc chọn "
+                "một trong hai thuật toán đa địa điểm này."
             ),
         }
 
@@ -197,14 +197,14 @@ class RouteRequestHandler(BaseHTTPRequestHandler):
                 )
             return
         self._send_json(
-            {"status": "not_found", "message": "Endpoint not found."},
+            {"status": "not_found", "message": "Không tìm thấy điểm cuối."},
             HTTPStatus.NOT_FOUND,
         )
 
     def do_POST(self) -> None:
         if urlparse(self.path).path != "/api/routes/solve":
             self._send_json(
-                {"status": "not_found", "message": "Endpoint not found."},
+                {"status": "not_found", "message": "Không tìm thấy điểm cuối."},
                 HTTPStatus.NOT_FOUND,
             )
             return
@@ -213,7 +213,7 @@ class RouteRequestHandler(BaseHTTPRequestHandler):
             length = int(self.headers.get("Content-Length", "0"))
             payload = json.loads(self.rfile.read(length) or b"{}")
             if not isinstance(payload, dict):
-                raise ValueError("JSON body must be an object.")
+                raise ValueError("Nội dung JSON phải là một đối tượng.")
         except (json.JSONDecodeError, ValueError) as error:
             self._send_json(
                 {"status": "invalid_input", "message": str(error)},
@@ -228,13 +228,13 @@ class RouteRequestHandler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run the Da Lat route API.")
+    parser = argparse.ArgumentParser(description="Chạy API định tuyến Đà Lạt.")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
 
     server = ThreadingHTTPServer((args.host, args.port), RouteRequestHandler)
-    print(f"Route API listening on http://{args.host}:{args.port}")
+    print(f"API định tuyến đang lắng nghe tại http://{args.host}:{args.port}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

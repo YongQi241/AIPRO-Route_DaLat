@@ -1,7 +1,7 @@
 % =====================================================================
 % MAIN FILE
-% Introduction to Artificial Intelligence - Route Optimization Report
-% Compile with pdflatex (run twice for the table of contents to settle)
+% Báo cáo Nhập môn Trí tuệ nhân tạo - Tối ưu hóa tuyến đường
+% Biên dịch bằng pdflatex (chạy hai lần để ổn định mục lục)
 % =====================================================================
 % !TeX program = pdflatex
 % !TeX encoding = UTF-8
@@ -14,10 +14,10 @@
 \usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=3cm, right=2cm]{geometry}
 
 % ---------------------------------------------------------------
-% VIETNAMESE ENCODING, LANGUAGE, AND FONT FOR PDFLATEX
-% T5 supplies Vietnamese glyph encoding, inputenc reads the UTF-8 source,
-% and babel localizes automatic document labels. mathptmx provides a
-% Times-like text and mathematics font while retaining pdfLaTeX.
+% MÃ HÓA, NGÔN NGỮ VÀ PHÔNG CHỮ TIẾNG VIỆT CHO PDFLATEX
+% T5 cung cấp mã hóa ký tự tiếng Việt, inputenc đọc nguồn UTF-8,
+% babel bản địa hóa các nhãn tự động. mathptmx cung cấp phông văn bản
+% và toán học tương tự Times trong khi vẫn dùng pdfLaTeX.
 % ---------------------------------------------------------------
 \usepackage[T5]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -25,7 +25,7 @@
 \usepackage{mathptmx}
 
 % ---------------------------------------------------------------
-% FONT SIZE 13 AND LINE SPACING 1.15
+% CỠ CHỮ 13 VÀ GIÃN DÒNG 1.15
 % ---------------------------------------------------------------
 \usepackage{setspace}
 \makeatletter
@@ -55,11 +55,10 @@
 \usepackage{caption}
 \usepackage[hidelinks]{hyperref}
 
-% Justify is the default paragraph style in LaTeX, so no extra
-% package is needed for the justify requirement.
+% Căn đều là kiểu đoạn mặc định trong LaTeX nên không cần gói bổ sung.
 
 % ---------------------------------------------------------------
-% CHAPTER AND SECTION TITLE STYLE
+% KIỂU TIÊU ĐỀ CHƯƠNG VÀ MỤC
 % ---------------------------------------------------------------
 \titleformat{\chapter}[hang]
   {\normalfont\bfseries\fontsize{16}{19}\selectfont}
@@ -77,7 +76,7 @@
   {\thesubsection}{10pt}{}
 
 % ---------------------------------------------------------------
-% HEADER AND FOOTER
+% ĐẦU TRANG VÀ CHÂN TRANG
 % ---------------------------------------------------------------
 \pagestyle{fancy}
 \setlength{\headheight}{14pt}
@@ -88,17 +87,16 @@
 \renewcommand{\headrulewidth}{0.4pt}
 
 % ---------------------------------------------------------------
-% A REUSABLE BOX FOR PLACES WHERE THE GROUP MUST FILL IN REAL DATA
-% Usage: \fillin{describe what goes here}
+% HỘP DÙNG LẠI CHO NHỮNG CHỖ NHÓM PHẢI ĐIỀN DỮ LIỆU THẬT
+% Cách dùng: \fillin{mô tả nội dung cần điền}
 % ---------------------------------------------------------------
 \newcommand{\fillin}[1]{\textcolor{red}{\textbf{[CẦN BỔ SUNG: #1]}}}
 
 \begin{document}
 
 % -----------------------------------------------------------
-% COVERS
-% Outside cover and inside cover are two separate files, both
-% unnumbered pages.
+% CÁC TRANG BÌA
+% Bìa ngoài và bìa trong là hai tệp riêng, đều không đánh số trang.
 % -----------------------------------------------------------
 \input{covers/outside_cover.tex}
 \input{covers/inside_cover.tex}
@@ -118,7 +116,7 @@
 \setcounter{page}{1}
 
 % -----------------------------------------------------------
-% BODY, ONE FILE PER SECTION
+% NỘI DUNG, MỖI PHẦN MỘT TỆP
 % -----------------------------------------------------------
 \input{sections/a_group_introduction.tex}
 \input{sections/b_problem_context.tex}

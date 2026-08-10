@@ -36,7 +36,7 @@ export function useRouteSolver() {
         const message =
           error instanceof Error
             ? error.message
-            : 'The route request could not be completed.'
+            : 'Không thể hoàn tất yêu cầu định tuyến.'
         setRouteRequestError(message)
         return null
       }

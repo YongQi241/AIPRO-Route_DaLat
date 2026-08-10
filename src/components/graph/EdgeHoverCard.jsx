@@ -2,6 +2,7 @@ import {
   formatEdgeCostCalculation,
   formatEdgeDetailNumber as number,
 } from './edgeCostDetails'
+import { formatCost, formatNodeNumber } from '../results/resultFormatting'
 import './EdgeHoverCard.css'
 
 function Condition({ label, children }) {
@@ -19,25 +20,42 @@ export default function EdgeHoverCard({
   formula,
   scenarioId,
   optimization,
+  position,
 }) {
-  if (!edge) return null
+  if (!edge || !position) return null
 
   const calculation = formatEdgeCostCalculation(detail, formula)
-  const scenarioName = detail?.scenario_name ?? scenarioId ?? 'not calculated'
+  const rawScenarioName = detail?.scenario_name ?? scenarioId
+  const scenarioName = ({
+    weekday_normal: 'ngày thường',
+    weekend_busy: 'cuối tuần đông đúc',
+    evening_rush: 'giờ cao điểm buổi tối',
+    heavy_rain: 'mưa lớn',
+    dense_fog: 'sương mù dày',
+  })[rawScenarioName] ?? rawScenarioName ?? 'chưa tính toán'
 
   return (
-    <aside className="edge-hover-card" role="tooltip">
+    <aside
+      className={[
+        'edge-hover-card',
+        position.placeAbove && 'edge-hover-card--above',
+      ].filter(Boolean).join(' ')}
+      role="tooltip"
+      style={{ left: position.x, top: position.y }}
+    >
       <header>
         <div>
-          <span>Edge {edge.edgeId}</span>
-          <strong>{edge.fromNode} → {edge.toNode}</strong>
+          <span>Cạnh {edge.edgeId}</span>
+          <strong>
+            {formatNodeNumber(edge.fromNode)} → {formatNodeNumber(edge.toNode)}
+          </strong>
         </div>
         <b className={detail?.closed ? 'is-closed' : ''}>
           {detail?.closed
-            ? 'Closed'
+            ? 'Đã đóng'
             : detail?.route_cost == null
-              ? 'No calculated cost'
-              : `Cost ${number(detail.route_cost)}`}
+              ? 'Không có giá trị chi phí'
+              : `Chi phí: ${formatCost(detail.route_cost)}`}
         </b>
       </header>
 
@@ -45,44 +63,44 @@ export default function EdgeHoverCard({
 
       {!detail ? (
         <p className="edge-hover-card__unavailable">
-          Calculate a route to load exact conditions and costs for the selected
-          scenario and optimization.
+          Không có giá trị chi phí cho đường này. Hãy tính tuyến để tải dữ liệu
+          theo kịch bản và tiêu chí đã chọn.
         </p>
       ) : (
         <section>
           <h3>
-            Scenario conditions · {scenarioId ?? '—'} ({scenarioName})
+            Điều kiện kịch bản · {scenarioId ?? '—'} ({scenarioName})
           </h3>
           <dl>
-            <Condition label="Distance">
-              {number(detail.distance_km, 3)} km → norm{' '}
+            <Condition label="Quãng đường">
+              {number(detail.distance_km, 3)} km → chuẩn hóa{' '}
               {number(detail.normalized?.distance)}
             </Condition>
-            <Condition label="Base time">
-              {number(detail.base_time_min, 3)} min
+            <Condition label="Thời gian cơ sở">
+              {number(detail.base_time_min, 3)} phút
             </Condition>
-            <Condition label="Time factor">
+            <Condition label="Hệ số thời gian">
               × {number(detail.time_multiplier, 3)}
             </Condition>
-            <Condition label="Adjusted time">
-              {number(detail.adjusted_time_min, 3)} min → norm{' '}
+            <Condition label="Thời gian điều chỉnh">
+              {number(detail.adjusted_time_min, 3)} phút → chuẩn hóa{' '}
               {number(detail.normalized?.time)}
             </Condition>
-            <Condition label="Congestion">
-              {number(detail.scenario_congestion, 3)} / 5 → norm{' '}
+            <Condition label="Ùn tắc">
+              {number(detail.scenario_congestion, 3)} / 5 → chuẩn hóa{' '}
               {number(detail.normalized?.congestion)}
             </Condition>
-            <Condition label="Base risk">
+            <Condition label="Rủi ro cơ sở">
               {number(detail.base_risk, 3)}
             </Condition>
-            <Condition label="Rain / fog risk">
+            <Condition label="Rủi ro mưa / sương mù">
               {number(detail.rain_risk, 3)} / {number(detail.fog_risk, 3)}
             </Condition>
-            <Condition label="Construction">
+            <Condition label="Công trình">
               + {number(detail.construction_penalty, 3)}
             </Condition>
-            <Condition label="Total risk">
-              {number(detail.total_risk, 3)} → norm{' '}
+            <Condition label="Tổng rủi ro">
+              {number(detail.total_risk, 3)} → chuẩn hóa{' '}
               {number(detail.normalized?.risk)}
             </Condition>
           </dl>
@@ -92,12 +110,12 @@ export default function EdgeHoverCard({
       {detail && (
         <footer>
           <h3>
-            Cost formula · {formula?.optimization ?? optimization ?? '—'}
+            Công thức chi phí · {formula?.optimization ?? optimization ?? '—'}
           </h3>
           <code>{calculation.expression}</code>
           <code>{calculation.substitution}</code>
           {calculation.contributions && (
-            <small>Terms: {calculation.contributions}</small>
+            <small>Các thành phần: {calculation.contributions}</small>
           )}
           {calculation.result && <strong>= {calculation.result}</strong>}
         </footer>

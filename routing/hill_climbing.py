@@ -56,7 +56,7 @@ def hill_climbing_search(
                 continue
             score = float(estimate(graph, neighbor, goal_node))
             if score < 0:
-                raise ValueError("Hill Climbing heuristic must be nonnegative.")
+                raise ValueError("Giá trị ước lượng Leo đồi phải không âm.")
             candidates.append((score, str(neighbor)))
 
         candidates.sort(key=lambda item: (item[0], item[1]))
@@ -100,18 +100,17 @@ def hill_climbing_search(
         optimization=optimization,
         started_at=started_at,
         explanation=(
-            "Hill Climbing preferred the unvisited successor with the "
-            "smallest straight-line estimate. When trapped at a local "
-            "minimum or dead end, it escaped or backtracked so valid "
-            "routes were not discarded prematurely."
+            "Leo đồi ưu tiên nút kế tiếp chưa thăm có ước lượng đường thẳng "
+            "nhỏ nhất. Khi mắc kẹt tại cực tiểu cục bộ hoặc ngõ cụt, thuật "
+            "toán thoát ra hoặc quay lui để không loại bỏ tuyến hợp lệ quá sớm."
         ),
         optimality_note=(
-            "The backtracking variant is complete on a finite reachable "
-            "graph, but it does not guarantee the shortest or cheapest route."
+            "Biến thể có quay lui là đầy đủ trên đồ thị hữu hạn khả dụng, "
+            "nhưng không bảo đảm tuyến ngắn nhất hoặc rẻ nhất."
         ),
         weight_used="heuristic_only",
     )
     result["metrics"]["local_minimum_escapes"] = escape_moves
     result["metrics"]["backtracks"] = backtracks
-    result["variant"] = "heuristic hill climbing with backtracking"
+    result["variant"] = "leo đồi theo hàm ước lượng có quay lui"
     return result

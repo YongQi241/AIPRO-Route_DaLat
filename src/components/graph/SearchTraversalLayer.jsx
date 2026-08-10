@@ -4,6 +4,7 @@ import {
   getTraceEdgeState,
 } from './edgeDecision'
 import { createDrawableEdges } from './graphGeometry'
+import { formatNodeNumber } from '../results/resultFormatting'
 import './SearchTraversalLayer.css'
 
 function resolveEdges(edgeLookup, edgeIds, kind) {
@@ -24,8 +25,8 @@ function EdgePaths({ edge, keyPrefix, onEdgeHover }) {
         `search-traversal-layer__edge--${edge.kind}`,
       ].join(' ')}
       d={path.value}
-      aria-label={`${edge.fromNode} to ${edge.toNode}: ${edge.reason ?? 'inferred path'}`}
-      onPointerEnter={() => onEdgeHover?.(edge)}
+      aria-label={`${formatNodeNumber(edge.fromNode)} đến ${formatNodeNumber(edge.toNode)}: ${edge.reason ?? 'đường suy ra'}`}
+      onPointerEnter={(event) => onEdgeHover?.(edge, event)}
       onPointerLeave={() => onEdgeHover?.(null)}
     />
   ))
@@ -63,7 +64,7 @@ export default function SearchTraversalLayer({
         kind,
         reason:
           kind === 'chosen'
-            ? `Finally chosen: this edge belongs to the returned route. ${decisionReason}`
+            ? `Được chọn cuối cùng: cạnh này thuộc tuyến kết quả. ${decisionReason}`
             : decisionReason,
       }
     }
@@ -93,7 +94,7 @@ export default function SearchTraversalLayer({
   return (
     <g
       className="search-traversal-layer"
-      aria-label="Inferred relaxation playback"
+      aria-label="Phát lại bước nới lỏng suy ra"
     >
       <defs>
         <filter
@@ -111,7 +112,7 @@ export default function SearchTraversalLayer({
         </filter>
       </defs>
 
-      <g aria-label="Path to current node">
+      <g aria-label="Đường tới nút hiện tại">
         {highlights.branch.map((edge) => (
           <EdgePaths
             key={`branch-${edge.edgeId}`}
@@ -121,7 +122,7 @@ export default function SearchTraversalLayer({
           />
         ))}
       </g>
-      <g aria-label="Trace edges by evaluation state">
+      <g aria-label="Các cạnh tiến trình theo trạng thái đánh giá">
         {highlights.trace.map((edge) => (
           <EdgePaths
             key={`trace-${edge.edgeId}`}

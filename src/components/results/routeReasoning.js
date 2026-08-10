@@ -1,12 +1,13 @@
 import { buildSearchActionTimeline } from '../graph/searchTimeline.js'
+import { formatNodeNumber, scaleCost } from './resultFormatting.js'
 
 const OBJECTIVES = {
-  distance_km: ['Distance', 'total_distance_km', 'km'],
-  adjusted_time_min: ['Travel time', 'total_time_min', 'min'],
-  route_cost: ['Scenario cost', 'total_cost', ''],
-  risk: ['Risk', 'total_risk', ''],
-  edge_count: ['Road count', 'path_edge_count', 'roads'],
-  heuristic_only: ['Heuristic guidance', null, ''],
+  distance_km: ['Quãng đường', 'total_distance_km', 'km'],
+  adjusted_time_min: ['Thời gian di chuyển', 'total_time_min', 'phút'],
+  route_cost: ['Chi phí kịch bản', 'total_cost', ''],
+  risk: ['Rủi ro', 'total_risk', ''],
+  edge_count: ['Số đoạn đường', 'path_edge_count', 'đường'],
+  heuristic_only: ['Hướng dẫn theo hàm ước lượng', null, ''],
 }
 
 function finite(value) {
@@ -17,50 +18,53 @@ function finite(value) {
 }
 
 function nodeLabel(nodeId, names) {
-  const id = String(nodeId ?? '')
-  const name = names?.get?.(id)
-  return name && name !== id ? `${name} (${id})` : id
+  return formatNodeNumber(nodeId)
 }
 
 function algorithmMethod(result) {
   const algorithm = String(result?.algorithm ?? '').toLowerCase()
   if (algorithm.includes('a*')) {
-    return 'A* ranked frontier nodes by f(n)=g(n)+h(n): accumulated route cost plus the estimated remaining cost. The lowest f(n) was expanded first, while a better g(n) could update an already discovered node.'
+    return 'A* xếp hạng các nút biên theo f(n)=g(n)+h(n): chi phí tuyến đã tích lũy cộng với chi phí còn lại ước tính. Nút có f(n) thấp nhất được mở rộng trước; một giá trị g(n) tốt hơn có thể cập nhật nút đã được phát hiện.'
   }
   if (algorithm.includes('dijkstra') || algorithm === 'ucs') {
-    return 'The search ranked frontier nodes by cumulative g(n). It settled the smallest known value first and retained a new route to a node only when that route lowered its recorded cumulative cost.'
+    return 'Thuật toán xếp hạng các nút biên theo g(n) tích lũy. Nó xử lý giá trị nhỏ nhất đã biết trước và chỉ giữ một tuyến mới tới nút khi tuyến đó làm giảm chi phí tích lũy đã ghi nhận.'
   }
   if (algorithm.includes('breadth') || algorithm === 'bfs') {
-    return 'Breadth-First Search used a FIFO queue and compared routes by number of roads. It guarantees the fewest-edge route, but distance, time, risk, and scenario cost do not control its expansion order.'
+    return 'Tìm kiếm theo chiều rộng dùng hàng đợi FIFO và so sánh tuyến theo số đoạn đường. Thuật toán bảo đảm tuyến có ít cạnh nhất, nhưng quãng đường, thời gian, rủi ro và chi phí kịch bản không chi phối thứ tự mở rộng.'
   }
   if (algorithm.includes('depth') || algorithm === 'dfs') {
-    return 'Depth-First Search used a LIFO stack and followed the newest branch until it reached a dead end or the destination. The first feasible route depends on directed neighbor order, not on route cost.'
+    return 'Tìm kiếm theo chiều sâu dùng ngăn xếp LIFO và đi theo nhánh mới nhất cho tới ngõ cụt hoặc điểm đến. Tuyến khả thi đầu tiên phụ thuộc vào thứ tự láng giềng có hướng, không phụ thuộc chi phí tuyến.'
   }
   if (algorithm.includes('greedy')) {
-    return 'Greedy Best-First ranked nodes only by h(n), the estimated cost remaining to the destination. Cost already travelled was deliberately excluded, which can reduce exploration but can miss a cheaper complete route.'
+    return 'Tìm kiếm Tham Lam ưu tiên tốt nhất chỉ xếp hạng nút theo h(n), tức chi phí còn lại ước tính tới đích. Chi phí đã đi được chủ động bỏ qua; cách này có thể giảm phạm vi khám phá nhưng cũng có thể bỏ lỡ một tuyến hoàn chỉnh rẻ hơn.'
   }
   if (algorithm.includes('hill')) {
-    return 'Hill Climbing chose the unvisited outgoing neighbor with the smallest h(n). This variant can accept an uphill escape and backtrack at dead ends, but its decisions remain local rather than globally optimal.'
+    return 'Leo đồi chọn láng giềng đi ra chưa thăm có h(n) nhỏ nhất. Biến thể này có thể chấp nhận bước thoát lên dốc và quay lui tại ngõ cụt, nhưng quyết định vẫn mang tính cục bộ thay vì tối ưu toàn cục.'
   }
   if (algorithm.includes('nearest')) {
-    return 'Nearest Neighbor ran a directed Dijkstra search to every remaining requested stop, chose the lowest reachable score, moved there, and repeated. Each choice is locally best from the current stop; the combined visiting order is approximate.'
+    return 'Láng giềng gần nhất chạy Dijkstra có hướng tới mọi điểm dừng còn lại, chọn điểm số khả dụng thấp nhất, di chuyển tới đó rồi lặp lại. Mỗi lựa chọn là tốt nhất cục bộ từ điểm dừng hiện tại; thứ tự ghé thăm tổng thể chỉ là xấp xỉ.'
   }
   if (algorithm.includes('brute')) {
-    return 'Brute Force TSP enumerated every feasible order of the requested stops, summed the selected objective over every connecting leg, and retained the complete order with the smallest total.'
+    return 'TSP duyệt cạn liệt kê mọi thứ tự khả thi của các điểm dừng, cộng mục tiêu đã chọn trên từng chặng nối và giữ lại thứ tự hoàn chỉnh có tổng nhỏ nhất.'
   }
-  return 'The route was produced according to the selected algorithm’s frontier and traversal rules.'
+  return 'Tuyến đường được tạo theo quy tắc quản lý biên và duyệt của thuật toán đã chọn.'
 }
 
 function objective(result) {
   const definition = OBJECTIVES[result?.weight_used] ?? [
-    result?.optimization ?? 'Selected criterion',
+    result?.optimization ?? 'Tiêu chí đã chọn',
     'total_cost',
     '',
   ]
   const [label, metricKey, unit] = definition
   const recorded = finite(result?.objective_value)
   const metric = metricKey ? finite(result?.metrics?.[metricKey]) : null
-  return { label, value: recorded ?? metric, unit }
+  const value = recorded ?? metric
+  return {
+    label,
+    value: result?.weight_used === 'route_cost' ? scaleCost(value) : value,
+    unit,
+  }
 }
 
 function traceStatistics(result, edgeFeatures) {
@@ -93,7 +97,7 @@ function selectedSegments(result, names) {
     to: nodeLabel(segment.to_node, names),
     distance: finite(segment.distance_km),
     time: finite(segment.adjusted_time_min),
-    cost: finite(segment.route_cost),
+    cost: scaleCost(segment.route_cost),
     congestion: finite(segment.congestion_level),
     risk: finite(segment.risk),
     detail: result?.edge_cost_details?.[String(segment.edge_id)] ?? null,
@@ -108,7 +112,7 @@ function formulaContributions(result) {
     if (!contributions) continue
     available = true
     Object.keys(totals).forEach((key) => {
-      totals[key] += finite(contributions[key]) ?? 0
+      totals[key] += scaleCost(contributions[key]) ?? 0
     })
   }
   return available ? totals : null
@@ -144,13 +148,13 @@ export function buildRouteReasoning(result, names, edgeFeatures = []) {
     method: algorithmMethod(result),
     objective: objective(result),
     figures: [
-      { label: 'Distance', value: finite(metrics.total_distance_km), unit: 'km' },
-      { label: 'Travel time', value: finite(metrics.total_time_min), unit: 'min' },
-      { label: 'Scenario cost', value: finite(metrics.total_cost), unit: '' },
-      { label: 'Total risk', value: finite(metrics.total_risk), unit: '' },
-      { label: 'Roads selected', value: finite(metrics.path_edge_count), unit: '' },
-      { label: 'Nodes explored', value: finite(metrics.explored_nodes), unit: '' },
-      { label: 'Processing time', value: finite(metrics.processing_time_ms), unit: 'ms' },
+      { label: 'Quãng đường', value: finite(metrics.total_distance_km), unit: 'km' },
+      { label: 'Thời gian di chuyển', value: finite(metrics.total_time_min), unit: 'phút' },
+      { label: 'Chi phí kịch bản ×100', value: scaleCost(metrics.total_cost), unit: '' },
+      { label: 'Tổng rủi ro', value: finite(metrics.total_risk), unit: '' },
+      { label: 'Số đường đã chọn', value: finite(metrics.path_edge_count), unit: '' },
+      { label: 'Số nút đã khám phá', value: finite(metrics.explored_nodes), unit: '' },
+      { label: 'Thời gian xử lý', value: finite(metrics.processing_time_ms), unit: 'ms' },
     ].filter(({ value }) => value != null),
     trace: traceStatistics(result, edgeFeatures),
     segments: selectedSegments(result, names),

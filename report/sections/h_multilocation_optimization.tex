@@ -1,3 +1,8 @@
+% !TeX root = ../main.tex
+% !TeX program = pdflatex
+% !TeX encoding = UTF-8
+% Biên dịch tài liệu gốc bằng pdfLaTeX.
+
 \chapter{Tối Ưu Hóa Đa Điểm Đến}
 \label{chap:multilocation}
 
@@ -11,9 +16,9 @@ Số lượng thứ tự ghé thăm có thể có tăng theo giai thừa của s
 
 Trong đồ án này, nhóm đã triển khai hai phương pháp khác nhau để giải quyết bài toán đa điểm, tùy thuộc vào số lượng địa điểm cần đến:
 
-\textbf{1. Duyệt Cạn (Brute Force TSP):} Được sử dụng khi số lượng điểm đến nhỏ. Thuật toán tạo ra tất cả các hoán vị của thứ tự ghé thăm. Chi phí của mỗi đoạn đường giữa các cặp điểm được tính toán sẵn bằng thuật toán A* (để tối ưu). Sau đó, tổng chi phí của từng hoán vị được tính và thứ tự có chi phí thấp nhất được chọn. Phương pháp này đảm bảo tìm ra đường đi tối ưu tuyệt đối (đường đi tổng thể ngắn nhất), nhưng tốc độ chạy rất chậm nếu số điểm vượt quá mức nhỏ gọn do độ phức tạp thời gian là $O(N!)$.
+\textbf{1. Duyệt Cạn (Brute Force TSP):} Được sử dụng khi số lượng điểm đến nhỏ. Thuật toán tạo ra tất cả các hoán vị của thứ tự ghé thăm. Chi phí đường đi ngắn nhất giữa từng cặp điểm được tính trước bằng Dijkstra. Sau đó, tổng chi phí của từng hoán vị được tính và thứ tự có chi phí thấp nhất được chọn. Phương pháp này đảm bảo tìm ra thứ tự tối ưu tuyệt đối, nhưng độ phức tạp tăng theo $O(N!)$; chương trình giới hạn tối đa tám đích.
 
-\textbf{2. Láng Giềng Gần Nhất (Nearest Neighbor TSP):} Bắt đầu từ điểm xuất phát cố định, thuật toán liên tục tìm điểm chưa thăm có chi phí đường đi gần nhất (sử dụng thuật toán A* để tính toán đường đi giữa các điểm) cho đến khi tất cả các địa điểm đều được ghé thăm. Phương pháp này rất nhanh và hoạt động tốt với số lượng điểm lớn, tuy nhiên, do là thuật toán tham lam cục bộ, nó không đảm bảo đường đi tổng thể tìm được là tối ưu tuyệt đối.
+\textbf{2. Láng Giềng Gần Nhất (Nearest Neighbor TSP):} Bắt đầu từ điểm xuất phát cố định, thuật toán liên tục chọn điểm chưa thăm có chi phí đường đi Dijkstra nhỏ nhất cho đến khi ghé đủ địa điểm. Phương pháp này nhanh hơn duyệt cạn nhưng không bảo đảm tối ưu toàn cục.
 
 \section{So Sánh Kết Quả Tối Ưu Hóa}
 
@@ -27,13 +32,14 @@ Với bài toán xuất phát từ DL01 và đi qua các điểm DL03, DL07, DL1
 \toprule
 Trường hợp & Thứ Tự Ghé Thăm & Tổng Chi Phí \\
 \midrule
-Thứ tự ban đầu & DL01 $\rightarrow$ DL03 $\rightarrow$ DL07 $\rightarrow$ DL15 & 25.10 \\
-Thứ tự đã tối ưu & DL01 $\rightarrow$ DL07 $\rightarrow$ DL03 $\rightarrow$ DL15 & 19.87 \\
+Thứ tự ban đầu & DL01 $\rightarrow$ DL03 $\rightarrow$ DL07 $\rightarrow$ DL15 & 1,090455 \\
+Thứ tự đã tối ưu & DL01 $\rightarrow$ DL07 $\rightarrow$ DL03 $\rightarrow$ DL15 & 0,857122 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Qua kết quả trên, thứ tự tối ưu bằng Brute Force đã giảm tổng chi phí từ 25.10 xuống 19.87, tương đương mức cải thiện giảm khoảng \textbf{20.8\%} chi phí so với thứ tự ban đầu.
+Với kịch bản S0 và cấu hình \texttt{balanced}, duyệt cạn xét đủ sáu hoán vị
+và giảm chi phí từ 1,090455 xuống 0,857122, tương đương \textbf{21,40\%}.
 
 \section{Mức Độ Tối Ưu Của Kết Quả}
 
@@ -41,5 +47,8 @@ Tùy vào phương pháp được lựa chọn (dựa trên số lượng điể
 
 \begin{itemize}[itemsep=2pt]
   \item \textbf{Duyệt Cạn (Brute Force TSP):} kết quả thu được là \textbf{tối ưu tuyệt đối} vì thuật toán đã vét cạn tất cả các hoán vị có thể có của lộ trình và đối chiếu chi phí của chúng.
-  \item \textbf{Láng Giềng Gần Nhất (Nearest Neighbor TSP):} kết quả thu được chỉ mang tính \textbf{xấp xỉ (approximate)}. Do thuật toán thường chọn các bước đi có vẻ là tốt nhất ở hiện tại, nó có thể dẫn đến một lựa chọn tồi tệ ở cuối lộ trình (ví dụ phải đi một quãng đường rất dài để đến điểm cuối cùng). Trong các thử nghiệm thực tế với danh sách điểm dừng trên, Nearest Neighbor cho ra tổng chi phí là \textbf{21.02} (thứ tự DL01 $\rightarrow$ DL03 $\rightarrow$ DL15 $\rightarrow$ DL07). Kết quả này kém hơn mức tối ưu tuyệt đối của Brute Force (19.87) một chút (khoảng 5.8\%), nhưng đổi lại nó chạy rất nhanh và phù hợp nếu số điểm cần đi qua lớn.
+  \item \textbf{Láng Giềng Gần Nhất (Nearest Neighbor TSP):} kết quả chỉ mang
+  tính \textbf{xấp xỉ}. Với ví dụ trên, thuật toán chọn DL01 $\rightarrow$
+  DL03 $\rightarrow$ DL15 $\rightarrow$ DL07 và đạt chi phí 0,929595, cao hơn
+  nghiệm chính xác 0,857122 khoảng 8,46\%, nhưng không phải xét mọi hoán vị.
 \end{itemize}

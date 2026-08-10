@@ -2,13 +2,13 @@
   --border-color: #cbd5e1;
   --panel-background: #ffffff;
   --top-row-size: auto;
-  --sidebar-column-size: clamp(230px, 24vw, 340px);
+  --sidebar-column-size: clamp(180px, 17vw, 230px);
   --bottom-row-size: minmax(150px, 25vh);
   display: grid;
   grid-template-rows:
     var(--top-row-size)
-    minmax(0, 1fr)
-    var(--bottom-row-size);
+    minmax(0, 1fr);
+  position: relative;
   width: 100%;
   height: 100dvh;
   min-height: 640px;
@@ -110,11 +110,15 @@
   transition: grid-template-columns 180ms ease;
 }
 
+.app-shell--no-sidebar .app-shell__main {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .app-shell__workspace {
   width: 100%;
   min-width: 0;
   min-height: 0;
-  padding: 20px;
+  padding: 12px;
   overflow: hidden;
 }
 
@@ -141,7 +145,7 @@
 .app-shell__sidebar-content {
   min-width: 0;
   min-height: 0;
-  padding: 20px;
+  padding: 14px 12px;
   overflow-y: auto;
   opacity: 1;
   transition: opacity 140ms ease;
@@ -161,14 +165,22 @@
 }
 
 .app-shell__bottom-panel {
+  position: absolute;
+  z-index: 5;
+  right: 0;
+  bottom: 0;
+  left: 0;
   display: grid;
   grid-template-rows: 34px minmax(0, 1fr);
+  height: var(--bottom-row-size);
   min-width: 0;
   min-height: 0;
   padding: 0 20px 14px;
   overflow: hidden;
   border-top: 1px solid var(--border-color);
   background: var(--panel-background);
+  box-shadow: 0 -8px 24px rgb(15 23 42 / 12%);
+  transition: height 180ms ease;
 }
 
 .app-shell__bottom-handle {
@@ -185,6 +197,7 @@
 
 .app-shell--bottom-collapsed .app-shell__bottom-panel {
   grid-template-rows: 39px 0;
+  height: 40px;
   padding: 0 20px;
 }
 
@@ -202,7 +215,7 @@
     height: auto;
     min-height: 100dvh;
     overflow: visible;
-    grid-template-rows: var(--top-row-size) auto var(--bottom-row-size);
+    grid-template-rows: var(--top-row-size) auto;
   }
 
   .app-shell__main {

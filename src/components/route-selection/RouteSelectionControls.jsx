@@ -8,18 +8,18 @@ import ScenarioFormulaPanel from './ScenarioFormulaPanel'
 import './RouteSelectionControls.css'
 
 const DEFAULT_SCENARIOS = [
-  { value: 'S0', label: 'S0 — Weekday normal' },
-  { value: 'S1', label: 'S1 — Weekend busy' },
-  { value: 'S2', label: 'S2 — Evening rush' },
-  { value: 'S3', label: 'S3 — Heavy rain' },
-  { value: 'S4', label: 'S4 — Dense fog' },
+  { value: 'S0', label: 'S0 — Ngày thường' },
+  { value: 'S1', label: 'S1 — Cuối tuần đông đúc' },
+  { value: 'S2', label: 'S2 — Giờ cao điểm buổi tối' },
+  { value: 'S3', label: 'S3 — Mưa lớn' },
+  { value: 'S4', label: 'S4 — Sương mù dày' },
 ]
 
 const DEFAULT_OPTIMIZATIONS = [
   { value: 'balanced', label: 'Balanced' },
-  { value: 'distance', label: 'Shortest distance' },
-  { value: 'time', label: 'Fastest time' },
-  { value: 'cost', label: 'Lowest cost' },
+  { value: 'distance', label: 'Shortest' },
+  { value: 'time', label: 'Fastest' },
+  { value: 'cost', label: 'Cheapest' },
 ]
 
 const MULTI_LOCATION_LABELS = {
@@ -108,17 +108,17 @@ export default function RouteSelectionControls({
   return (
     <form className={rootClassName} onSubmit={handleSubmit}>
       <fieldset className="route-selection__fields" disabled={disabled}>
-        <legend className="route-selection__legend">Route settings</legend>
+        <legend className="route-selection__legend">Thiết lập tuyến đường</legend>
 
         <label className="route-selection__field">
-          <span>Start location</span>
+          <span>Điểm xuất phát</span>
           <select
             value={routeSelection.startNode}
             onChange={(event) =>
               handleEndpointChange('startNode', event.target.value)
             }
           >
-            <option value="">Select start</option>
+            <option value="">Chọn điểm xuất phát</option>
             {locations.map((location) => (
               <option key={location.value} value={location.value}>
                 {location.label}
@@ -132,7 +132,7 @@ export default function RouteSelectionControls({
         </span>
 
         <label className="route-selection__field">
-          <span>Destination</span>
+          <span>Điểm đến</span>
           <select
             value={routeSelection.goalNode}
             aria-invalid={hasSameEndpoints}
@@ -140,7 +140,7 @@ export default function RouteSelectionControls({
               handleEndpointChange('goalNode', event.target.value)
             }
           >
-            <option value="">Select destination</option>
+            <option value="">Chọn điểm đến</option>
             {locations.map((location) => (
               <option key={location.value} value={location.value}>
                 {location.label}
@@ -150,7 +150,7 @@ export default function RouteSelectionControls({
         </label>
 
         <label className="route-selection__field">
-          <span>Scenario</span>
+          <span>Kịch bản</span>
           <select
             value={routeSelection.scenarioId}
             onChange={(event) =>
@@ -186,7 +186,7 @@ export default function RouteSelectionControls({
           type="submit"
           disabled={!canSubmit}
         >
-          Find route
+          Tìm tuyến đường
         </button>
       </fieldset>
 
@@ -206,25 +206,25 @@ export default function RouteSelectionControls({
           className="route-selection__multi-location-note"
           id="multi-location-guidance"
         >
-          <strong>Chosen multi-location methods:</strong> Nearest Neighbor and
-          Brute Force TSP.
+          <strong>Phương pháp đa địa điểm:</strong> Nearest Neighbor và Brute
+          Force TSP.
           {supportsMultiLocation && (
             <span>
               {' '}
-              Currently using {MULTI_LOCATION_LABELS[selectedAlgorithm]}.
+              Đang sử dụng {MULTI_LOCATION_LABELS[selectedAlgorithm]}.
             </span>
           )}
           {!supportsMultiLocation && (
             <span>
               {' '}
-              Select either method in Search strategy to add intermediate
-              locations.
+              Chọn một trong hai phương pháp tại Search strategy để thêm
+              địa điểm trung gian.
             </span>
           )}
         </p>
 
         <label className="route-selection__field">
-          <span>Intermediate locations (optional)</span>
+          <span>Trung gian (optional)</span>
           <span className="route-selection__intermediate-input">
             <select
               value={intermediateDraft}
@@ -238,8 +238,8 @@ export default function RouteSelectionControls({
             >
               <option value="">
                 {supportsMultiLocation
-                  ? 'Add a location'
-                  : 'Choose a multi-location method first'}
+                  ? 'Thêm một địa điểm'
+                  : 'Trước tiên hãy chọn phương pháp đa địa điểm'}
               </option>
               {availableIntermediateLocations.map((location) => (
                 <option key={location.value} value={location.value}>
@@ -254,7 +254,7 @@ export default function RouteSelectionControls({
                 disabled || !supportsMultiLocation || !intermediateDraft
               }
             >
-              Add
+              Thêm
             </button>
           </span>
         </label>
@@ -284,7 +284,7 @@ export default function RouteSelectionControls({
 
       {hasSameEndpoints && (
         <p className="route-selection__error" role="alert">
-          Start location and destination must be different.
+          Điểm xuất phát và điểm đến phải khác nhau.
         </p>
       )}
     </form>
