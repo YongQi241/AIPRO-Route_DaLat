@@ -16,10 +16,10 @@ test('substitutes scenario-normalized edge values into the weighted formula', ()
     },
   )
 
-  assert.equal(calculation.expression, 'cost formula')
+  assert.equal(calculation.expression, 'Chi phí')
   assert.match(calculation.substitution, /α 0\.2 × 0\.2/)
   assert.match(calculation.substitution, /δ 0\.15 × 0\.5/)
-  assert.equal(calculation.result, '0.325')
+  assert.equal(calculation.result, '32.5')
 })
 
 test('does not calculate a cost for a scenario-closed edge', () => {

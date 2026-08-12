@@ -22,11 +22,11 @@ test('builds exact route, trace, formula, and segment figures', () => {
   }, names, edgeFeatures)
 
   assert.deepEqual(reasoning.path, ['A', 'B'])
-  assert.equal(reasoning.objective.value, 0.6)
+  assert.equal(reasoning.objective.value, 60)
   assert.equal(reasoning.trace.expansions, 1)
   assert.equal(reasoning.trace.edgeChecks, 1)
   assert.deepEqual(reasoning.contributions, {
-    distance: 0.1, time: 0.2, congestion: 0.2, risk: 0.1,
+    distance: 10, time: 20, congestion: 20, risk: 10,
   })
   assert.equal(reasoning.segments[0].congestion, 3)
 })

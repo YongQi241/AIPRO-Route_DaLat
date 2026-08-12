@@ -1,5 +1,10 @@
 import { describeCandidateEdgeDecision } from '../graph/edgeDecision.js'
 import { describeLocationDecision } from '../graph/locationDecision.js'
+import {
+  formatSearchCost,
+  getSearchCostModel,
+  SEARCH_COST_MODEL,
+} from '../graph/searchCostModel.js'
 import { formatNodeNumber, scaleCost } from '../results/resultFormatting.js'
 
 function toNumber(value) {
@@ -28,17 +33,13 @@ function expansionReason(action, algorithm) {
   const values = action.currentValues ?? {}
   const normalizedAlgorithm = String(algorithm ?? '').toLowerCase()
   const rule = action.selectionRule
+  const costModel = getSearchCostModel(algorithm, rule)
 
-  if (rule === 'lowest_f_cost' || normalizedAlgorithm.includes('a*')) {
-    return `Chọn vì f(n)=${number(values.fCost)} nhỏ nhất (g=${number(values.gCost)}, h=${number(values.hCost)}).`
+  if (costModel === SEARCH_COST_MODEL.ASTAR) {
+    return `Chọn vì f(n)=${formatSearchCost(values.fCost, 'chưa ghi nhận')} nhỏ nhất (g=${formatSearchCost(values.gCost, 'chưa ghi nhận')}, h=${formatSearchCost(values.hCost, 'chưa ghi nhận')}).`
   }
-  if (
-    rule === 'lowest_g_cost' ||
-    normalizedAlgorithm.includes('dijkstra') ||
-    normalizedAlgorithm.includes('uniform-cost') ||
-    normalizedAlgorithm === 'ucs'
-  ) {
-    return `Chọn vì g(n)=${number(values.gCost ?? values.priority)} nhỏ nhất trên biên.`
+  if (costModel === SEARCH_COST_MODEL.CUMULATIVE_G) {
+    return `Chọn vì g(n)=${formatSearchCost(values.gCost ?? values.priority, 'chưa ghi nhận')} nhỏ nhất trên biên.`
   }
   if (rule === 'lowest_h_cost' || normalizedAlgorithm.includes('greedy')) {
     return `Chọn vì h(n)=${number(values.hCost ?? values.priority)} nhỏ nhất; không xét chi phí đã đi.`
@@ -64,7 +65,7 @@ function candidateSummary(action) {
   return `Xét ${count} đường: ${action.candidateEdgeIds.join(', ')}.`
 }
 
-function localEdgeCost(action, edgeCostDetails) {
+function localEdgeCost(action, edgeCostDetails, algorithm) {
   const detail = edgeCostDetails?.[action.activeEdgeId]
   if (!detail) return ''
   if (detail.closed) {
@@ -73,7 +74,11 @@ function localEdgeCost(action, edgeCostDetails) {
   if (toNumber(detail.route_cost) == null) {
     return ' Không có giá trị chi phí.'
   }
-  return ` Chi phí cạnh: ${number(detail.route_cost)}; g(n)/f(n) là chi phí tích lũy.`
+  const costModel = getSearchCostModel(algorithm, action.selectionRule)
+  const cumulativeLabel = costModel === SEARCH_COST_MODEL.CUMULATIVE_G
+    ? 'g(n) là chi phí tích lũy.'
+    : 'g(n)/f(n) là chi phí tích lũy.'
+  return ` Chi phí cạnh: ${number(detail.route_cost)}; ${cumulativeLabel}`
 }
 
 export function describeTraceAction(action, actions = [], context = {}) {
@@ -105,10 +110,11 @@ export function describeTraceAction(action, actions = [], context = {}) {
     const decision = describeCandidateEdgeDecision(
       action.activeEdgeId,
       evaluatedAtThisPoint,
+      { algorithm },
     )
     return {
       title: `Xét ${action.activeEdgeId}: ${current} → ${neighbor}`,
-      detail: `${decision}${localEdgeCost(action, edgeCostDetails)}`,
+      detail: `${decision}${localEdgeCost(action, edgeCostDetails, algorithm)}`,
     }
   }
 
