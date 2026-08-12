@@ -573,6 +573,7 @@ export default function GraphWorkspace({
               branchEdgeIds={activeSearchEdgeIds}
               candidateEdgeIds={preservedCandidateEdgeIds}
               evaluatedCandidateActions={evaluatedCandidateActions}
+              algorithm={result?.algorithm}
               finalPathEdgeIds={
                 isSearchComplete ? result?.path_edges ?? [] : []
               }

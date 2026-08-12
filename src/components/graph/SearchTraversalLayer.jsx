@@ -39,6 +39,7 @@ export default function SearchTraversalLayer({
   candidateEdgeIds = [],
   evaluatedCandidateActions = [],
   finalPathEdgeIds = [],
+  algorithm = null,
   onEdgeHover,
 }) {
   const highlights = useMemo(() => {
@@ -57,6 +58,7 @@ export default function SearchTraversalLayer({
       const decisionReason = describeCandidateEdgeDecision(
         edge.edgeId,
         evaluatedCandidateActions,
+        { algorithm },
       )
 
       return {
@@ -79,6 +81,7 @@ export default function SearchTraversalLayer({
     branchEdgeIds,
     candidateEdgeIds,
     evaluatedCandidateActions,
+    algorithm,
     features,
     finalPathEdgeIds,
     project,
