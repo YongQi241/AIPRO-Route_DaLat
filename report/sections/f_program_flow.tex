@@ -142,10 +142,9 @@ Nạp đồ thị và dữ liệu & \path{routing/graph_loader.py},
 \bottomrule
 \end{longtable}
 
-Backend công bố chín thuật toán qua API, trong đó Tham Lam ưu tiên tốt nhất có trong
-backend nhưng chưa có thẻ chọn ở \texttt{AlgorithmSidebar.jsx}. Giao diện hiện
-cho chọn tám thuật toán: BFS, DFS, UCS, Dijkstra, A*, Láng giềng gần nhất, Leo
-đồi và TSP duyệt cạn. Láng giềng gần nhất và TSP duyệt cạn là hai chế độ
+Backend công bố chín thuật toán qua API và giao diện cho chọn đầy đủ: BFS, DFS,
+UCS, Dijkstra, A*, Tham Lam ưu tiên tốt nhất, Leo đồi, Láng giềng gần nhất và
+TSP duyệt cạn. Láng giềng gần nhất và TSP duyệt cạn là hai chế độ
 nhiều địa điểm; TSP duyệt cạn giới hạn tối đa tám đích.
 
 \section{Luồng dữ liệu giữa frontend và backend}
@@ -184,8 +183,8 @@ Luồng dữ liệu của một yêu cầu tìm đường diễn ra như sau:
   "optimization": "balanced",
   "start_node": "DL01",
   "goal_node": "DL09",
-  "path_nodes": ["DL01", "DL06", "DL19", "DL09"],
-  "path_edges": ["E005", "E041", "E064"],
+  "path_nodes": ["DL01", "DL05", "DL02", "DL22", "...", "DL09"],
+  "path_edges": ["E001", "E008", "E009", "E052", "...", "E033"],
   "visited_order": ["DL01", "DL02", "DL05", "DL22"],
   "frontier_steps": [{
     "current": "DL01",
@@ -194,9 +193,9 @@ Luồng dữ liệu của một yêu cầu tìm đường diễn ra như sau:
     "visited": ["DL01"]
   }],
   "metrics": {
-    "total_distance_km": 39.429,
-    "total_time_min": 68.307,
-    "total_cost": 1.34248,
+    "total_distance_km": 52.136,
+    "total_time_min": 108.461,
+    "total_cost": 2.887377,
     "explored_nodes": 25
   },
   "segments": [],
@@ -256,7 +255,7 @@ tất, ngoại trừ phản hồi thành công không có tiến trình thì đ�
 \section{Luồng hiển thị bản đồ và đồ thị}
 
 Hook \texttt{useGraphData} tự động tải 25 node từ
-\texttt{nodes\_snapped.geojson} và 114 cạnh có hướng từ
+\texttt{nodes\_snapped.geojson} và 60 cạnh có hướng từ
 \texttt{edges.geojson} trong thư mục
 \path{data/generated/}. Không gian làm việc dùng SVG và xếp các
 lớp theo thứ tự sau:
@@ -277,7 +276,7 @@ Chú thích cạnh gồm Cạnh ứng viên, Cạnh đang nới lỏng, Đoạn 
 và đoạn cam.
 
 Chế độ Bản đồ giữ tọa độ địa lý và hình học đường thực. Chế độ Đồ thị dùng bố
-cục liên kết xác định để giãn đều nút nhưng vẫn giữ các kết nối có hướng. Người
+cục lò xo Fruchterman--Reingold xác định nhưng vẫn giữ các kết nối có hướng. Người
 dùng có thể phóng to/thu nhỏ bằng nút hoặc con lăn chuột trong khoảng từ
 $60\%$ đến $500\%$, giữ chuột trái để kéo, nhấn đúp hoặc chọn Đặt lại góc nhìn
 để trở về góc nhìn ban đầu. Các vùng Điều khiển tuyến đường, Chiến lược tìm kiếm

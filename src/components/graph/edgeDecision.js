@@ -16,7 +16,7 @@ export function getDecisionCost(values, costModel = SEARCH_COST_MODEL.GENERIC) {
   return getSearchDecisionCost(values, costModel)
 }
 
-function formatCost(values, costModel) {
+function formatCost(values, costModel, costContext) {
   if (!values) return 'tiến trình này không chứa giá trị chi phí'
 
   const gCost = toNumber(values.gCost)
@@ -28,17 +28,17 @@ function formatCost(values, costModel) {
     const cumulativeCost = gCost ?? toNumber(values.priority)
     return cumulativeCost == null
       ? 'tiến trình này không chứa giá trị g(n)'
-      : `g(n)=${formatSearchCost(cumulativeCost)}`
+      : `g(n)=${formatSearchCost(cumulativeCost, costContext)}`
   }
 
-  if (gCost != null) parts.push(`g(n)=${formatSearchCost(gCost)}`)
-  if (hCost != null) parts.push(`h(n)=${formatSearchCost(hCost)}`)
+  if (gCost != null) parts.push(`g(n)=${formatSearchCost(gCost, costContext)}`)
+  if (hCost != null) parts.push(`h(n)=${formatSearchCost(hCost, costContext)}`)
   if (gCost != null && hCost != null) {
-    parts.push(`f(n)=g(n)+h(n)=${formatSearchCost(total)}`)
+    parts.push(`f(n)=g(n)+h(n)=${formatSearchCost(total, costContext)}`)
   } else if (values.fCost != null) {
-    parts.push(`f(n)=${formatSearchCost(total)}`)
+    parts.push(`f(n)=${formatSearchCost(total, costContext)}`)
   } else if (values.priority != null && total != null) {
-    parts.push(`độ ưu tiên=${formatSearchCost(total)}`)
+    parts.push(`độ ưu tiên=${formatSearchCost(total, costContext)}`)
   }
 
   return parts.length > 0 ? parts.join(', ') : 'tiến trình này không chứa giá trị chi phí'
@@ -47,7 +47,7 @@ function formatCost(values, costModel) {
 export function describeCandidateEdgeDecision(
   edgeId,
   evaluatedActions = [],
-  { algorithm = null } = {},
+  { algorithm = null, weightUsed = null, optimization = null } = {},
 ) {
   const normalizedEdgeId = String(edgeId)
   const action = [...evaluatedActions]
@@ -63,9 +63,10 @@ export function describeCandidateEdgeDecision(
   }
 
   const costModel = getSearchCostModel(algorithm, action.selectionRule)
+  const costContext = { weightUsed, optimization }
   const candidateCost = getDecisionCost(action.newValues, costModel)
   const retainedCost = getDecisionCost(action.oldValues, costModel)
-  const costDetail = formatCost(action.newValues, costModel)
+  const costDetail = formatCost(action.newValues, costModel, costContext)
   const retainedOwner = action.retainedEdgeId
     ? ` thuộc về đường ${action.retainedEdgeId}`
     : ''
@@ -75,12 +76,12 @@ export function describeCandidateEdgeDecision(
   }
   if (action.outcome === 'update') {
     return candidateCost != null && retainedCost != null
-      ? `Cập nhật biên: ${formatSearchCost(candidateCost)} < ${formatSearchCost(retainedCost)}${retainedOwner}`
+      ? `Cập nhật biên: ${formatSearchCost(candidateCost, costContext)} < ${formatSearchCost(retainedCost, costContext)}${retainedOwner}`
       : `Cập nhật biên: ${costDetail} tốt hơn phương án cũ${retainedOwner}`
   }
   if (action.outcome === 'keep') {
     return candidateCost != null && retainedCost != null
-      ? `Không cập nhật: ${formatSearchCost(candidateCost)} ≥ ${formatSearchCost(retainedCost)}${retainedOwner}`
+      ? `Không cập nhật: ${formatSearchCost(candidateCost, costContext)} ≥ ${formatSearchCost(retainedCost, costContext)}${retainedOwner}`
       : `Không cập nhật: ${costDetail} không tốt hơn phương án đang giữ${retainedOwner}`
   }
   if (action.outcome === 'skip') {

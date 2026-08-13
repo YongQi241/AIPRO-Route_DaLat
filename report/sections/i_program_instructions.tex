@@ -134,7 +134,7 @@ File & Vai trò \\
 \path{nodes_snapped.geojson} &
 Chứa 25 địa điểm, ID, tên và tọa độ để frontend tạo danh sách chọn và vẽ node. \\
 \path{edges.geojson} &
-Chứa hình học của 114 cạnh có hướng. Frontend dùng \texttt{edge\_id} để vẽ
+Chứa hình học của 60 cạnh có hướng. Frontend dùng \texttt{edge\_id} để vẽ
 mạng đường và chọn chính xác cạnh thuộc tuyến. \\
 \path{nodes_snapped.csv}, \path{edges.csv} &
 Nguồn dữ liệu node và cạnh mà backend dùng để xây dựng
@@ -171,8 +171,8 @@ mở. Vì vậy giao diện hiện không cần nút Tải dữ liệu. Năm k�
   Cân bằng, Quãng đường ngắn nhất, Thời gian nhanh nhất và Chi phí thấp nhất; \texttt{cost}
   là alias của profile \texttt{balanced} trong backend.
   \item Chọn thuật toán trong Chiến lược tìm kiếm. Giao diện hiện có BFS, DFS,
-  UCS, Dijkstra, A*, Láng giềng gần nhất, Leo đồi và TSP duyệt cạn. Backend còn
-  hỗ trợ Tham Lam ưu tiên tốt nhất qua API nhưng thanh bên chưa có lựa chọn này.
+  UCS, Dijkstra, A*, Tham Lam ưu tiên tốt nhất, Láng giềng gần nhất, Leo đồi
+  và TSP duyệt cạn.
   \item Nhấn Tìm tuyến đường. Frontend gửi mã thay vì tên địa điểm đến API. Trong lúc
   chờ, biểu mẫu bị vô hiệu hóa; khi nhận phản hồi, thông báo trạng thái cho biết
   thành công, không có đường, đầu vào không hợp lệ hoặc lỗi dịch vụ.
@@ -190,7 +190,7 @@ mở. Vì vậy giao diện hiện không cần nút Tải dữ liệu. Năm k�
   Kết quả, Chi tiết và Giải thích dễ hiểu được mở để xem tuyến, tổng chỉ
   số, dữ liệu từng đoạn và giải thích từ backend.
   \item Chọn Bản đồ để xem tọa độ địa lý hoặc Đồ thị để xem cấu trúc liên kết
-  được giãn đều. Dùng nút $+$/$-$ hoặc con lăn để phóng to, thu nhỏ; giữ chuột
+  theo bố cục lò xo Fruchterman--Reingold. Dùng nút $+$/$-$ hoặc con lăn để phóng to, thu nhỏ; giữ chuột
   trái và kéo để di chuyển; dùng Đặt lại góc nhìn hoặc nhấn đúp để trở về góc nhìn ban đầu.
   \item Khi cần thêm diện tích cho bản đồ, dùng nút tam giác để thu gọn Điều
   khiển tuyến đường phía trên, Chiến lược tìm kiếm bên phải hoặc Chi tiết tìm kiếm phía dưới.
@@ -221,14 +221,15 @@ Trường & Giá trị \\
 Điểm đích & Làng Cu Lần (DL09) \\
 Thuật toán & A* \\
 Kịch bản, tiêu chí & S0, \texttt{balanced} \\
-Tuyến node & DL01 $\rightarrow$ DL06 $\rightarrow$ DL19 $\rightarrow$ DL09 \\
-Tên địa điểm & Nhà lao thiếu nhi Đà Lạt $\rightarrow$ Thung Lũng Tình Yêu
-$\rightarrow$ Làng Đồng trụ LangBiang $\rightarrow$ Làng Cu Lần \\
-Cạnh tuyến & E005, E041, E064 \\
-Tổng khoảng cách & 39.429 km \\
-Thời gian ước tính & 68.307 phút \\
-Tổng chi phí & 1.34248 \\
-Tổng rủi ro & 1.0 \\
+Tuyến node & DL01 $\rightarrow$ DL05 $\rightarrow$ DL02 $\rightarrow$ DL22
+$\rightarrow$ DL21 $\rightarrow$ DL10 $\rightarrow$ DL15 $\rightarrow$ DL18
+$\rightarrow$ DL20 $\rightarrow$ DL08 $\rightarrow$ DL09 \\
+Tên địa điểm & Xem danh sách địa điểm theo thứ tự node ở trên \\
+Cạnh tuyến & E001, E008, E009, E052, E040, E037, E043, E049, E036, E033 \\
+Tổng khoảng cách & 52.136 km \\
+Thời gian ước tính & 108.461 phút \\
+Tổng chi phí & 2.887377 \\
+Tổng rủi ro & 3.0 \\
 Số nút đã xét & 25 \\
 Thời gian xử lý đo được & 0.637 ms \\
 \bottomrule
@@ -263,15 +264,15 @@ Thuật toán & Láng giềng gần nhất \\
 Kịch bản, tiêu chí & S1, \texttt{time} \\
 Thứ tự ghé thăm & DL01 $\rightarrow$ DL03 $\rightarrow$ DL08
 $\rightarrow$ DL09 \\
-Tuyến nút đầy đủ & DL01 $\rightarrow$ DL02 $\rightarrow$ DL22
-$\rightarrow$ DL21 $\rightarrow$ DL03 $\rightarrow$ DL04
-$\rightarrow$ DL18 $\rightarrow$ DL08 $\rightarrow$ DL20
-$\rightarrow$ DL09 \\
-Tổng khoảng cách & 43.778 km \\
-Thời gian ước tính & 91.424 phút \\
-Tổng chi phí & 2.057684 \\
-Tổng rủi ro & 9.0 \\
-Số cạnh tuyến & 9 \\
+Tuyến nút đầy đủ & DL01 $\rightarrow$ DL05 $\rightarrow$ DL02
+$\rightarrow$ DL23 $\rightarrow$ DL21 $\rightarrow$ DL03
+$\rightarrow$ DL15 $\rightarrow$ DL18 $\rightarrow$ DL20
+$\rightarrow$ DL08 $\rightarrow$ DL09 \\
+Tổng khoảng cách & 52.776 km \\
+Thời gian ước tính & 131.607 phút \\
+Tổng chi phí & 3.417570 \\
+Tổng rủi ro & 11.0 \\
+Số cạnh tuyến & 10 \\
 Thời gian xử lý đo được & 4.108 ms \\
 \bottomrule
 \end{tabular}
@@ -281,7 +282,7 @@ Láng giềng gần nhất lần lượt chọn đích chưa thăm có chi phí 
 nhất từ vị trí hiện tại, nên đây là phương pháp xấp xỉ và không đảm bảo tối ưu
 toàn cục. Để xác minh chế độ chính xác, cùng yêu cầu trên đã được chạy với TSP
 duyệt cạn: backend xét đủ 6 hoán vị, trả cùng thứ tự và cùng tổng thời gian
-91.424 phút trong lần thử này, với thời gian xử lý 4.965 ms. Kết quả TSP duyệt
+131.607 phút trong lần thử kiểm tra. Kết quả TSP duyệt
 cạn là tối ưu toàn cục cho tập đích và trọng số đã chọn, trong giới hạn tối đa
 tám đích của chương trình.
 

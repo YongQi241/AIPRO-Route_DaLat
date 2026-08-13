@@ -77,9 +77,34 @@ export function getSearchDecisionCost(values, costModel) {
     hCost
 }
 
-export function formatSearchCost(value, fallback = 'không xác định') {
-  const scaled = scaleCost(value)
-  return scaled == null
-    ? fallback
-    : scaled.toLocaleString(undefined, { maximumFractionDigits: 3 })
+function resolveSearchWeight(weightUsed, optimization) {
+  if (weightUsed) return String(weightUsed).toLowerCase()
+
+  const normalizedOptimization = String(optimization ?? '').toLowerCase()
+  if (['shortest', 'distance'].includes(normalizedOptimization)) {
+    return 'distance_km'
+  }
+  if (['fastest', 'time'].includes(normalizedOptimization)) {
+    return 'adjusted_time_min'
+  }
+  return 'route_cost'
+}
+
+export function formatSearchCost(
+  value,
+  {
+    weightUsed = null,
+    weight_used: resultWeightUsed = null,
+    optimization = null,
+    fallback = 'không xác định',
+  } = {},
+) {
+  const weight = resolveSearchWeight(weightUsed ?? resultWeightUsed, optimization)
+  const number = weight === 'route_cost' ? scaleCost(value) : finiteNumber(value)
+  if (number == null) return fallback
+
+  const formatted = number.toLocaleString(undefined, { maximumFractionDigits: 3 })
+  if (weight === 'distance_km') return `${formatted} km`
+  if (weight === 'adjusted_time_min') return `${formatted} phút`
+  return formatted
 }

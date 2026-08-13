@@ -9,6 +9,7 @@ export default function EdgeLabelLayer({
   edgeCosts = new Map(),
   closedEdgeIds = new Set(),
   onEdgeHover,
+  labelScale = 1,
 }) {
   const drawableEdges = useMemo(
     () => createDrawableEdges(features, project),
@@ -23,11 +24,11 @@ export default function EdgeLabelLayer({
             <text
               key={`label-${path.id}`}
               className="edge-label-layer__label"
-              x={path.label.x}
-              y={path.label.y}
+              x="0"
+              y="0"
               textAnchor="middle"
               dominantBaseline="central"
-              transform={`rotate(${path.label.angle} ${path.label.x} ${path.label.y})`}
+              transform={`translate(${path.label.x} ${path.label.y}) rotate(${path.label.angle}) scale(${labelScale})`}
               aria-hidden="true"
               onPointerEnter={(event) => onEdgeHover?.(edge, event)}
               onPointerLeave={() => onEdgeHover?.(null)}

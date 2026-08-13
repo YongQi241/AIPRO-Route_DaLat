@@ -4,12 +4,12 @@
 
 .edge-label-layer__label {
   fill: #475569;
-  font-size: 7px;
+  font-size: 6px;
   font-weight: 750;
   paint-order: stroke;
   stroke: rgb(255 255 255 / 94%);
   stroke-linejoin: round;
-  stroke-width: 3px;
+  stroke-width: 2.5px;
   cursor: help;
   pointer-events: all;
   user-select: none;

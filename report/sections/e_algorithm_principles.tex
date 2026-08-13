@@ -61,15 +61,21 @@ Tìm kiếm Tham Lam chỉ quan tâm đến hàm ước lượng $h(n)$, tức l
 
 \textbf{Hoạt động.} Thuật toán này thường tìm đường rất nhanh vì nó đi thẳng hướng về đích. Tuy nhiên, nó dễ bị mắc kẹt vào chướng ngại vật hoặc chọn những con đường vòng vèo có chi phí thực tế rất cao do không xét đến chi phí $g(n)$.
 
-\textbf{Tính hoàn chỉnh và tối ưu.} Greedy BFS không hoàn chỉnh (có thể bị kẹt trong vòng lặp nếu không xử lý tốt tập các đỉnh đã xét) và không tối ưu (đường đi tìm được hiếm khi là đường ngắn nhất).
+\textbf{Tính hoàn chỉnh và tối ưu.} Cài đặt dùng tập đã thăm và hàng đợi ưu
+tiên nên hoàn chỉnh trên đồ thị hữu hạn khả dụng, nhưng không tối ưu vì bỏ qua
+chi phí tích lũy $g(n)$.
 
 \section{Leo Đồi (Hill Climbing)}
 
-Thuật toán Leo Đồi cũng ưu tiên chọn đỉnh kề có $h(n)$ nhỏ nhất, nhưng khác với Greedy BFS (duy trì một hàng đợi ưu tiên các đỉnh có thể quay lui), Hill Climbing không có cơ chế quay lui (backtracking). Nó chỉ chọn bước đi tốt nhất ngay tại thời điểm hiện tại và tiến tới.
+Thuật toán Leo Đồi ưu tiên chọn đỉnh kề chưa thăm có $h(n)$ nhỏ nhất. Biến thể
+trong chương trình lưu đường đi hiện hành, cho phép bước thoát khi heuristic
+không giảm và quay lui khi gặp ngõ cụt.
 
 \textbf{Hoạt động.} Từ đỉnh hiện tại, thuật toán xem xét các đỉnh kề và di chuyển đến đỉnh có khoảng cách ước lượng đến đích nhỏ nhất. Quá trình lặp lại cho đến khi đến đích.
 
-\textbf{Tính hoàn chỉnh và tối ưu.} Hill Climbing rất dễ bị kẹt ở "cực trị địa phương" (Local Optimum), tức là đi vào ngõ cụt mà xung quanh không có đường nào tốt hơn để đi tiếp. Nó không hoàn chỉnh và không tối ưu.
+\textbf{Tính hoàn chỉnh và tối ưu.} Nhờ tập đã thăm và quay lui, biến thể này
+hoàn chỉnh trên đồ thị hữu hạn khả dụng. Tuy nhiên, nó không bảo đảm tối ưu vì
+quyết định vẫn dựa trên heuristic cục bộ thay vì tổng chi phí tuyến.
 
 \section{Hàm Heuristic}
 
@@ -79,7 +85,15 @@ Hàm Heuristic $h(n)$ được nhóm sử dụng là khoảng cách đường ch
 h(n) = 2r \arcsin\left(\sqrt{\sin^2\left(\frac{\Delta \phi}{2}\right) + \cos\phi_1 \cos\phi_2 \sin^2\left(\frac{\Delta \lambda}{2}\right)}\right)
 \end{equation}
 
-Trong đó, $\phi$ là vĩ độ, $\lambda$ là kinh độ và $r$ là bán kính trái đất. Do chi phí thực tế $g(n)$ trong đồ án là sự kết hợp của quãng đường, thời gian và mức độ kẹt xe, khoảng cách đường chim bay đóng vai trò là cơ sở ước lượng tốt để thuật toán có thể hướng về đích một cách tự nhiên. Tuy nhiên, do $g(n)$ được nhân với các trọng số thay đổi theo chiến thuật (profile) và cộng thêm kẹt xe, $h(n)$ (với đơn vị km thuần túy) có thể cần được điều chỉnh (scale) tương ứng để đảm bảo tính "chấp nhận được" (admissible).
+Trong đó, $\phi$ là vĩ độ, $\lambda$ là kinh độ và $r$ là bán kính Trái Đất.
+Khi tối ưu \texttt{distance\_km}, dữ liệu đã cộng các đoạn nối POI và mọi cạnh
+đều dài không nhỏ hơn khoảng cách Haversine giữa hai đầu mút. Nhờ bất đẳng thức
+tam giác, heuristic này vừa \emph{admissible} vừa \emph{consistent}; kiểm tra
+mọi cặp đỉnh trong năm kịch bản không phát hiện vi phạm. Khi tối ưu thời gian,
+A* chia Haversine cho vận tốc cực đại 60 km/h; giả định này an toàn khi mọi vận
+tốc mô hình không vượt ngưỡng. Với \texttt{route\_cost} và rủi ro, chương trình
+dùng heuristic 0 để giữ bảo đảm tối ưu. Greedy và Hill Climbing dùng Haversine
+để dẫn hướng thực dụng nhưng bản thân hai chiến lược không bảo đảm nghiệm tối ưu.
 
 \section{Tóm Tắt Về Tính Hoàn Chỉnh Và Tối Ưu}
 
@@ -95,8 +109,8 @@ Breadth First Search & Có & Chỉ khi chi phí cạnh bằng nhau \\
 Depth First Search & Có, với tập đã thăm & Không \\
 Uniform Cost Search & Có & Có, với chi phí không âm \\
 A* (A Star Search) & Có (với Heuristic hợp lệ) & Có \\
-Greedy Best-First Search & Không & Không \\
-Hill Climbing & Không (Dễ kẹt ngõ cụt) & Không \\
+Greedy Best-First Search & Có, trên đồ thị hữu hạn & Không \\
+Hill Climbing có Backtracking & Có, trên đồ thị hữu hạn & Không \\
 \bottomrule
 \end{tabular}
 \end{table}

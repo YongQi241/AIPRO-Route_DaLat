@@ -32,14 +32,14 @@ Với bài toán xuất phát từ DL01 và đi qua các điểm DL03, DL07, DL1
 \toprule
 Trường hợp & Thứ Tự Ghé Thăm & Tổng Chi Phí \\
 \midrule
-Thứ tự ban đầu & DL01 $\rightarrow$ DL03 $\rightarrow$ DL07 $\rightarrow$ DL15 & 1,090455 \\
-Thứ tự đã tối ưu & DL01 $\rightarrow$ DL07 $\rightarrow$ DL03 $\rightarrow$ DL15 & 0,857122 \\
+Thứ tự ban đầu & DL01 $\rightarrow$ DL03 $\rightarrow$ DL07 $\rightarrow$ DL15 & 2,785366 \\
+Thứ tự đã tối ưu & DL01 $\rightarrow$ DL15 $\rightarrow$ DL03 $\rightarrow$ DL07 & 1,848521 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Với kịch bản S0 và cấu hình \texttt{balanced}, duyệt cạn xét đủ sáu hoán vị
-và giảm chi phí từ 1,090455 xuống 0,857122, tương đương \textbf{21,40\%}.
+và giảm chi phí từ 2,785366 xuống 1,848521, tương đương \textbf{33,63\%}.
 
 \section{Mức Độ Tối Ưu Của Kết Quả}
 
@@ -49,6 +49,6 @@ Tùy vào phương pháp được lựa chọn (dựa trên số lượng điể
   \item \textbf{Duyệt Cạn (Brute Force TSP):} kết quả thu được là \textbf{tối ưu tuyệt đối} vì thuật toán đã vét cạn tất cả các hoán vị có thể có của lộ trình và đối chiếu chi phí của chúng.
   \item \textbf{Láng Giềng Gần Nhất (Nearest Neighbor TSP):} kết quả chỉ mang
   tính \textbf{xấp xỉ}. Với ví dụ trên, thuật toán chọn DL01 $\rightarrow$
-  DL03 $\rightarrow$ DL15 $\rightarrow$ DL07 và đạt chi phí 0,929595, cao hơn
-  nghiệm chính xác 0,857122 khoảng 8,46\%, nhưng không phải xét mọi hoán vị.
+  DL03 $\rightarrow$ DL15 $\rightarrow$ DL07 và đạt chi phí 1,920959, cao hơn
+  nghiệm chính xác 1,848521 khoảng 3,92\%, nhưng không phải xét mọi hoán vị.
 \end{itemize}

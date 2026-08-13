@@ -24,8 +24,8 @@ const action = (
   selectionRule,
 })
 
-const describe = (edgeId, actions, algorithm = 'Dijkstra') =>
-  describeCandidateEdgeDecision(edgeId, actions, { algorithm })
+const describe = (edgeId, actions, algorithm = 'Dijkstra', context = {}) =>
+  describeCandidateEdgeDecision(edgeId, actions, { algorithm, ...context })
 
 test('Dijkstra explains add, update, and keep with cumulative g(n)', () => {
   assert.equal(
@@ -63,6 +63,48 @@ test('UCS uses the same g(n) semantics and ignores h(n) and f(n)', () => {
 
   assert.equal(reason, 'Thêm vào biên: g(n)=5')
   assert.doesNotMatch(reason, /h\(n\)|f\(n\)/)
+})
+
+test('Dijkstra and UCS preserve distance and time magnitudes with units', () => {
+  assert.equal(
+    describe(
+      'E_DISTANCE',
+      [action('E_DISTANCE', 'add', { gCost: 2.75 })],
+      'Dijkstra',
+      { weightUsed: 'distance_km' },
+    ),
+    'Thêm vào biên: g(n)=2.75 km',
+  )
+  assert.equal(
+    describe(
+      'E_TIME',
+      [action('E_TIME', 'update', { gCost: 8.5 }, { gCost: 10 })],
+      'UCS',
+      { weightUsed: 'adjusted_time_min' },
+    ),
+    'Cập nhật biên: 8.5 phút < 10 phút',
+  )
+})
+
+test('search cost formatting falls back from optimization to the correct unit', () => {
+  assert.equal(
+    describe(
+      'E_DISTANCE',
+      [action('E_DISTANCE', 'add', { gCost: 1.25 })],
+      'Dijkstra',
+      { optimization: 'shortest' },
+    ),
+    'Thêm vào biên: g(n)=1.25 km',
+  )
+  assert.equal(
+    describe(
+      'E_TIME',
+      [action('E_TIME', 'add', { gCost: 6 })],
+      'UCS',
+      { optimization: 'fastest' },
+    ),
+    'Thêm vào biên: g(n)=6 phút',
+  )
 })
 
 test('Dijkstra and UCS recognize their request IDs and display names', () => {

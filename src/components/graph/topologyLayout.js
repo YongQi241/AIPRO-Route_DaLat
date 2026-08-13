@@ -7,7 +7,9 @@ const DEFAULT_VIEWBOX = {
 
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5))
 
-export function createTopologyLayout(
+// Deterministic Fruchterman-Reingold spring layout. The simulation uses the
+// classic inverse-distance repulsion and squared-distance attraction forces.
+export function createFruchtermanReingoldLayout(
   nodeFeatures = [],
   edgeFeatures = [],
   rootNodeId = '',
@@ -59,7 +61,8 @@ export function createTopologyLayout(
   }
 }
 
-export const createTreeLayout = createTopologyLayout
+export const createTopologyLayout = createFruchtermanReingoldLayout
+export const createTreeLayout = createFruchtermanReingoldLayout
 
 function initializePositions(nodeIds, rootNodeId, width, height) {
   const centerX = width / 2

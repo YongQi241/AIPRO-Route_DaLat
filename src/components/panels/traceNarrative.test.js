@@ -37,6 +37,20 @@ test('explains Dijkstra and UCS expansion with only the smallest g(n)', () => {
   }
 })
 
+test('shows unscaled Dijkstra and UCS expansion costs for shortest and fastest', () => {
+  const shortest = describeTraceAction({
+    type: 'expand', currentNodeId: 'A', currentValues: { gCost: 2.4 },
+    selectionRule: 'lowest_g_cost', candidateEdgeIds: [],
+  }, [], { algorithm: 'Dijkstra', optimization: 'shortest' })
+  const fastest = describeTraceAction({
+    type: 'expand', currentNodeId: 'A', currentValues: { gCost: 7.5 },
+    selectionRule: 'lowest_g_cost', candidateEdgeIds: [],
+  }, [], { algorithm: 'UCS', weightUsed: 'adjusted_time_min' })
+
+  assert.match(shortest.detail, /g\(n\)=2\.4 km/)
+  assert.match(fastest.detail, /g\(n\)=7\.5 phút/)
+})
+
 test('distinguishes a local scenario edge cost from cumulative search cost', () => {
   const action = {
     type: 'consider-edge', frameIndex: 0, actionIndex: 1,

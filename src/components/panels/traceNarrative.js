@@ -29,17 +29,17 @@ function listLocations(nodeIds, locationNames) {
   return nodeIds.map((nodeId) => locationLabel(nodeId, locationNames)).join(', ')
 }
 
-function expansionReason(action, algorithm) {
+function expansionReason(action, algorithm, costContext) {
   const values = action.currentValues ?? {}
   const normalizedAlgorithm = String(algorithm ?? '').toLowerCase()
   const rule = action.selectionRule
   const costModel = getSearchCostModel(algorithm, rule)
 
   if (costModel === SEARCH_COST_MODEL.ASTAR) {
-    return `Chọn vì f(n)=${formatSearchCost(values.fCost, 'chưa ghi nhận')} nhỏ nhất (g=${formatSearchCost(values.gCost, 'chưa ghi nhận')}, h=${formatSearchCost(values.hCost, 'chưa ghi nhận')}).`
+    return `Chọn vì f(n)=${formatSearchCost(values.fCost, { ...costContext, fallback: 'chưa ghi nhận' })} nhỏ nhất (g=${formatSearchCost(values.gCost, { ...costContext, fallback: 'chưa ghi nhận' })}, h=${formatSearchCost(values.hCost, { ...costContext, fallback: 'chưa ghi nhận' })}).`
   }
   if (costModel === SEARCH_COST_MODEL.CUMULATIVE_G) {
-    return `Chọn vì g(n)=${formatSearchCost(values.gCost ?? values.priority, 'chưa ghi nhận')} nhỏ nhất trên biên.`
+    return `Chọn vì g(n)=${formatSearchCost(values.gCost ?? values.priority, { ...costContext, fallback: 'chưa ghi nhận' })} nhỏ nhất trên biên.`
   }
   if (rule === 'lowest_h_cost' || normalizedAlgorithm.includes('greedy')) {
     return `Chọn vì h(n)=${number(values.hCost ?? values.priority)} nhỏ nhất; không xét chi phí đã đi.`
@@ -82,7 +82,8 @@ function localEdgeCost(action, edgeCostDetails, algorithm) {
 }
 
 export function describeTraceAction(action, actions = [], context = {}) {
-  const { algorithm, edgeCostDetails, locationNames } = context
+  const { algorithm, edgeCostDetails, locationNames, weightUsed, optimization } = context
+  const costContext = { weightUsed, optimization }
   const current = locationLabel(action.currentNodeId, locationNames)
   const neighbor = locationLabel(action.activeNeighborId, locationNames)
 
@@ -97,7 +98,7 @@ export function describeTraceAction(action, actions = [], context = {}) {
   if (action.type === 'expand') {
     return {
       title: `Mở rộng ${current}`,
-      detail: `${expansionReason(action, algorithm)} ${candidateSummary(action)}`,
+      detail: `${expansionReason(action, algorithm, costContext)} ${candidateSummary(action)}`,
     }
   }
 
@@ -110,7 +111,7 @@ export function describeTraceAction(action, actions = [], context = {}) {
     const decision = describeCandidateEdgeDecision(
       action.activeEdgeId,
       evaluatedAtThisPoint,
-      { algorithm },
+      { algorithm, ...costContext },
     )
     return {
       title: `Xét ${action.activeEdgeId}: ${current} → ${neighbor}`,

@@ -507,8 +507,7 @@ function inferFirstDiscoveryParents(frames, safeStep, startNode, edgeByPair) {
   for (let index = 0; index <= safeStep; index += 1) {
     const frame = frames[index] ?? {}
     const parentNode = getTraceNodeId(frame.current)
-    if (!parentNode) continue
-    discovered.add(parentNode)
+    if (!parentNode || !discovered.has(parentNode)) continue
     for (const value of frame.frontier ?? []) {
       const frontierNode = getTraceNodeId(value)
       if (!frontierNode || discovered.has(frontierNode)) continue

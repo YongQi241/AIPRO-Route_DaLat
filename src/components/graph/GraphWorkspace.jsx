@@ -13,7 +13,7 @@ import { createNodeConnectionLookup } from './nodeConnections'
 import RoadNetworkLayer from './RoadNetworkLayer'
 import SearchAnimationLayer from './SearchAnimationLayer'
 import SearchTraversalLayer from './SearchTraversalLayer'
-import { createTopologyLayout } from './topologyLayout'
+import { createFruchtermanReingoldLayout } from './topologyLayout'
 import {
   buildSearchActionTimeline,
   getInferredSearchBranchEdgeIds,
@@ -105,7 +105,8 @@ export default function GraphWorkspace({
   const canvasRef = useRef(null)
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT)
   const [isPanning, setIsPanning] = useState(false)
-  const [layoutMode, setLayoutMode] = useState('tree')
+  const [layoutMode, setLayoutMode] = useState('graph')
+  const [edgePopupsEnabled, setEdgePopupsEnabled] = useState(true)
   const [hoveredEdge, setHoveredEdge] = useState(null)
   const [edgeHoverPosition, setEdgeHoverPosition] = useState(null)
   const graphData = useAppStore((state) => state.graphData)
@@ -182,9 +183,9 @@ export default function GraphWorkspace({
     result,
   ])
 
-  const treeLayout = useMemo(
+  const graphLayout = useMemo(
     () =>
-      createTopologyLayout(
+      createFruchtermanReingoldLayout(
         nodeFeatures,
         edgeFeatures,
         result?.start_node,
@@ -198,21 +199,21 @@ export default function GraphWorkspace({
     [edgeFeatures, nodeFeatures, result?.start_node],
   )
   const displayEdgeFeatures =
-    layoutMode === 'tree' ? treeLayout.edgeFeatures : edgeFeatures
+    layoutMode === 'graph' ? graphLayout.edgeFeatures : edgeFeatures
   const nodeConnectionLookup = useMemo(
     () => createNodeConnectionLookup(edgeFeatures),
     [edgeFeatures],
   )
 
   const drawing = useMemo(() => {
-    if (layoutMode === 'tree') {
+    if (layoutMode === 'graph') {
       return {
         project: IDENTITY_PROJECTOR,
         nodes: nodeFeatures
           .map((feature, index) => {
             const properties = feature.properties ?? {}
             const id = String(properties.node_id ?? index)
-            const position = treeLayout.positions.get(id)
+            const position = graphLayout.positions.get(id)
             if (!position) return null
             return {
               id,
@@ -260,7 +261,7 @@ export default function GraphWorkspace({
     layoutMode,
     nodeConnectionLookup,
     nodeFeatures,
-    treeLayout.positions,
+    graphLayout.positions,
   ])
 
   const isSuccessful = result?.status === 'success'
@@ -450,8 +451,8 @@ export default function GraphWorkspace({
           <h1>Mạng lưới đường Đà Lạt</h1>
           <p>
             {drawing.nodes.length} địa điểm · {edgeFeatures.length} cạnh có
-            hướng · {layoutMode === 'tree'
-              ? 'bố cục đồ thị giãn đều'
+            hướng · {layoutMode === 'graph'
+              ? 'bố cục lò xo Fruchterman–Reingold'
               : 'bản đồ địa lý'}
           </p>
         </div>
@@ -496,10 +497,10 @@ export default function GraphWorkspace({
           </button>
           <button
             type="button"
-            className={layoutMode === 'tree' ? 'is-active' : ''}
-            onClick={() => changeLayout('tree')}
-            aria-pressed={layoutMode === 'tree'}
-            title="Bố cục đồ thị giãn đều"
+            className={layoutMode === 'graph' ? 'is-active' : ''}
+            onClick={() => changeLayout('graph')}
+            aria-pressed={layoutMode === 'graph'}
+            title="Bố cục lò xo Fruchterman–Reingold"
           >
             Đồ thị
           </button>
@@ -536,6 +537,19 @@ export default function GraphWorkspace({
           >
             Đặt lại góc nhìn
           </button>
+          <button
+            type="button"
+            className={edgePopupsEnabled ? 'is-active' : ''}
+            onClick={() => setEdgePopupsEnabled((enabled) => !enabled)}
+            aria-pressed={edgePopupsEnabled}
+            title={
+              edgePopupsEnabled
+                ? 'Tắt popup chi tiết cạnh'
+                : 'Bật popup chi tiết cạnh'
+            }
+          >
+            Chi tiết cạnh
+          </button>
         </div>
 
         <svg
@@ -558,6 +572,7 @@ export default function GraphWorkspace({
               features={displayEdgeFeatures}
               project={drawing.project}
               onEdgeHover={handleEdgeHover}
+              hoveredEdgeId={hoveredEdge?.edgeId ?? null}
             />
             <FinalRouteLayer
               features={displayEdgeFeatures}
@@ -574,18 +589,23 @@ export default function GraphWorkspace({
               candidateEdgeIds={preservedCandidateEdgeIds}
               evaluatedCandidateActions={evaluatedCandidateActions}
               algorithm={result?.algorithm}
+              weightUsed={result?.weight_used}
+              optimization={result?.optimization}
               finalPathEdgeIds={
                 isSearchComplete ? result?.path_edges ?? [] : []
               }
               onEdgeHover={handleEdgeHover}
             />
-            <EdgeLabelLayer
-              features={displayEdgeFeatures}
-              project={drawing.project}
-              edgeCosts={scenarioEdgeCosts}
-              closedEdgeIds={closedEdgeIds}
-              onEdgeHover={handleEdgeHover}
-            />
+            {layoutMode === 'graph' && (
+              <EdgeLabelLayer
+                features={displayEdgeFeatures}
+                project={drawing.project}
+                edgeCosts={scenarioEdgeCosts}
+                closedEdgeIds={closedEdgeIds}
+                onEdgeHover={handleEdgeHover}
+                labelScale={1 / Math.sqrt(viewport.scale)}
+              />
+            )}
 
             <SearchAnimationLayer
               nodes={drawing.nodes}
@@ -595,17 +615,24 @@ export default function GraphWorkspace({
               }
               totalActions={actionTimeline.length}
               showFinalPath={showFinalPath}
+              markerScale={
+                layoutMode === 'map'
+                  ? 1 / (viewport.scale * 0.6)
+                  : 1
+              }
             />
           </g>
         </svg>
-        <EdgeHoverCard
-          edge={hoveredEdge}
-          position={edgeHoverPosition}
-          detail={activeCostData?.edge_cost_details?.[hoveredEdge?.edgeId]}
-          formula={activeCostData?.edge_cost_formula}
-          scenarioId={routeSelection.scenarioId}
-          optimization={routeSelection.optimization}
-        />
+        {edgePopupsEnabled && (
+          <EdgeHoverCard
+            edge={hoveredEdge}
+            position={edgeHoverPosition}
+            detail={activeCostData?.edge_cost_details?.[hoveredEdge?.edgeId]}
+            formula={activeCostData?.edge_cost_formula}
+            scenarioId={routeSelection.scenarioId}
+            optimization={routeSelection.optimization}
+          />
+        )}
         <ul className="graph-workspace__legend" aria-label="Chú thích đồ thị">
           {GRAPH_LEGEND_ITEMS.map(({ type, state, label }) => (
             <li key={state}>

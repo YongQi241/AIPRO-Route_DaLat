@@ -1,115 +1,61 @@
-﻿edge_id,from_node,to_node,from_name,to_name,distance_km,base_time_min,average_speed_kph,road_type,one_way_share,direction,congestion_level,risk_score,closed,backbone_edge,data_source
-E001,DL01,DL02,Nhà lao thiếu nhi Đà Lạt,Ga Đà Lạt,2.32,3.56,39.0,residential|secondary,0.0,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E002,DL02,DL01,Ga Đà Lạt,Nhà lao thiếu nhi Đà Lạt,2.32,3.56,39.0,residential|secondary,0.0,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E003,DL01,DL05,Nhà lao thiếu nhi Đà Lạt,Bảo tàng Lâm Đồng,2.207,4.24,31.2,residential|secondary|trunk,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E004,DL05,DL01,Bảo tàng Lâm Đồng,Nhà lao thiếu nhi Đà Lạt,2.207,4.24,31.2,residential|secondary|trunk,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E005,DL01,DL06,Nhà lao thiếu nhi Đà Lạt,Thung Lũng Tình Yêu,6.008,9.1,39.6,residential|secondary,0.132,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E006,DL06,DL01,Thung Lũng Tình Yêu,Nhà lao thiếu nhi Đà Lạt,6.013,9.1,39.6,residential|secondary,0.132,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E007,DL01,DL14,Nhà lao thiếu nhi Đà Lạt,Vườn Hoa Cẩm Tú Cầu,7.289,15.2,28.8,primary|residential|secondary|trunk|unclassified,0.106,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E008,DL14,DL01,Vườn Hoa Cẩm Tú Cầu,Nhà lao thiếu nhi Đà Lạt,7.231,15.06,28.8,primary|residential|secondary|trunk|unclassified,0.067,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E009,DL01,DL22,Nhà lao thiếu nhi Đà Lạt,Hồ Xuân Hương,3.023,4.62,39.3,residential|secondary,0.182,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E010,DL22,DL01,Hồ Xuân Hương,Nhà lao thiếu nhi Đà Lạt,3.031,4.63,39.3,residential|secondary,0.182,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E011,DL02,DL05,Ga Đà Lạt,Bảo tàng Lâm Đồng,1.598,3.15,30.4,secondary|tertiary|trunk,0.444,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E012,DL05,DL02,Bảo tàng Lâm Đồng,Ga Đà Lạt,1.541,3.01,30.7,secondary|tertiary|trunk,0.308,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E013,DL02,DL14,Ga Đà Lạt,Vườn Hoa Cẩm Tú Cầu,9.495,18.42,30.9,primary|residential|secondary|trunk|unclassified,0.085,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E014,DL14,DL02,Vườn Hoa Cẩm Tú Cầu,Ga Đà Lạt,9.438,18.28,31.0,primary|residential|secondary|trunk|unclassified,0.053,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E015,DL02,DL22,Ga Đà Lạt,Hồ Xuân Hương,0.704,1.06,40.0,secondary,0.5,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E016,DL22,DL02,Hồ Xuân Hương,Ga Đà Lạt,0.711,1.07,40.0,secondary,0.5,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E017,DL02,DL23,Ga Đà Lạt,Quảng trường Lâm Viên,1.294,2.32,33.5,residential|secondary|tertiary,0.333,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E018,DL23,DL02,Quảng trường Lâm Viên,Ga Đà Lạt,1.302,2.33,33.5,residential|secondary|tertiary,0.333,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E019,DL03,DL04,Crazy House,Museum Madam De Dalat,2.182,4.16,31.5,primary|residential|secondary|tertiary,0.214,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E020,DL04,DL03,Museum Madam De Dalat,Crazy House,2.217,4.19,31.7,primary|residential|secondary|tertiary,0.241,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E021,DL03,DL13,Crazy House,Dinh III Bảo Đại,1.037,2.07,30.0,tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E022,DL13,DL03,Dinh III Bảo Đại,Crazy House,1.037,2.07,30.0,tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E023,DL03,DL15,Crazy House,Nhà thờ Cam Ly,2.77,5.94,28.0,primary|residential|secondary|tertiary,0.207,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E024,DL15,DL03,Nhà thờ Cam Ly,Crazy House,2.805,5.98,28.2,primary|residential|secondary|tertiary,0.233,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E025,DL03,DL21,Crazy House,Chợ Đà Lạt,1.414,2.76,30.7,primary|primary_link|residential|secondary|tertiary,0.391,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E026,DL21,DL03,Chợ Đà Lạt,Crazy House,1.401,2.81,29.9,primary|residential|secondary|tertiary,0.455,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E027,DL04,DL10,Museum Madam De Dalat,Vườn dâu Công nghệ cao Bình Yên,0.366,1.1,20.0,residential,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E028,DL10,DL04,Vườn dâu Công nghệ cao Bình Yên,Museum Madam De Dalat,0.366,1.1,20.0,residential,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E029,DL04,DL15,Museum Madam De Dalat,Nhà thờ Cam Ly,0.919,2.76,20.0,residential,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E030,DL15,DL04,Nhà thờ Cam Ly,Museum Madam De Dalat,0.919,2.76,20.0,residential,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E031,DL04,DL18,Museum Madam De Dalat,Làng Cổ Tích,4.529,10.51,25.9,primary|primary_link|residential|tertiary|unclassified,0.2,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E032,DL18,DL04,Làng Cổ Tích,Museum Madam De Dalat,4.566,10.57,25.9,primary|primary_link|residential|tertiary|unclassified,0.133,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E033,DL04,DL21,Museum Madam De Dalat,Chợ Đà Lạt,2.273,4.8,28.4,residential|secondary|tertiary,0.185,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E034,DL21,DL04,Chợ Đà Lạt,Museum Madam De Dalat,2.27,4.84,28.1,residential|secondary|tertiary,0.185,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E035,DL05,DL14,Bảo tàng Lâm Đồng,Vườn Hoa Cẩm Tú Cầu,7.591,18.54,24.6,residential|trunk,0.073,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E036,DL14,DL05,Vườn Hoa Cẩm Tú Cầu,Bảo tàng Lâm Đồng,7.642,18.66,24.6,residential|trunk,0.105,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E037,DL05,DL22,Bảo tàng Lâm Đồng,Hồ Xuân Hương,1.493,2.94,30.4,secondary|tertiary|trunk,0.231,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E038,DL22,DL05,Hồ Xuân Hương,Bảo tàng Lâm Đồng,1.547,3.07,30.2,secondary|tertiary|trunk,0.438,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E039,DL05,DL23,Bảo tàng Lâm Đồng,Quảng trường Lâm Viên,1.946,2.73,42.7,primary|secondary|trunk,0.5,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E040,DL23,DL05,Quảng trường Lâm Viên,Bảo tàng Lâm Đồng,2.208,3.14,42.3,primary|secondary|trunk,0.579,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E041,DL06,DL19,Thung Lũng Tình Yêu,Làng Đồng trụ LangBiang,11.125,18.59,35.9,living_street|residential|secondary|tertiary,0.14,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E042,DL19,DL06,Làng Đồng trụ LangBiang,Thung Lũng Tình Yêu,11.194,18.69,35.9,living_street|residential|secondary|tertiary,0.213,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E043,DL06,DL21,Thung Lũng Tình Yêu,Chợ Đà Lạt,5.783,9.11,38.1,residential|secondary,0.191,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E044,DL21,DL06,Chợ Đà Lạt,Thung Lũng Tình Yêu,5.88,9.31,37.9,residential|secondary,0.22,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E045,DL06,DL22,Thung Lũng Tình Yêu,Hồ Xuân Hương,4.92,7.38,40.0,secondary,0.13,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E046,DL22,DL06,Hồ Xuân Hương,Thung Lũng Tình Yêu,4.955,7.43,40.0,secondary,0.2,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E047,DL07,DL11,Thác Datanla,Thác Prenn,4.883,4.88,60.0,primary,0.25,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E048,DL11,DL07,Thác Prenn,Thác Datanla,6.249,6.89,54.4,motorway|motorway_link|primary|residential|trunk_link,0.636,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E049,DL07,DL12,Thác Datanla,Đường hầm điêu khắc,10.684,19.56,32.8,primary|secondary|tertiary,0.231,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E050,DL12,DL07,Đường hầm điêu khắc,Thác Datanla,10.65,19.51,32.8,primary_link|secondary|tertiary,0.25,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E051,DL07,DL16,Thác Datanla,Hồ Tuyền Lâm,1.442,2.36,36.7,primary|secondary|tertiary,0.6,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E052,DL16,DL07,Hồ Tuyền Lâm,Thác Datanla,1.408,2.3,36.7,primary_link|secondary|tertiary,0.75,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E053,DL07,DL24,Thác Datanla,Thiền viện Trúc Lâm Đà Lạt,1.871,2.82,39.8,primary|secondary|tertiary,0.375,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E054,DL24,DL07,Thiền viện Trúc Lâm Đà Lạt,Thác Datanla,1.837,2.77,39.8,primary_link|secondary|tertiary,0.429,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E055,DL07,DL25,Thác Datanla,Bến xe Liên tỉnh Đà Lạt,3.226,3.78,51.3,primary|tertiary,0.5,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E056,DL25,DL07,Bến xe Liên tỉnh Đà Lạt,Thác Datanla,3.21,3.75,51.3,primary|tertiary,0.444,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E057,DL08,DL09,Devil Mountain Tourist Area,Làng Cu Lần,12.358,18.54,40.0,secondary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E058,DL09,DL08,Làng Cu Lần,Devil Mountain Tourist Area,12.358,18.54,40.0,secondary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E059,DL08,DL18,Devil Mountain Tourist Area,Làng Cổ Tích,18.629,29.5,37.9,primary|primary_link|residential|secondary|tertiary|unclassified,0.094,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E060,DL18,DL08,Làng Cổ Tích,Devil Mountain Tourist Area,18.66,29.54,37.9,primary|primary_link|residential|secondary|tertiary|unclassified,0.147,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E061,DL08,DL20,Devil Mountain Tourist Area,Thác Ankroet,4.509,6.76,40.0,secondary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E062,DL20,DL08,Thác Ankroet,Devil Mountain Tourist Area,4.509,6.76,40.0,secondary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E063,DL09,DL19,Làng Cu Lần,Làng Đồng trụ LangBiang,22.268,35.31,37.8,living_street|residential|secondary|tertiary,0.137,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E064,DL19,DL09,Làng Đồng trụ LangBiang,Làng Cu Lần,22.296,35.35,37.8,living_street|residential|secondary|tertiary,0.189,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E065,DL09,DL20,Làng Cu Lần,Thác Ankroet,7.849,11.77,40.0,secondary,0.0,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E066,DL20,DL09,Thác Ankroet,Làng Cu Lần,7.849,11.77,40.0,secondary,0.0,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E067,DL10,DL15,Vườn dâu Công nghệ cao Bình Yên,Nhà thờ Cam Ly,1.285,3.85,20.0,residential,0.0,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E068,DL15,DL10,Nhà thờ Cam Ly,Vườn dâu Công nghệ cao Bình Yên,1.285,3.85,20.0,residential,0.0,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E069,DL10,DL18,Vườn dâu Công nghệ cao Bình Yên,Làng Cổ Tích,4.685,10.93,25.7,primary|primary_link|residential|tertiary|unclassified,0.207,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E070,DL18,DL10,Làng Cổ Tích,Vườn dâu Công nghệ cao Bình Yên,4.722,10.99,25.8,primary|primary_link|residential|tertiary|unclassified,0.138,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E071,DL10,DL19,Vườn dâu Công nghệ cao Bình Yên,Làng Đồng trụ LangBiang,11.843,20.99,33.8,living_street|residential|secondary|tertiary,0.197,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E072,DL19,DL10,Làng Đồng trụ LangBiang,Vườn dâu Công nghệ cao Bình Yên,11.841,20.99,33.8,living_street|residential|secondary|tertiary,0.222,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E073,DL10,DL21,Vườn dâu Công nghệ cao Bình Yên,Chợ Đà Lạt,2.429,5.22,27.9,residential|secondary|tertiary,0.192,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E074,DL21,DL10,Chợ Đà Lạt,Vườn dâu Công nghệ cao Bình Yên,2.426,5.26,27.7,residential|secondary|tertiary,0.192,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E075,DL11,DL16,Thác Prenn,Hồ Tuyền Lâm,7.691,9.24,49.9,motorway|motorway_link|primary|residential|secondary|tertiary|trunk_link,0.625,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E076,DL16,DL11,Hồ Tuyền Lâm,Thác Prenn,6.291,7.19,52.5,primary|primary_link|secondary|tertiary,0.5,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E077,DL11,DL24,Thác Prenn,Thiền viện Trúc Lâm Đà Lạt,8.121,9.71,50.2,motorway|motorway_link|primary|residential|secondary|tertiary|trunk_link,0.526,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E078,DL24,DL11,Thiền viện Trúc Lâm Đà Lạt,Thác Prenn,6.721,7.65,52.7,primary|primary_link|secondary|tertiary,0.364,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E079,DL12,DL16,Đường hầm điêu khắc,Hồ Tuyền Lâm,10.106,18.93,32.0,secondary|tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E080,DL16,DL12,Hồ Tuyền Lâm,Đường hầm điêu khắc,10.106,18.93,32.0,secondary|tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E081,DL12,DL24,Đường hầm điêu khắc,Thiền viện Trúc Lâm Đà Lạt,8.919,16.98,31.5,secondary|tertiary,0.0,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E082,DL24,DL12,Thiền viện Trúc Lâm Đà Lạt,Đường hầm điêu khắc,8.919,16.98,31.5,secondary|tertiary,0.0,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E083,DL13,DL15,Dinh III Bảo Đại,Nhà thờ Cam Ly,3.577,7.75,27.7,primary|residential|secondary|tertiary,0.161,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E084,DL15,DL13,Nhà thờ Cam Ly,Dinh III Bảo Đại,3.39,7.53,27.0,primary|residential|secondary|tertiary,0.133,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E085,DL13,DL17,Dinh III Bảo Đại,Khu du lịch sinh thái Cao Nguyên Hoa Đà Lạt,9.05,22.26,24.4,primary|primary_link|residential|tertiary|unclassified,0.306,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E086,DL17,DL13,Khu du lịch sinh thái Cao Nguyên Hoa Đà Lạt,Dinh III Bảo Đại,8.843,22.01,24.1,primary|primary_link|residential|tertiary|unclassified,0.219,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E087,DL13,DL21,Dinh III Bảo Đại,Chợ Đà Lạt,2.451,4.84,30.4,primary|primary_link|residential|secondary|tertiary,0.333,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E088,DL21,DL13,Chợ Đà Lạt,Dinh III Bảo Đại,2.438,4.89,29.9,primary|residential|secondary|tertiary,0.385,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E089,DL13,DL25,Dinh III Bảo Đại,Bến xe Liên tỉnh Đà Lạt,2.865,6.05,28.4,residential|tertiary,0.0,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E090,DL25,DL13,Bến xe Liên tỉnh Đà Lạt,Dinh III Bảo Đại,2.865,6.05,28.4,residential|tertiary,0.0,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E091,DL15,DL17,Nhà thờ Cam Ly,Khu du lịch sinh thái Cao Nguyên Hoa Đà Lạt,8.942,23.77,22.6,primary|primary_link|residential|tertiary|unclassified,0.182,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E092,DL17,DL15,Khu du lịch sinh thái Cao Nguyên Hoa Đà Lạt,Nhà thờ Cam Ly,9.199,24.49,22.5,primary|primary_link|residential|tertiary|unclassified,0.114,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E093,DL15,DL18,Nhà thờ Cam Ly,Làng Cổ Tích,4.897,11.63,25.3,primary|primary_link|residential|tertiary|unclassified,0.207,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E094,DL18,DL15,Làng Cổ Tích,Nhà thờ Cam Ly,5.154,12.35,25.0,primary|primary_link|residential|tertiary|unclassified,0.129,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E095,DL16,DL24,Hồ Tuyền Lâm,Thiền viện Trúc Lâm Đà Lạt,1.294,2.19,35.4,secondary|tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E096,DL24,DL16,Thiền viện Trúc Lâm Đà Lạt,Hồ Tuyền Lâm,1.294,2.19,35.4,secondary|tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E097,DL16,DL25,Hồ Tuyền Lâm,Bến xe Liên tỉnh Đà Lạt,4.574,6.04,45.5,primary|secondary|tertiary,0.615,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E098,DL25,DL16,Bến xe Liên tỉnh Đà Lạt,Hồ Tuyền Lâm,4.537,5.98,45.5,primary|primary_link|secondary|tertiary,0.636,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E099,DL17,DL18,Khu du lịch sinh thái Cao Nguyên Hoa Đà Lạt,Làng Cổ Tích,5.555,16.67,20.0,residential|unclassified,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E100,DL18,DL17,Làng Cổ Tích,Khu du lịch sinh thái Cao Nguyên Hoa Đà Lạt,5.555,16.67,20.0,residential|unclassified,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E101,DL18,DL20,Làng Cổ Tích,Thác Ankroet,14.151,22.77,37.3,primary|primary_link|residential|secondary|tertiary|unclassified,0.152,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E102,DL20,DL18,Thác Ankroet,Làng Cổ Tích,14.12,22.74,37.3,primary|primary_link|residential|secondary|tertiary|unclassified,0.097,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E103,DL21,DL22,Chợ Đà Lạt,Hồ Xuân Hương,1.734,3.09,33.7,residential|secondary,0.611,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E104,DL22,DL21,Hồ Xuân Hương,Chợ Đà Lạt,1.624,2.87,33.9,residential|secondary,0.417,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E105,DL21,DL23,Chợ Đà Lạt,Quảng trường Lâm Viên,1.774,3.14,33.9,primary|residential|secondary,0.85,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E106,DL23,DL21,Quảng trường Lâm Viên,Chợ Đà Lạt,1.261,2.33,32.5,residential|secondary,0.727,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E107,DL22,DL23,Hồ Xuân Hương,Quảng trường Lâm Viên,0.636,1.33,28.6,residential|secondary|tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E108,DL23,DL22,Quảng trường Lâm Viên,Hồ Xuân Hương,0.636,1.33,28.6,residential|secondary|tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E109,DL22,DL25,Hồ Xuân Hương,Bến xe Liên tỉnh Đà Lạt,2.6,4.03,38.7,primary|secondary|tertiary,0.619,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E110,DL25,DL22,Bến xe Liên tỉnh Đà Lạt,Hồ Xuân Hương,2.58,3.98,38.9,primary|primary_link|secondary|tertiary,0.65,directed,1,0,False,False,OpenStreetMap + modeled speeds
-E111,DL23,DL25,Quảng trường Lâm Viên,Bến xe Liên tỉnh Đà Lạt,2.198,3.19,41.3,primary|secondary|tertiary,0.875,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E112,DL25,DL23,Bến xe Liên tỉnh Đà Lạt,Quảng trường Lâm Viên,2.021,2.91,41.6,primary|secondary|tertiary,0.941,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E113,DL24,DL25,Thiền viện Trúc Lâm Đà Lạt,Bến xe Liên tỉnh Đà Lạt,5.003,6.5,46.2,primary|secondary|tertiary,0.5,directed,1,0,False,True,OpenStreetMap + modeled speeds
-E114,DL25,DL24,Bến xe Liên tỉnh Đà Lạt,Thiền viện Trúc Lâm Đà Lạt,4.966,6.44,46.2,primary|primary_link|secondary|tertiary,0.5,directed,1,0,False,True,OpenStreetMap + modeled speeds
+﻿edge_id,from_node,to_node,from_name,to_name,distance_km,connector_distance_m,base_time_min,average_speed_kph,road_type,one_way_share,direction,congestion_level,risk_score,closed,backbone_edge,data_source
+E001,DL01,DL05,Nhà lao thiếu nhi Đà Lạt,Bảo tàng Lâm Đồng,2.46,252.6,5.25,28.1,residential|secondary|trunk,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E002,DL05,DL01,Bảo tàng Lâm Đồng,Nhà lao thiếu nhi Đà Lạt,2.46,252.6,5.25,28.1,residential|secondary|trunk,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E003,DL01,DL06,Nhà lao thiếu nhi Đà Lạt,Thung Lũng Tình Yêu,6.253,244.9,10.08,37.2,residential|secondary,0.132,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E004,DL06,DL01,Thung Lũng Tình Yêu,Nhà lao thiếu nhi Đà Lạt,6.258,244.9,10.08,37.2,residential|secondary,0.132,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E005,DL01,DL14,Nhà lao thiếu nhi Đà Lạt,Vườn Hoa Cẩm Tú Cầu,7.619,330.0,16.52,27.7,primary|residential|secondary|trunk|unclassified,0.106,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E006,DL14,DL01,Vườn Hoa Cẩm Tú Cầu,Nhà lao thiếu nhi Đà Lạt,7.561,330.0,16.38,27.7,primary|residential|secondary|trunk|unclassified,0.067,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E007,DL02,DL05,Ga Đà Lạt,Bảo tàng Lâm Đồng,1.777,179.1,3.87,27.6,secondary|tertiary|trunk,0.444,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E008,DL05,DL02,Bảo tàng Lâm Đồng,Ga Đà Lạt,1.72,179.1,3.73,27.7,secondary|tertiary|trunk,0.308,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E009,DL02,DL22,Ga Đà Lạt,Hồ Xuân Hương,0.98,276.9,2.16,27.2,secondary,0.5,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E010,DL22,DL02,Hồ Xuân Hương,Ga Đà Lạt,0.988,276.9,2.17,27.3,secondary,0.5,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E011,DL02,DL23,Ga Đà Lạt,Quảng trường Lâm Viên,1.527,233.4,3.25,28.2,residential|secondary|tertiary,0.333,directed,1,0,False,False,OpenStreetMap + modeled speeds + connector
+E012,DL23,DL02,Quảng trường Lâm Viên,Ga Đà Lạt,1.535,233.4,3.26,28.2,residential|secondary|tertiary,0.333,directed,1,0,False,False,OpenStreetMap + modeled speeds + connector
+E013,DL03,DL04,Crazy House,Museum Madam De Dalat,2.331,149.2,4.75,29.4,primary|residential|secondary|tertiary,0.214,directed,1,0,False,False,OpenStreetMap + modeled speeds + connector
+E014,DL04,DL03,Museum Madam De Dalat,Crazy House,2.366,149.2,4.79,29.6,primary|residential|secondary|tertiary,0.241,directed,1,0,False,False,OpenStreetMap + modeled speeds + connector
+E015,DL03,DL13,Crazy House,Dinh III Bảo Đại,1.273,236.3,3.02,25.3,tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E016,DL13,DL03,Dinh III Bảo Đại,Crazy House,1.273,236.3,3.02,25.3,tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E017,DL03,DL15,Crazy House,Nhà thờ Cam Ly,3.002,231.6,6.87,26.2,primary|residential|secondary|tertiary,0.207,directed,1,0,False,False,OpenStreetMap + modeled speeds + connector
+E018,DL15,DL03,Nhà thờ Cam Ly,Crazy House,3.036,231.6,6.9,26.4,primary|residential|secondary|tertiary,0.233,directed,1,0,False,False,OpenStreetMap + modeled speeds + connector
+E019,DL03,DL21,Crazy House,Chợ Đà Lạt,1.585,170.9,3.45,27.6,primary|primary_link|residential|secondary|tertiary,0.391,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E020,DL21,DL03,Chợ Đà Lạt,Crazy House,1.572,170.9,3.5,27.0,primary|residential|secondary|tertiary,0.455,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E021,DL04,DL10,Museum Madam De Dalat,Vườn dâu Công nghệ cao Bình Yên,0.496,130.2,1.62,18.4,residential,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E022,DL10,DL04,Vườn dâu Công nghệ cao Bình Yên,Museum Madam De Dalat,0.496,130.2,1.62,18.4,residential,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E023,DL04,DL15,Museum Madam De Dalat,Nhà thờ Cam Ly,1.112,192.6,3.53,18.9,residential,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E024,DL15,DL04,Nhà thờ Cam Ly,Museum Madam De Dalat,1.112,192.6,3.53,18.9,residential,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E025,DL04,DL21,Museum Madam De Dalat,Chợ Đà Lạt,2.405,131.9,5.32,27.1,residential|secondary|tertiary,0.185,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E026,DL21,DL04,Chợ Đà Lạt,Museum Madam De Dalat,2.402,131.9,5.37,26.8,residential|secondary|tertiary,0.185,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E027,DL06,DL19,Thung Lũng Tình Yêu,Làng Đồng trụ LangBiang,11.372,246.7,19.58,34.8,living_street|residential|secondary|tertiary,0.14,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E028,DL19,DL06,Làng Đồng trụ LangBiang,Thung Lũng Tình Yêu,11.44,246.7,19.68,34.9,living_street|residential|secondary|tertiary,0.213,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E029,DL07,DL11,Thác Datanla,Thác Prenn,5.369,486.0,6.83,47.2,primary,0.25,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E030,DL11,DL07,Thác Prenn,Thác Datanla,6.735,486.0,8.83,45.8,motorway|motorway_link|primary|residential|trunk_link,0.636,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E031,DL07,DL16,Thác Datanla,Hồ Tuyền Lâm,1.947,504.9,4.38,26.7,primary|secondary|tertiary,0.6,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E032,DL16,DL07,Hồ Tuyền Lâm,Thác Datanla,1.913,504.9,4.32,26.6,primary_link|secondary|tertiary,0.75,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E033,DL08,DL09,Devil Mountain Tourist Area,Làng Cu Lần,14.153,1701.9,23.12,36.7,primary|secondary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E034,DL09,DL08,Làng Cu Lần,Devil Mountain Tourist Area,14.153,1701.9,23.12,36.7,primary|secondary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E035,DL08,DL20,Devil Mountain Tourist Area,Thác Ankroet,6.392,1838.0,14.18,27.0,secondary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E036,DL20,DL08,Thác Ankroet,Devil Mountain Tourist Area,6.392,1838.0,14.18,27.0,secondary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E037,DL10,DL15,Vườn dâu Công nghệ cao Bình Yên,Nhà thờ Cam Ly,1.497,212.6,4.7,19.1,residential,0.0,directed,1,0,False,False,OpenStreetMap + modeled speeds + connector
+E038,DL15,DL10,Nhà thờ Cam Ly,Vườn dâu Công nghệ cao Bình Yên,1.497,212.6,4.7,19.1,residential,0.0,directed,1,0,False,False,OpenStreetMap + modeled speeds + connector
+E039,DL10,DL21,Vườn dâu Công nghệ cao Bình Yên,Chợ Đà Lạt,2.58,151.9,5.82,26.6,residential|secondary|tertiary,0.192,directed,1,0,False,False,OpenStreetMap + modeled speeds + connector
+E040,DL21,DL10,Chợ Đà Lạt,Vườn dâu Công nghệ cao Bình Yên,2.578,151.9,5.87,26.3,residential|secondary|tertiary,0.192,directed,1,0,False,False,OpenStreetMap + modeled speeds + connector
+E041,DL12,DL16,Đường hầm điêu khắc,Hồ Tuyền Lâm,10.306,200.3,19.74,31.3,secondary|tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E042,DL16,DL12,Hồ Tuyền Lâm,Đường hầm điêu khắc,10.306,200.3,19.74,31.3,secondary|tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E043,DL15,DL18,Nhà thờ Cam Ly,Làng Cổ Tích,5.256,359.5,13.07,24.1,primary|primary_link|residential|tertiary|unclassified,0.207,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E044,DL18,DL15,Làng Cổ Tích,Nhà thờ Cam Ly,5.513,359.5,13.79,24.0,primary|primary_link|residential|tertiary|unclassified,0.129,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E045,DL16,DL24,Hồ Tuyền Lâm,Thiền viện Trúc Lâm Đà Lạt,1.733,439.3,3.98,26.1,secondary|tertiary|tertiary_link,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E046,DL24,DL16,Thiền viện Trúc Lâm Đà Lạt,Hồ Tuyền Lâm,1.733,439.3,3.98,26.1,secondary|tertiary|tertiary_link,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E047,DL17,DL18,Khu du lịch sinh thái Cao Nguyên Hoa Đà Lạt,Làng Cổ Tích,6.677,1121.4,21.15,18.9,residential|unclassified,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E048,DL18,DL17,Làng Cổ Tích,Khu du lịch sinh thái Cao Nguyên Hoa Đà Lạt,6.677,1121.4,21.15,18.9,residential|unclassified,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E049,DL18,DL20,Làng Cổ Tích,Thác Ankroet,15.225,1124.5,27.2,33.6,primary|primary_link|residential|secondary|tertiary|unclassified,0.152,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E050,DL20,DL18,Thác Ankroet,Làng Cổ Tích,15.194,1124.5,27.16,33.6,primary|primary_link|residential|secondary|tertiary|unclassified,0.097,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E051,DL21,DL22,Chợ Đà Lạt,Hồ Xuân Hương,1.986,251.5,4.1,29.1,residential|secondary,0.611,directed,1,0,False,False,OpenStreetMap + modeled speeds + connector
+E052,DL22,DL21,Hồ Xuân Hương,Chợ Đà Lạt,1.875,251.5,3.88,29.0,residential|secondary,0.417,directed,1,0,False,False,OpenStreetMap + modeled speeds + connector
+E053,DL21,DL23,Chợ Đà Lạt,Quảng trường Lâm Viên,1.982,208.0,3.97,29.9,primary|residential|secondary,0.85,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E054,DL23,DL21,Quảng trường Lâm Viên,Chợ Đà Lạt,1.469,208.0,3.16,27.9,residential|secondary,0.727,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E055,DL22,DL23,Hồ Xuân Hương,Quảng trường Lâm Viên,0.942,305.9,2.56,22.1,residential|secondary|tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E056,DL23,DL22,Quảng trường Lâm Viên,Hồ Xuân Hương,0.942,305.9,2.56,22.1,residential|secondary|tertiary,0.0,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E057,DL23,DL25,Quảng trường Lâm Viên,Bến xe Liên tỉnh Đà Lạt,2.47,271.7,4.28,34.6,primary|secondary|tertiary,0.875,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E058,DL25,DL23,Bến xe Liên tỉnh Đà Lạt,Quảng trường Lâm Viên,2.293,271.7,4.0,34.4,primary|secondary|tertiary,0.941,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E059,DL24,DL25,Thiền viện Trúc Lâm Đà Lạt,Bến xe Liên tỉnh Đà Lạt,5.505,502.0,8.53,38.7,primary|secondary|tertiary|tertiary_link,0.5,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector
+E060,DL25,DL24,Bến xe Liên tỉnh Đà Lạt,Thiền viện Trúc Lâm Đà Lạt,5.468,502.0,8.48,38.7,primary|primary_link|secondary|tertiary|tertiary_link,0.5,directed,1,0,False,True,OpenStreetMap + modeled speeds + connector

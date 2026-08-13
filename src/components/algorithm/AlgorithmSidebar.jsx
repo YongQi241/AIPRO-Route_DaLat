@@ -38,6 +38,13 @@ const DEFAULT_ALGORITHMS = [
     guarantee: 'Tối ưu nếu ước lượng chấp nhận được',
   },
   {
+    value: 'greedy',
+    name: 'Greedy Best-First Search',
+    shortName: 'Greedy',
+    description: 'Ưu tiên nút có khoảng cách ước lượng tới đích nhỏ nhất.',
+    guarantee: 'Không bảo đảm tối ưu',
+  },
+  {
     value: 'hill_climbing',
     name: 'Hill Climbing with Backtracking',
     shortName: 'Hill Climbing',

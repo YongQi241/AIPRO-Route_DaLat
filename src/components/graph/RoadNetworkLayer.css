@@ -14,9 +14,21 @@
 .road-network-layer__edge-hitbox {
   fill: none;
   stroke: transparent;
-  stroke-width: 12;
+  stroke-width: 7;
   cursor: help;
   pointer-events: stroke;
+}
+
+.road-network-layer__edge--hovered {
+  stroke: #64748b;
+}
+
+.road-network-layer__edge--congested.road-network-layer__edge--hovered {
+  stroke: #ea580c;
+}
+
+.road-network-layer__edge--closed.road-network-layer__edge--hovered {
+  stroke: #b91c1c;
 }
 
 .road-network-layer__edge--congested {

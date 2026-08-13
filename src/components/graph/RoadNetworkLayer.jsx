@@ -7,6 +7,7 @@ export default function RoadNetworkLayer({
   features = [],
   project,
   onEdgeHover,
+  hoveredEdgeId = null,
 }) {
   const drawableEdges = useMemo(
     () => createDrawableEdges(features, project),
@@ -22,6 +23,8 @@ export default function RoadNetworkLayer({
               'road-network-layer__edge',
               edge.closed && 'road-network-layer__edge--closed',
               edge.congestion >= 4 && 'road-network-layer__edge--congested',
+              edge.edgeId === hoveredEdgeId &&
+                'road-network-layer__edge--hovered',
             ]
               .filter(Boolean)
               .join(' ')

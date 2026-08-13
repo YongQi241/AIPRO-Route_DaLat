@@ -27,7 +27,9 @@ export function createNodeConnectionLookup(edgeFeatures = []) {
 
 export function describeNodeConnections(node) {
   const connections = node?.connections ?? []
-  const heading = formatNodeNumber(node?.id ?? 'Không xác định')
+  const nodeNumber = formatNodeNumber(node?.id ?? 'Không xác định')
+  const nodeName = String(node?.name ?? '').trim()
+  const heading = nodeName ? `${nodeNumber} — ${nodeName}` : nodeNumber
   if (connections.length === 0) return `${heading}\nKhông có cạnh kết nối.`
 
   const outgoing = connections.filter(

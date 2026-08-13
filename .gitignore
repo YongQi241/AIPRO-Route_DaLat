@@ -11,6 +11,7 @@
 .mypy_cache/
 .ruff_cache/
 .coverage
+.cache/
 htmlcov/
 
 # Node and Vite

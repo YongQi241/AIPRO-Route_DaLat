@@ -9,6 +9,7 @@ export default function SearchAnimationLayer({
   action = null,
   totalActions = 0,
   showFinalPath = false,
+  markerScale = 1,
 }) {
   const simulation = useAppStore((state) => state.simulation)
   const setCurrentStep = useAppStore((state) => state.setCurrentStep)
@@ -59,6 +60,7 @@ export default function SearchAnimationLayer({
       evaluatedNodeId={isComplete ? null : action?.activeNeighborId}
       finalPathNodeIds={result?.path_nodes}
       showFinalPath={showFinalPath}
+      markerScale={markerScale}
     />
   )
 }

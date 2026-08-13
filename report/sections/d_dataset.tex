@@ -11,8 +11,8 @@ Danh sách đầu vào gồm 25 địa điểm du lịch và đầu mối giao t
 được lưu trong \texttt{data/nodes.geojson}. Script \texttt{build\_edges.py}
 dùng OSMnx để tải mạng đường lái xe từ OpenStreetMap, ghép mỗi địa điểm vào
 đỉnh đường gần nhất và tính tuyến giữa các cặp địa điểm được chọn. Một cây
-khung nhỏ nhất bảo đảm toàn bộ mạng liên thông; mỗi địa điểm còn được nối với
-ba láng giềng địa lý gần nhất để tạo các tuyến thay thế.
+khung nhỏ nhất bảo đảm toàn bộ mạng liên thông; các cặp gần nhất còn lại được
+thêm cho đến khi đạt mục tiêu 60 cạnh có hướng.
 
 Khoảng cách và loại đường được lấy từ mạng OpenStreetMap. Thời gian cơ sở được
 tính từ khoảng cách và vận tốc mô hình theo loại đường (15--50 km/h), không
@@ -20,8 +20,8 @@ phải dữ liệu giao thông trực tiếp. Script \texttt{generate\_edge\_con
 dùng seed 2026 để sinh điều kiện có thể tái lập cho năm kịch bản S0--S4. Vì vậy
 các mức ùn tắc và rủi ro là dữ liệu mô phỏng, không phải quan sát thời gian thực.
 
-Sau tiền xử lý, backend dùng 25 đỉnh, 114 cạnh có hướng và 570 bản ghi điều
-kiện (114 cạnh nhân với 5 kịch bản). Các file CSV và GeoJSON sinh ra dùng chung
+Sau tiền xử lý, backend dùng 25 đỉnh, 60 cạnh có hướng và 300 bản ghi điều
+kiện (60 cạnh nhân với 5 kịch bản). Các file CSV và GeoJSON sinh ra dùng chung
 \texttt{node\_id} và \texttt{edge\_id} để backend và frontend đồng bộ.
 
 \section{Danh sách địa điểm}
@@ -71,6 +71,12 @@ theo phút. Mỗi kịch bản gán mức ùn tắc nguyên từ 1 (thông thoá
 nặng), hệ số thời gian, rủi ro mưa, sương mù, thi công và trạng thái đóng/mở cho
 từng cạnh. Giá trị thay đổi theo kịch bản nhưng cố định trong một lần tìm đường.
 
+Khoảng cách cạnh bao gồm cả hai đoạn nối từ tọa độ địa điểm đến đỉnh đường đã
+ghép. Kiểm tra trên dữ liệu sinh hiện tại không phát hiện cạnh nào có
+\texttt{distance\_km} nhỏ hơn khoảng cách Haversine giữa hai đầu mút. Kiểm tra
+mọi cặp đỉnh trong năm kịch bản cũng không phát hiện trường hợp heuristic
+Haversine đánh giá vượt chi phí đường đi ngắn nhất theo khoảng cách.
+
 \begin{table}[h!]
 \centering
 \caption{Một số cạnh đầu tiên trong dữ liệu gốc}
@@ -79,11 +85,11 @@ từng cạnh. Giá trị thay đổi theo kịch bản nhưng cố định tron
 \toprule
 Cạnh & Hướng & Khoảng cách (km) & Thời gian (phút) & Loại đường \\
 \midrule
-E001 & DL01 $\rightarrow$ DL02 & 2,320 & 3,56 & residential, secondary \\
-E002 & DL02 $\rightarrow$ DL01 & 2,320 & 3,56 & residential, secondary \\
-E003 & DL01 $\rightarrow$ DL05 & 2,207 & 4,24 & residential, secondary, trunk \\
-E005 & DL01 $\rightarrow$ DL06 & 6,008 & 9,10 & residential, secondary \\
-E007 & DL01 $\rightarrow$ DL14 & 7,289 & 15,20 & primary, residential, secondary, trunk, unclassified \\
+E001 & DL01 $\rightarrow$ DL05 & 2,460 & 5,25 & residential, secondary, trunk \\
+E002 & DL05 $\rightarrow$ DL01 & 2,460 & 5,25 & residential, secondary, trunk \\
+E003 & DL01 $\rightarrow$ DL06 & 6,253 & 10,08 & residential, secondary \\
+E004 & DL06 $\rightarrow$ DL01 & 6,258 & 10,08 & residential, secondary \\
+E005 & DL01 $\rightarrow$ DL14 & 7,619 & 16,52 & primary, residential, secondary, trunk, unclassified \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -98,7 +104,7 @@ E007 & DL01 $\rightarrow$ DL14 & 7,289 & 15,20 & primary, residential, secondary
   \item Ùn tắc, thời tiết, thi công và đóng đường được sinh giả lập bằng seed cố
   định; chúng không thay đổi trong thời gian một chuyến đi.
   \item Thời gian chờ đèn giao thông và tại giao lộ không được mô hình riêng.
-  \item Hình học cạnh hiện được xuất thành đoạn thẳng giữa hai địa điểm để giao
-  diện nhẹ hơn, trong khi khoảng cách và thời gian vẫn dựa trên tuyến đường đã
-  tính từ OpenStreetMap.
+  \item Mỗi cạnh gồm tuyến đường OpenStreetMap và hai đoạn nối từ địa điểm đến
+  đỉnh đường đã ghép. Khoảng cách, thời gian và hình học đều bao gồm các đoạn
+  nối này; tốc độ giả định trên đoạn nối là 15 km/h.
 \end{itemize}

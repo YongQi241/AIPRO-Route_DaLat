@@ -38,6 +38,7 @@ export default function GraphNodeLayer({
   evaluatedNodeId = null,
   finalPathNodeIds = [],
   showFinalPath = false,
+  markerScale = 1,
 }) {
   const frontierSet = useMemo(
     () => new Set(frontierNodeIds),
@@ -69,7 +70,7 @@ export default function GraphNodeLayer({
             className={`graph-node-layer__node graph-node-layer__node--${nodeState}`}
             data-node-id={node.id}
             data-node-state={nodeState}
-            transform={`translate(${node.x} ${node.y})`}
+            transform={`translate(${node.x} ${node.y}) scale(${markerScale})`}
             tabIndex="0"
             role="img"
             aria-label={`${hoverDescription.replaceAll('\n', '. ')}; ${NODE_STATE_LABELS[nodeState]}`}

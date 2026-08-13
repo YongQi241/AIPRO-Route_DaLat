@@ -19,8 +19,12 @@ INPUT_FILE = BASE_DIR / "nodes.geojson"
 OUTPUT_DIR = BASE_DIR / "generated"
 OUTPUT_DIR.mkdir(exist_ok=True)
 
-# Local alternative links added in addition to the connectivity backbone.
-LOCAL_NEIGHBORS = 3
+# Target number of directed edges in the final output (about 2x the number
+# of undirected location pairs, since each pair becomes two directed edges).
+# The MST backbone is always kept in full to guarantee connectivity, so if
+# the backbone alone already needs more edges than this target, the target
+# is not reachable and the backbone size wins instead.
+TARGET_TOTAL_EDGES = 60
 
 # Padding around the outermost tourist locations.
 BBOX_MARGIN_DEGREES = 0.03
@@ -29,13 +33,14 @@ BBOX_MARGIN_DEGREES = 0.03
 # Coordinates here are lat/lon (EPSG:4326), so this is a rough approximation:
 # at Da Lat's latitude, ~0.00005 deg is roughly 5 meters. Increase for
 # coarser/lighter geometry, decrease to keep more shape detail.
-SIMPLIFY_TOLERANCE_DEGREES = 0.00005
+SIMPLIFY_TOLERANCE_DEGREES = 0.00001
 
-# When True, every edge's stored geometry is a straight 2-point line from
-# origin to destination instead of the traced road path. distance_km,
-# base_time_min, and average_speed_kph still reflect the real routed path
-# on the road network -- only the drawn/exported geometry is straightened.
-USE_STRAIGHT_LINE_GEOMETRY = True
+# Every edge's geometry is the real routed road path, with a short
+# straight "connector" segment stitched onto each end so the line always
+# starts and ends exactly at the tourist location's own coordinates
+# rather than at the road node it snapped to. Speed assumed for those
+# connector segments (and for the same-snapped-node fallback below).
+CONNECTOR_SPEED_KPH = 15.0
 
 # Modeling assumptions, not official posted speed limits.
 ASSUMED_SPEEDS_KPH = {
@@ -68,11 +73,20 @@ def canonical_pair(a: int, b: int) -> tuple[int, int]:
     return (a, b) if a < b else (b, a)
 
 
-def build_pair_set(locations: gpd.GeoDataFrame) -> set[tuple[int, int]]:
+def build_pair_set(
+    locations: gpd.GeoDataFrame,
+    target_total_edges: int = TARGET_TOTAL_EDGES,
+) -> set[tuple[int, int]]:
     """
     Build an undirected pair set containing:
       1. a minimum-spanning-tree backbone, which guarantees connectivity;
-      2. LOCAL_NEIGHBORS geographic links per location for route alternatives.
+      2. the shortest remaining geographic links, added one at a time,
+         until the pair count reaches target_total_edges / 2 (each
+         undirected pair becomes two directed edges later).
+
+    If the backbone alone already needs more pairs than the target allows,
+    the backbone wins and no extra links are added -- connectivity is
+    never sacrificed to hit the target.
     """
     n = len(locations)
     latitudes = locations["latitude"].to_numpy()
@@ -82,6 +96,7 @@ def build_pair_set(locations: gpd.GeoDataFrame) -> set[tuple[int, int]]:
     complete_graph.add_nodes_from(range(n))
 
     distance_matrix = np.zeros((n, n), dtype=float)
+    candidate_pairs: list[tuple[float, int, int]] = []
 
     for i in range(n):
         distances = np.asarray(
@@ -96,7 +111,9 @@ def build_pair_set(locations: gpd.GeoDataFrame) -> set[tuple[int, int]]:
         distance_matrix[i] = distances
 
         for j in range(i + 1, n):
-            complete_graph.add_edge(i, j, weight=float(distances[j]))
+            distance = float(distances[j])
+            complete_graph.add_edge(i, j, weight=distance)
+            candidate_pairs.append((distance, i, j))
 
     spanning_tree = nx.minimum_spanning_tree(
         complete_graph,
@@ -108,17 +125,14 @@ def build_pair_set(locations: gpd.GeoDataFrame) -> set[tuple[int, int]]:
         for i, j in spanning_tree.edges()
     }
 
-    for i in range(n):
-        nearest_indices = np.argsort(distance_matrix[i])
-        added = 0
-        for j in nearest_indices:
-            j = int(j)
-            if j == i:
-                continue
-            selected_pairs.add(canonical_pair(i, j))
-            added += 1
-            if added >= LOCAL_NEIGHBORS:
+    target_pairs = max(len(selected_pairs), target_total_edges // 2)
+
+    if len(selected_pairs) < target_pairs:
+        candidate_pairs.sort(key=lambda item: item[0])
+        for _distance, i, j in candidate_pairs:
+            if len(selected_pairs) >= target_pairs:
                 break
+            selected_pairs.add(canonical_pair(i, j))
 
     return selected_pairs
 
@@ -142,8 +156,7 @@ def build_route_record(
             )
         )
         distance_m = max(straight_line_m, 1.0)
-        assumed_connector_speed_kph = 15.0
-        travel_time_s = distance_m / (assumed_connector_speed_kph * 1000 / 3600)
+        travel_time_s = distance_m / (CONNECTOR_SPEED_KPH * 1000 / 3600)
         geometry = LineString(
             [
                 (source["longitude"], source["latitude"]),
@@ -157,8 +170,9 @@ def build_route_record(
             "from_name": source["name_vi"],
             "to_name": destination["name_vi"],
             "distance_km": round(distance_m / 1000, 3),
+            "connector_distance_m": round(distance_m, 1),
             "base_time_min": round(travel_time_s / 60, 2),
-            "average_speed_kph": assumed_connector_speed_kph,
+            "average_speed_kph": CONNECTOR_SPEED_KPH,
             "road_type": "same_snapped_road_node",
             "one_way_share": 0.0,
             "direction": "directed",
@@ -189,27 +203,56 @@ def build_route_record(
         weight="travel_time",
     )
 
-    distance_m = float(route_edges["length"].sum())
-    travel_time_s = float(route_edges["travel_time"].sum())
+    route_distance_m = float(route_edges["length"].sum())
+    route_time_s = float(route_edges["travel_time"].sum())
 
-    if distance_m <= 0 or travel_time_s <= 0:
+    if route_distance_m <= 0 or route_time_s <= 0:
         raise ValueError(
             f"Invalid route metrics from {source['node_id']} "
             f"to {destination['node_id']}."
         )
 
-    geometry = unary_union(route_edges.geometry.tolist())
+    # Short straight segments from each location's own coordinates to the
+    # road node it snapped to, so the stored geometry -- and the distance
+    # and time it represents -- starts and ends exactly on the location.
+    connector_speed_m_s = CONNECTOR_SPEED_KPH * 1000 / 3600
+    start_connector_m = float(source["snap_distance_m"])
+    end_connector_m = float(destination["snap_distance_m"])
+    start_connector_s = start_connector_m / connector_speed_m_s
+    end_connector_s = end_connector_m / connector_speed_m_s
+
+    origin_node = road_graph.nodes[origin_road_node]
+    destination_node = road_graph.nodes[destination_road_node]
+
+    segments = []
+    if start_connector_m > 1e-6:
+        segments.append(
+            LineString(
+                [
+                    (source["longitude"], source["latitude"]),
+                    (origin_node["x"], origin_node["y"]),
+                ]
+            )
+        )
+    segments.extend(route_edges.geometry.tolist())
+    if end_connector_m > 1e-6:
+        segments.append(
+            LineString(
+                [
+                    (destination_node["x"], destination_node["y"]),
+                    (destination["longitude"], destination["latitude"]),
+                ]
+            )
+        )
+
+    distance_m = start_connector_m + route_distance_m + end_connector_m
+    travel_time_s = start_connector_s + route_time_s + end_connector_s
+
+    geometry = unary_union(segments)
     geometry = geometry.simplify(
         SIMPLIFY_TOLERANCE_DEGREES,
         preserve_topology=True,
     )
-    if USE_STRAIGHT_LINE_GEOMETRY:
-        geometry = LineString(
-            [
-                (source["longitude"], source["latitude"]),
-                (destination["longitude"], destination["latitude"]),
-            ]
-        )
     average_speed_kph = (
         (distance_m / 1000) / (travel_time_s / 3600)
     )
@@ -225,6 +268,7 @@ def build_route_record(
         "from_name": source["name_vi"],
         "to_name": destination["name_vi"],
         "distance_km": round(distance_m / 1000, 3),
+        "connector_distance_m": round(start_connector_m + end_connector_m, 1),
         "base_time_min": round(travel_time_s / 60, 2),
         "average_speed_kph": round(average_speed_kph, 1),
         "road_type": normalize_highway_values(
@@ -242,7 +286,7 @@ def build_route_record(
         "risk_score": 0,
         "closed": False,
         "backbone_edge": False,
-        "data_source": "OpenStreetMap + modeled speeds",
+        "data_source": "OpenStreetMap + modeled speeds + connector",
         "geometry": geometry,
     }
 

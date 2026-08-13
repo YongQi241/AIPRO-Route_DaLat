@@ -53,7 +53,7 @@ test('describes the location and all connected edges for hover text', () => {
     ]).get('DL01'),
   })
 
-  assert.match(description, /^01/)
+  assert.match(description, /^01 — Ga Đà Lạt/)
   assert.match(description, /Đi ra \(1\): E001 → 02/)
   assert.match(description, /Đi vào \(1\): E002 ← 03/)
 })

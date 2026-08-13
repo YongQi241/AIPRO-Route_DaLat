@@ -65,6 +65,8 @@ export default function SearchLogPanel({ className = '', overlay = false }) {
           {visibleActions.map((action, index) => {
             const event = describeTraceAction(action, actions, {
               algorithm: result?.algorithm,
+              weightUsed: result?.weight_used,
+              optimization: result?.optimization,
               edgeCostDetails: result?.edge_cost_details,
               locationNames,
             })
@@ -122,6 +124,8 @@ export default function SearchLogPanel({ className = '', overlay = false }) {
             const isActive = index === visibleActions.length - 1
             const event = describeTraceAction(action, actions, {
               algorithm: result?.algorithm,
+              weightUsed: result?.weight_used,
+              optimization: result?.optimization,
               edgeCostDetails: result?.edge_cost_details,
               locationNames,
             })
