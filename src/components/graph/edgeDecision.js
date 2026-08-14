@@ -5,6 +5,12 @@ import {
   SEARCH_COST_MODEL,
 } from './searchCostModel.js'
 
+const TRACE_EDGE_PAINT_PRIORITY = Object.freeze({
+  pending: 0,
+  checked: 1,
+  chosen: 2,
+})
+
 function toNumber(value) {
   const number = Number(value)
   return value == null || value === '' || !Number.isFinite(number)
@@ -119,4 +125,21 @@ export function getTraceEdgeState(
   )
     ? 'checked'
     : 'pending'
+}
+
+/**
+ * SVG paints later siblings over earlier siblings. Keep final-route choices
+ * after every pending/checked edge so search history cannot cover them.
+ */
+export function sortTraceEdgesByPaintPriority(edges = []) {
+  return edges
+    .map((edge, sourceIndex) => ({ edge, sourceIndex }))
+    .sort((left, right) => {
+      const priorityDifference =
+        (TRACE_EDGE_PAINT_PRIORITY[left.edge?.kind] ?? -1) -
+        (TRACE_EDGE_PAINT_PRIORITY[right.edge?.kind] ?? -1)
+
+      return priorityDifference || left.sourceIndex - right.sourceIndex
+    })
+    .map(({ edge }) => edge)
 }
