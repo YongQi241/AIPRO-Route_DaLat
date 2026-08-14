@@ -43,6 +43,14 @@ export default function AppShell({
   const [isTopPanelCollapsed, setIsTopPanelCollapsed] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isBottomPanelCollapsed, setIsBottomPanelCollapsed] = useState(false)
+  const renderedBottomPanel =
+    typeof bottomPanel === 'function'
+      ? bottomPanel({
+          collapse: () => setIsBottomPanelCollapsed(true),
+          expand: () => setIsBottomPanelCollapsed(false),
+          isCollapsed: isBottomPanelCollapsed,
+        })
+      : bottomPanel
 
   const rootClassName = [
     'app-shell',
@@ -134,7 +142,7 @@ export default function AppShell({
           className="app-shell__bottom-content"
           aria-hidden={isBottomPanelCollapsed}
         >
-          {bottomPanel}
+          {renderedBottomPanel}
         </div>
       </section>
     </div>

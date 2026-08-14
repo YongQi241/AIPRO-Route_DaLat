@@ -5,6 +5,7 @@ import {
   describeCandidateEdgeDecision,
   getEvaluatedCandidateEdgeIds,
   getTraceEdgeState,
+  sortTraceEdgesByPaintPriority,
 } from './edgeDecision.js'
 
 const action = (
@@ -203,5 +204,19 @@ test('classifies trace edges as pending, checked, or finally chosen', () => {
   assert.equal(
     getTraceEdgeState('chosen-edge', actions, ['chosen-edge']),
     'chosen',
+  )
+})
+
+test('paints chosen edges after checked edges regardless of trace order', () => {
+  const edges = [
+    { edgeId: 'chosen-first', kind: 'chosen' },
+    { edgeId: 'pending-last', kind: 'pending' },
+    { edgeId: 'checked-last', kind: 'checked' },
+    { edgeId: 'chosen-second', kind: 'chosen' },
+  ]
+
+  assert.deepEqual(
+    sortTraceEdgesByPaintPriority(edges).map(({ edgeId }) => edgeId),
+    ['pending-last', 'checked-last', 'chosen-first', 'chosen-second'],
   )
 })

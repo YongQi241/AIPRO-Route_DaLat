@@ -1,4 +1,4 @@
-.route-explanation { min-width: 0; overflow: hidden; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; }
+.route-explanation { min-width: 0; min-height: 0; overflow: hidden; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; }
 .route-explanation__header { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 13px 16px; border-bottom: 1px solid #e2e8f0; }
 .route-explanation__header > div > span, .route-explanation__summary > span { color: #7c3aed; font-size: .65rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .route-explanation__header h2 { margin: 2px 0 0; }
@@ -9,7 +9,7 @@
 .route-explanation__empty { display: grid; place-content: center; min-height: 130px; padding: 20px; color: #64748b; text-align: center; }
 .route-explanation__empty strong { color: #334155; font-size: .8rem; }
 .route-explanation__empty span { margin-top: 4px; font-size: .7rem; }
-.route-explanation__body { display: grid; gap: 12px; padding: 14px; color: #475569; font-size: .72rem; line-height: 1.5; }
+.route-explanation__body { min-width: 0; min-height: 0; display: grid; align-content: start; gap: 12px; padding: 14px; color: #475569; font-size: .72rem; line-height: 1.5; }
 .route-explanation__summary, .route-explanation__section { display: grid; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; }
 .route-explanation__summary strong { color: #1e293b; font-size: .82rem; }
 .route-explanation__summary p, .route-explanation__section p { margin: 0; }

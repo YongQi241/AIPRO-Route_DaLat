@@ -47,7 +47,9 @@ export default function App() {
           traceOverlay={<SearchLogPanel overlay />}
         />
       }
-      bottomPanel={<BottomPanelTabs />}
+      bottomPanel={({ collapse }) => (
+        <BottomPanelTabs onRequestCollapse={collapse} />
+      )}
     />
   )
 }

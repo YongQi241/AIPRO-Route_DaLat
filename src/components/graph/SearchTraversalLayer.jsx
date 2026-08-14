@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import {
   describeCandidateEdgeDecision,
   getTraceEdgeState,
+  sortTraceEdgesByPaintPriority,
 } from './edgeDecision'
 import { createDrawableEdges } from './graphGeometry'
 import { formatNodeNumber } from '../results/resultFormatting'
@@ -75,8 +76,10 @@ export default function SearchTraversalLayer({
 
     return {
       branch: resolveEdges(edgeLookup, branchEdgeIds, 'branch'),
-      trace: resolveEdges(edgeLookup, candidateEdgeIds, 'pending').map(
-        withTraceState,
+      trace: sortTraceEdgesByPaintPriority(
+        resolveEdges(edgeLookup, candidateEdgeIds, 'pending').map(
+          withTraceState,
+        ),
       ),
     }
   }, [

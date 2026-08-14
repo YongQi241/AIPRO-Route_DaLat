@@ -23,7 +23,10 @@ const TABS = [
 
 const TAB_IDS = TABS.map(({ id }) => id)
 
-export default function BottomPanelTabs({ className = '' }) {
+export default function BottomPanelTabs({
+  className = '',
+  onRequestCollapse,
+}) {
   const [activeTab, setActiveTab] = useState(TABS[0].id)
   const hasRevealedFinalResult = useAppStore(
     (state) => state.hasRevealedFinalResult,
@@ -74,43 +77,57 @@ export default function BottomPanelTabs({ className = '' }) {
 
   return (
     <section className={rootClassName}>
-      <div
-        className="bottom-panel-tabs__bar"
-        role="tablist"
-        aria-label="Thông tin mô phỏng và tuyến đường"
-        onKeyDown={handleKeyDown}
-      >
-        {TABS.map(({ id, label }, index) => {
-          const isActive = id === active.id
-          const isLocked = isResultTabLocked(id, hasRevealedFinalResult)
+      <div className="bottom-panel-tabs__navigation">
+        <div
+          className="bottom-panel-tabs__bar"
+          role="tablist"
+          aria-label="Thông tin mô phỏng và tuyến đường"
+          onKeyDown={handleKeyDown}
+        >
+          {TABS.map(({ id, label }, index) => {
+            const isActive = id === active.id
+            const isLocked = isResultTabLocked(id, hasRevealedFinalResult)
 
-          return (
-            <button
-              id={instanceId + '-' + id + '-tab'}
-              className={isActive ? 'bottom-panel-tabs__tab--active' : ''}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              aria-disabled={isLocked}
-              aria-controls={instanceId + '-' + id + '-panel'}
-              tabIndex={isActive ? 0 : -1}
-              disabled={isLocked}
-              title={
-                isLocked
-                  ? 'Khả dụng sau khi mô phỏng tìm kiếm hoàn tất'
-                  : label
-              }
-              ref={(element) => {
-                tabRefs.current[index] = element
-              }}
-              key={id}
-              onClick={() => selectTab(index)}
-            >
-              <span aria-hidden="true" />
-              {label}
-            </button>
-          )
-        })}
+            return (
+              <button
+                id={instanceId + '-' + id + '-tab'}
+                className={isActive ? 'bottom-panel-tabs__tab--active' : ''}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                aria-disabled={isLocked}
+                aria-controls={instanceId + '-' + id + '-panel'}
+                tabIndex={isActive ? 0 : -1}
+                disabled={isLocked}
+                title={
+                  isLocked
+                    ? 'Khả dụng sau khi mô phỏng tìm kiếm hoàn tất'
+                    : label
+                }
+                ref={(element) => {
+                  tabRefs.current[index] = element
+                }}
+                key={id}
+                onClick={() => selectTab(index)}
+              >
+                <span aria-hidden="true" />
+                {label}
+              </button>
+            )
+          })}
+        </div>
+        {onRequestCollapse && (
+          <button
+            className="bottom-panel-tabs__collapse"
+            type="button"
+            onClick={onRequestCollapse}
+            aria-label="Thu gọn bảng chi tiết tìm kiếm"
+            title="Thu gọn bảng chi tiết tìm kiếm"
+          >
+            <span aria-hidden="true">↓</span>
+            <b>Thu gọn</b>
+          </button>
+        )}
       </div>
 
       <div
