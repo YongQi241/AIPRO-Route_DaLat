@@ -40,15 +40,21 @@ def dfs_search(
     if early_result is not None:
         return early_result
 
-    stack = [start_node]
-    discovered = {start_node}
-    parent: dict[str, str | None] = {start_node: None}
+    stack = [(start_node, None)]
+    discovered = set()
+    parent: dict[str, str | None] = {}
     visited_order: list[str] = []
     frontier_steps: list[dict] = []
     path_nodes: list[str] = []
 
     while stack:
-        current = stack.pop()
+        current, curr_parent = stack.pop()
+
+        if current in discovered:
+            continue
+
+        discovered.add(current)
+        parent[current] = curr_parent
         visited_order.append(current)
 
         if current == goal_node:
@@ -58,7 +64,7 @@ def dfs_search(
                     "current": current,
                     "selection_rule": "lifo_stack",
                     # Next stack item appears first for the GUI.
-                    "frontier": list(reversed(stack)),
+                    "frontier": [item[0] for item in reversed(stack)],
                     "visited": visited_order.copy(),
                 }
             )
@@ -69,15 +75,13 @@ def dfs_search(
         neighbors = list(graph.successors(current))
         for neighbor in reversed(neighbors):
             if neighbor not in discovered:
-                discovered.add(neighbor)
-                parent[neighbor] = current
-                stack.append(neighbor)
+                stack.append((neighbor, current))
 
         frontier_steps.append(
             {
                 "current": current,
                 "selection_rule": "lifo_stack",
-                "frontier": list(reversed(stack)),
+                "frontier": [item[0] for item in reversed(stack)],
                 "visited": visited_order.copy(),
             }
         )
