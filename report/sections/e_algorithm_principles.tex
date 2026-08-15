@@ -47,6 +47,29 @@ $3,1+5,0=8,1$. Vì mở rộng theo chi phí tăng dần, UCS chọn A--D.
 \textbf{Tính hoàn chỉnh và tối ưu.} UCS hoàn chỉnh và tối ưu khi mọi chi phí
 cạnh không âm, điều kiện luôn đúng với các trọng số của đồ án.
 
+\section{Thuật toán Dijkstra}
+
+Dijkstra tính đường đi ngắn nhất từ một đỉnh nguồn đến các đỉnh còn lại bằng
+hàng đợi ưu tiên. Thuật toán gán chi phí ban đầu của đỉnh nguồn bằng 0, chi phí
+của các đỉnh khác bằng vô cực, rồi liên tục chọn đỉnh chưa chốt có chi phí tích
+lũy nhỏ nhất và nới lỏng các cạnh đi ra từ đỉnh đó.
+
+\textbf{Phạm vi tìm kiếm trong chương trình.} Khi đỉnh đích được chốt, chương
+trình ghi nhận tuyến tối ưu đến đích nhưng Dijkstra không dừng tại đó. Thuật toán
+tiếp tục cho đến khi hàng đợi ưu tiên rỗng, nhờ đó chốt khoảng cách ngắn nhất đến
+mọi đỉnh có thể đi tới từ đỉnh nguồn. Vì đồ thị có hướng và một số cạnh có thể bị
+đóng theo kịch bản, ``mọi đỉnh có thể đi tới'' không nhất thiết là toàn bộ đỉnh
+của đồ thị. Kết quả chỉ được backend trả về sau khi quá trình này hoàn tất.
+
+Đây là điểm khác với UCS trong cài đặt của đồ án: hai thuật toán dùng cùng quy
+tắc nới lỏng với trọng số không âm, nhưng UCS dừng ngay khi đỉnh đích được chốt,
+còn Dijkstra tạo vết tìm kiếm đơn nguồn đầy đủ trên phần đồ thị có thể đi tới.
+
+\textbf{Tính hoàn chỉnh và tối ưu.} Dijkstra hoàn chỉnh trên đồ thị hữu hạn và
+tìm được đường có chi phí nhỏ nhất khi mọi trọng số cạnh không âm. Với danh sách
+kề và hàng đợi ưu tiên nhị phân, thời gian chạy là
+$O((|V|+|E|)\log |V|)$ và bộ nhớ là $O(|V|+|E|)$.
+
 \section{Tìm Kiếm A* (A Star Search)}
 
 Thuật toán A* kết hợp chi phí thực tế đã tiêu tốn $g(n)$ và chi phí ước lượng đến đích $h(n)$. Nó luôn chọn mở rộng đỉnh có tổng chi phí $f(n) = g(n) + h(n)$ nhỏ nhất.
@@ -108,6 +131,7 @@ Thuật toán & Hoàn chỉnh & Tối ưu \\
 Breadth First Search & Có & Chỉ khi chi phí cạnh bằng nhau \\
 Depth First Search & Có, với tập đã thăm & Không \\
 Uniform Cost Search & Có & Có, với chi phí không âm \\
+Dijkstra & Có & Có, với chi phí không âm \\
 A* (A Star Search) & Có (với Heuristic hợp lệ) & Có \\
 Greedy Best-First Search & Có, trên đồ thị hữu hạn & Không \\
 Hill Climbing có Backtracking & Có, trên đồ thị hữu hạn & Không \\

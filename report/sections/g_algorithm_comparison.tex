@@ -21,6 +21,7 @@ Thuật toán & Độ Phức Tạp Thời Gian & Sử Dụng Bộ Nhớ & Hoàn 
 Breadth First Search & $O(b^d)$ & $O(b^d)$ & Có & Chỉ khi chi phí cạnh bằng nhau \\
 Depth First Search & $O(b^m)$ & $O(bm)$ & Có, trên đồ thị hữu hạn & Không \\
 Uniform Cost Search & $O(b^{1 + \lfloor C^*/\epsilon \rfloor})$ & $O(b^{1 + \lfloor C^*/\epsilon \rfloor})$ & Có & Có \\
+Dijkstra & $O((|V|+|E|)\log |V|)$ & $O(|V|+|E|)$ & Có & Có \\
 A* Search & $O(b^d)$ & $O(b^d)$ & Có & Có \\
 Greedy BFS & $O(|E|\log |V|)$ & $O(|V|)$ & Có, trên đồ thị hữu hạn & Không \\
 Hill Climbing có quay lui & $O(|V|+|E|)$ & $O(|V|)$ & Có, trên đồ thị hữu hạn & Không \\
@@ -47,6 +48,7 @@ Thuật toán & Chi Phí Đường Đi & Số Đỉnh Đã Duyệt & Thời Gian
 Breadth First Search & 0,759472 & 16 & 0,039 & 6 \\
 Depth First Search & 0,759472 & 8 & 0,030 & 6 \\
 Uniform Cost Search & 0,681234 & 13 & 0,349 & 6 \\
+Dijkstra & 0,681234 & 25 & 0,475 & 6 \\
 A* Search & 0,681234 & 13 & 0,815 & 6 \\
 Greedy BFS & 0,920694 & 7 & 0,212 & 6 \\
 Hill Climbing & 0,920694 & 7 & 0,091 & 6 \\
@@ -56,19 +58,23 @@ Hill Climbing & 0,920694 & 7 & 0,091 & 6 \\
 
 \section{Chất Lượng Lộ Trình, Số Đỉnh Đã Duyệt và Thời Gian Xử Lý}
 
-UCS và A* tìm cùng tuyến DL01--DL05--DL02--DL22--DL21--DL10--DL15 với chi phí thấp nhất
-0,681234. Với trọng số \texttt{route\_cost}, A* dùng heuristic 0 để không đánh
-giá vượt chi phí còn lại nên hành vi gần với UCS. Greedy và Hill Climbing chỉ
-duyệt bảy đỉnh và nhanh hơn trong lần đo, nhưng tuyến qua DL04 có chi phí
-0,920694, cao hơn khoảng 35,15\%. BFS trả tuyến có cùng số cạnh nhưng chi phí lớn
-hơn nhiều vì BFS tối ưu số bước chứ không tối ưu trọng số. DFS phụ thuộc thứ tự
-láng giềng và tìm một tuyến năm cạnh mà không có bảo đảm tối ưu.
+UCS, Dijkstra và A* tìm cùng tuyến
+DL01--DL05--DL02--DL22--DL21--DL10--DL15 với chi phí thấp nhất 0,681234.
+Dijkstra duyệt đủ 25 đỉnh có thể đi tới vì cài đặt tiếp tục sau khi chốt đỉnh
+đích; UCS dừng tại đích nên chỉ duyệt 13 đỉnh. Với trọng số
+\texttt{route\_cost}, A* dùng heuristic 0 để không đánh giá vượt chi phí còn lại
+nên hành vi gần với UCS. Greedy và Hill Climbing chỉ duyệt bảy đỉnh và nhanh hơn
+trong lần đo, nhưng tuyến qua DL04 có chi phí 0,920694, cao hơn khoảng 35,15\%.
+BFS trả tuyến có cùng số cạnh nhưng chi phí lớn hơn nhiều vì BFS tối ưu số bước
+chứ không tối ưu trọng số. DFS phụ thuộc thứ tự láng giềng và tìm một tuyến năm
+cạnh mà không có bảo đảm tối ưu.
 
 \begin{itemize}[itemsep=2pt]
   \item \textbf{BFS và DFS:} không sử dụng trọng số cạnh; BFS chỉ bảo đảm
   đường ít cạnh nhất, còn DFS phụ thuộc mạnh vào thứ tự duyệt.
-  \item \textbf{UCS và A*:} bảo đảm chi phí tối ưu khi chi phí cạnh không
-  âm và heuristic của A* là chấp nhận được.
+  \item \textbf{UCS, Dijkstra và A*:} bảo đảm chi phí tối ưu khi chi phí cạnh
+  không âm và heuristic của A* là chấp nhận được. UCS và A* dừng ở đích, còn
+  Dijkstra tiếp tục chốt mọi đỉnh có thể đi tới từ nguồn.
   \item \textbf{Greedy BFS:} Thường có số đỉnh duyệt ít hơn và thời gian chạy nhanh hơn A*, nhưng chi phí đường đi thường cao hơn vì nó không quan tâm đến $g(n)$, dễ dẫn đến các đường đi vòng.
   \item \textbf{Hill Climbing:} duyệt ít đỉnh trong trường hợp này nhưng
   không bảo đảm tối ưu; biến thể cài đặt quay lui khi gặp ngõ cụt.

@@ -214,6 +214,12 @@ Backend trả toàn bộ kết quả sau khi thuật toán kết thúc; hệ th�
 trực tiếp từng bước trong lúc thuật toán đang chạy. Frontend dùng dữ liệu tiến trình
 đã nhận để phát lại quá trình tìm kiếm:
 
+Riêng với Dijkstra, backend ghi nhận tuyến khi đỉnh đích được chốt nhưng vẫn
+tiếp tục mở rộng cho đến khi mọi đỉnh có thể đi tới từ đỉnh nguồn đã được chốt.
+Vì vậy phản hồi Dijkstra và phần công bố kết quả cuối chỉ có sau khi phạm vi tìm
+kiếm đơn nguồn này hoàn tất. UCS dùng cùng quy tắc nới lỏng nhưng dừng khi đỉnh
+đích được chốt.
+
 \begin{itemize}[itemsep=3pt]
   \item \texttt{visited\_order} lưu thứ tự các nút đã được mở rộng. Nếu không
   có \texttt{frontier\_steps}, frontend dùng danh sách này làm dữ liệu dự phòng.
