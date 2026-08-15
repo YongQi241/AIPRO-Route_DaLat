@@ -31,9 +31,15 @@ def dijkstra_search(
     weight: str = "distance_km",
     scenario_id: str | None = None,
     optimization: str | None = None,
+    stop_at_goal: bool = False,
 ) -> dict:
     """
     Explicit Dijkstra search with visualization history.
+
+    By default, Dijkstra settles every node reachable from the start so the
+    result contains a complete single-source search trace. Goal-directed
+    callers such as UCS can set ``stop_at_goal`` to stop when the destination
+    is settled.
 
     Supported weights:
         distance_km, adjusted_time_min, route_cost, risk
@@ -49,7 +55,14 @@ def dijkstra_search(
         optimization=optimization,
         started_at=started_at,
     )
-    if early_result is not None:
+    if early_result is not None and not (
+        early_result["status"] == "success"
+        and start_node == goal_node
+        and not stop_at_goal
+    ):
+        early_result["search_scope"] = (
+            "goal_directed" if stop_at_goal else "all_reachable_nodes"
+        )
         return early_result
 
     if weight not in SUPPORTED_WEIGHTS:
@@ -84,24 +97,26 @@ def dijkstra_search(
 
         if current == goal_node:
             path_nodes = reconstruct_path(parent, goal_node)
-            frontier_steps.append(
-                {
-                    "current": current,
-                    "current_values": {
-                        "g_cost": round(current_distance, 6),
-                        "priority": round(current_distance, 6),
-                    },
-                    "selection_rule": "lowest_g_cost",
-                    "relaxations": [],
-                    "frontier": _frontier_snapshot(
-                        frontier,
-                        settled,
-                        distance,
-                    ),
-                    "visited": visited_order.copy(),
-                }
-            )
-            break
+            if stop_at_goal:
+                frontier_steps.append(
+                    {
+                        "current": current,
+                        "current_values": {
+                            "g_cost": round(current_distance, 6),
+                            "priority": round(current_distance, 6),
+                        },
+                        "selection_rule": "lowest_g_cost",
+                        "goal_reached": True,
+                        "relaxations": [],
+                        "frontier": _frontier_snapshot(
+                            frontier,
+                            settled,
+                            distance,
+                        ),
+                        "visited": visited_order.copy(),
+                    }
+                )
+                break
 
         relaxations: list[dict] = []
         for neighbor in graph.successors(current):
@@ -159,6 +174,8 @@ def dijkstra_search(
                     "priority": round(current_distance, 6),
                 },
                 "selection_rule": "lowest_g_cost",
+                "goal_reached": current == goal_node,
+                "expands_goal": current == goal_node and not stop_at_goal,
                 "relaxations": relaxations,
                 "frontier": _frontier_snapshot(
                     frontier,
@@ -169,7 +186,7 @@ def dijkstra_search(
             }
         )
 
-    return finish_result(
+    result = finish_result(
         graph,
         trace=SearchTrace(
             path_nodes=path_nodes,
@@ -183,8 +200,9 @@ def dijkstra_search(
         optimization=optimization,
         started_at=started_at,
         explanation=(
-            f"Dijkstra mở rộng các nút theo {weight} tích lũy tăng dần và "
-            f"chọn tuyến có {weight} nhỏ nhất."
+            f"Dijkstra mở rộng các nút theo {weight} tích lũy tăng dần, "
+            "tiếp tục sau khi gặp đích để chốt chi phí tới mọi nút có thể "
+            f"đi tới, và chọn tuyến đến đích có {weight} nhỏ nhất."
         ),
         optimality_note=(
             f"Tối ưu theo {weight} vì trọng số của mọi cạnh được chọn đều "
@@ -192,6 +210,10 @@ def dijkstra_search(
         ),
         weight_used=weight,
     )
+    result["search_scope"] = (
+        "goal_directed" if stop_at_goal else "all_reachable_nodes"
+    )
+    return result
 
 
 def _frontier_snapshot(

@@ -224,6 +224,13 @@ BFS and DFS follow graph traversal order rather than minimizing a numeric
 weight. Greedy uses its heuristic. The selected scenario still determines
 which edges and effective conditions enter the graph.
 
+UCS and Dijkstra use the same nonnegative weighted relaxation rule but expose
+different search scopes. UCS is goal-directed and stops when the selected
+destination is settled. Dijkstra continues until every node reachable from the
+start is settled, so its trace represents a complete single-source
+shortest-path tree. Results identify the mode as `goal_directed` or
+`all_reachable_nodes` in `search_scope`.
+
 ### Scenarios
 
 The bundled condition template contains:

@@ -305,6 +305,7 @@ def solve_route(
                 graph,
                 start_node,
                 goal_node,
+                weight=selected_weight,
                 **common,
             ))
 

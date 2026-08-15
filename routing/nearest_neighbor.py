@@ -92,6 +92,7 @@ def nearest_neighbor_route(
                 weight=weight,
                 scenario_id=scenario_id,
                 optimization=optimization,
+                stop_at_goal=True,
             )
 
             if result["status"] != "success":
@@ -179,6 +180,7 @@ def nearest_neighbor_route(
             weight=weight,
             scenario_id=scenario_id,
             optimization=optimization,
+            stop_at_goal=True,
         )
 
         if return_result["status"] != "success":

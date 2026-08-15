@@ -192,7 +192,7 @@ function buildFrameActions({
     return
   }
   const candidates =
-    currentNodeId === goalNode
+    currentNodeId === goalNode && frame.expands_goal !== true
       ? []
       : getCandidateEdges(edgeFeatures, currentNodeId)
   const beforeLookup = createFrontierLookup(previousFrame?.frontier)

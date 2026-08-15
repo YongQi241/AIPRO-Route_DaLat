@@ -120,6 +120,50 @@ test('keeps string-only frontier entries without emitting UNKNOWN', () => {
   )
 })
 
+test('lets exhaustive Dijkstra expand outgoing edges after reaching its goal', () => {
+  const timeline = buildSearchActionTimeline(
+    {
+      status: 'success',
+      start_node: 'A',
+      goal_node: 'B',
+      path_nodes: ['A', 'B'],
+      path_edges: ['E_AB'],
+      frontier_steps: [
+        {
+          current: 'A',
+          frontier: [{ node: 'B', g_cost: 1 }],
+          visited: ['A'],
+          selection_rule: 'lowest_g_cost',
+        },
+        {
+          current: 'B',
+          expands_goal: true,
+          frontier: [{ node: 'C', g_cost: 2 }],
+          visited: ['A', 'B'],
+          selection_rule: 'lowest_g_cost',
+          relaxations: [
+            {
+              edge_id: 'E_BC',
+              node: 'C',
+              outcome: 'add',
+              previous_values: null,
+              candidate_values: { g_cost: 2, priority: 2 },
+            },
+          ],
+        },
+      ],
+    },
+    edges,
+  )
+
+  assert.ok(
+    timeline.some(
+      (action) =>
+        action.type === 'consider-edge' && action.activeEdgeId === 'E_BC',
+    ),
+  )
+})
+
 test('uses exact A* relaxation g, h, and f costs when provided', () => {
   const timeline = buildSearchActionTimeline(
     {

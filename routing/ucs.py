@@ -38,6 +38,7 @@ def ucs_search(
         weight=selected_weight,
         scenario_id=scenario_id,
         optimization=optimization,
+        stop_at_goal=True,
     )
     result["algorithm"] = "UCS"
     if result["status"] == "success":

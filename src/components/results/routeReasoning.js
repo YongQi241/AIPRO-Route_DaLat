@@ -26,8 +26,11 @@ function algorithmMethod(result) {
   if (algorithm.includes('a*')) {
     return 'A* xếp hạng các nút biên theo f(n)=g(n)+h(n): chi phí tuyến đã tích lũy cộng với chi phí còn lại ước tính. Nút có f(n) thấp nhất được mở rộng trước; một giá trị g(n) tốt hơn có thể cập nhật nút đã được phát hiện.'
   }
-  if (algorithm.includes('dijkstra') || algorithm === 'ucs') {
-    return 'Thuật toán xếp hạng các nút biên theo g(n) tích lũy. Nó xử lý giá trị nhỏ nhất đã biết trước và chỉ giữ một tuyến mới tới nút khi tuyến đó làm giảm chi phí tích lũy đã ghi nhận.'
+  if (algorithm.includes('dijkstra')) {
+    return 'Dijkstra xếp hạng các nút biên theo g(n) tích lũy và tiếp tục sau khi gặp đích cho tới khi mọi nút có thể đi tới đều được chốt. Tuyến tới đích là một nhánh của cây đường đi ngắn nhất đầy đủ từ điểm xuất phát.'
+  }
+  if (algorithm === 'ucs') {
+    return 'UCS xếp hạng các nút biên theo g(n) tích lũy và dừng ngay khi đích được lấy khỏi hàng đợi ưu tiên. Nó chỉ giữ một tuyến mới tới nút khi tuyến đó làm giảm chi phí tích lũy đã ghi nhận.'
   }
   if (algorithm.includes('breadth') || algorithm === 'bfs') {
     return 'Tìm kiếm theo chiều rộng dùng hàng đợi FIFO và so sánh tuyến theo số đoạn đường. Thuật toán bảo đảm tuyến có ít cạnh nhất, nhưng quãng đường, thời gian, rủi ro và chi phí kịch bản không chi phối thứ tự mở rộng.'

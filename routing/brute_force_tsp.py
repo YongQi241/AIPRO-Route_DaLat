@@ -44,6 +44,7 @@ def brute_force_tsp_route(
             result = dijkstra_search(
                 graph, source, target, weight=weight,
                 scenario_id=scenario_id, optimization=optimization,
+                stop_at_goal=True,
             )
             if result["status"] == "success":
                 legs[(source, target)] = result

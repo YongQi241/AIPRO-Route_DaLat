@@ -59,3 +59,25 @@ test('reports brute-force permutation coverage', () => {
   assert.deepEqual(reasoning.permutations, { evaluated: 6, possible: 6 })
   assert.match(reasoning.method, /mọi thứ tự khả thi/)
 })
+
+test('distinguishes exhaustive Dijkstra from goal-directed UCS', () => {
+  const base = {
+    status: 'success',
+    weight_used: 'distance_km',
+    path_nodes: ['A', 'B'],
+    path_edges: ['E1'],
+    visited_order: ['A', 'B'],
+    frontier_steps: [],
+    metrics: {},
+    segments: [],
+  }
+
+  const dijkstra = buildRouteReasoning(
+    { ...base, algorithm: 'Dijkstra' },
+    names,
+  )
+  const ucs = buildRouteReasoning({ ...base, algorithm: 'UCS' }, names)
+
+  assert.match(dijkstra.method, /mọi nút có thể đi tới/)
+  assert.match(ucs.method, /dừng ngay khi đích/)
+})

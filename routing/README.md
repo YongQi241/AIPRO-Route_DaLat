@@ -63,6 +63,11 @@ Every algorithm returns the same core fields:
 - `metrics` and `segments`: totals and per-edge details;
 - `explanation` and `optimality_note`: user-facing reasoning.
 
+For weighted search, UCS stops once its requested goal is settled. Dijkstra
+continues settling all reachable nodes and returns
+`search_scope: "all_reachable_nodes"`; the selected route remains the optimal
+branch from the start to the requested goal.
+
 The frontend must use `path_edges` to select road geometry; it must not infer
 route edges from coordinates.
 
