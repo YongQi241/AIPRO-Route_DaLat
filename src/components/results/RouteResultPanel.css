@@ -1,6 +1,9 @@
 .route-result-panel {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   align-content: start;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   overflow: hidden;
   border: 1px solid #e2e8f0;
@@ -82,7 +85,12 @@
 }
 
 .route-result-panel__path {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 13px 15px 11px;
+  overflow: hidden;
+  box-sizing: border-box;
   border-bottom: 1px solid #eef2f7;
 }
 
@@ -96,10 +104,37 @@
   display: flex;
   align-items: flex-start;
   gap: 21px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 8px 0 2px;
   margin: 0;
   overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-color: #94a3b8 #e2e8f0;
+  scrollbar-width: thin;
   list-style: none;
+}
+
+.route-result-panel__path ol:focus-visible {
+  border-radius: 6px;
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.route-result-panel__path ol::-webkit-scrollbar {
+  height: 6px;
+}
+
+.route-result-panel__path ol::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.route-result-panel__path ol::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #94a3b8;
 }
 
 .route-result-panel__path li {

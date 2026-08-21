@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useAppStore } from '../../store/useAppStore'
 import {
   createNodeNameLookup,
@@ -6,6 +6,7 @@ import {
   formatMetric,
   formatNumber,
 } from './resultFormatting'
+import { scrollRoutePathOnWheel } from './routePathScroll'
 import './RouteResultPanel.css'
 
 const STATUS_LABELS = {
@@ -16,6 +17,8 @@ const STATUS_LABELS = {
 }
 
 export default function RouteResultPanel({ className = '' }) {
+  const pathRegionRef = useRef(null)
+  const pathListRef = useRef(null)
   const nodes = useAppStore((state) => state.graphData.nodes)
   const result = useAppStore((state) => state.routeResult)
 
@@ -36,6 +39,20 @@ export default function RouteResultPanel({ className = '' }) {
   const rootClassName = ['route-result-panel', className]
     .filter(Boolean)
     .join(' ')
+
+  useEffect(() => {
+    const pathRegion = pathRegionRef.current
+    if (!pathRegion) return undefined
+
+    const handlePathWheel = (event) => {
+      scrollRoutePathOnWheel(pathListRef.current, event)
+    }
+
+    // A native non-passive listener is required because React/browser root
+    // wheel listeners may be passive and ignore preventDefault().
+    pathRegion.addEventListener('wheel', handlePathWheel, { passive: false })
+    return () => pathRegion.removeEventListener('wheel', handlePathWheel)
+  }, [path.length])
 
   return (
     <section className={rootClassName} aria-labelledby="route-result-title">
@@ -66,9 +83,14 @@ export default function RouteResultPanel({ className = '' }) {
         </div>
       ) : (
         <>
-          <div className="route-result-panel__path">
+          <div className="route-result-panel__path" ref={pathRegionRef}>
             <span>Đường đi đã chọn</span>
-            <ol>
+            <ol
+              aria-label="Các nút trên tuyến đường đã chọn"
+              ref={pathListRef}
+              tabIndex={0}
+              title="Lăn chuột để xem toàn bộ tuyến đường"
+            >
               {pathLabels.map((label, index) => (
                 <li key={`${path[index]}-${index}`}>
                   <span>{index + 1}</span>
