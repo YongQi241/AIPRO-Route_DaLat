@@ -3,12 +3,10 @@ export function formatNodeNumber(value) {
   return text.match(/\d+/g)?.join('') ?? text
 }
 
-export const COST_DISPLAY_SCALE = 100
-
 export function scaleCost(value) {
   if (value == null || value === '') return null
   const number = Number(value)
-  return Number.isFinite(number) ? number * COST_DISPLAY_SCALE : null
+  return Number.isFinite(number) ? number : null
 }
 
 export function formatCost(value, maximumFractionDigits = 3) {
