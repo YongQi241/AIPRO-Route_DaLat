@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "test": "node --test src/components/graph/edgeCostDetails.test.js src/components/graph/edgeDecision.test.js src/components/graph/graphGeometry.test.js src/components/graph/locationDecision.test.js src/components/graph/nodeConnections.test.js src/components/graph/searchTimeline.test.js src/components/panels/resultRevealUi.test.js src/components/panels/traceNarrative.test.js src/components/results/routeReasoning.test.js src/services/routeRequest.test.js src/services/scenarioCostFormula.test.js src/services/scenarioCostModel.test.js src/services/scenarioCostService.test.js src/store/useAppStore.test.js",
+    "test": "node --test src/components/graph/edgeCostDetails.test.js src/components/graph/edgeDecision.test.js src/components/graph/graphGeometry.test.js src/components/graph/locationDecision.test.js src/components/graph/nodeConnections.test.js src/components/graph/searchTimeline.test.js src/components/panels/resultRevealUi.test.js src/components/panels/traceNarrative.test.js src/components/results/routeReasoning.test.js src/services/routeComparison.test.js src/services/routeRequest.test.js src/services/scenarioCostFormula.test.js src/services/scenarioCostModel.test.js src/services/scenarioCostService.test.js src/store/useAppStore.test.js",
     "preview": "vite preview"
   },
   "dependencies": {

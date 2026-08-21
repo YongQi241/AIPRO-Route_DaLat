@@ -82,14 +82,14 @@ async function requestDemoRoute(request) {
   }
 }
 
-export async function solveRoute(request) {
+export async function solveRoute(request, { allowDemoFallback = true } = {}) {
   const configuredUrl = import.meta.env.VITE_ROUTE_API_URL?.trim()
   const apiUrl = configuredUrl || DEFAULT_API_URL
 
   try {
     return await requestBackendRoute(apiUrl, request)
   } catch (error) {
-    if (configuredUrl || import.meta.env.PROD) throw error
+    if (!allowDemoFallback || configuredUrl || import.meta.env.PROD) throw error
     return requestDemoRoute(request)
   }
 }
