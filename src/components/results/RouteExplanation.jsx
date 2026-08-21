@@ -100,7 +100,7 @@ function SegmentConsiderations({ segments }) {
             <dl>
               <Figure label="Quãng đường" value={segment.distance} unit="km" />
               <Figure label="Thời gian điều chỉnh" value={segment.time} unit="phút" />
-              <Figure label="Chi phí kịch bản ×100" value={segment.cost} />
+              <Figure label="Chi phí kịch bản" value={segment.cost} />
               <Figure label="Ùn tắc" value={segment.congestion} unit="/ 5" />
               <Figure label="Rủi ro" value={segment.risk} />
               {detail?.time_multiplier != null && <Figure label="Hệ số thời gian" value={detail.time_multiplier} unit="×" />}

@@ -148,7 +148,7 @@ function routeMetrics(result) {
   const risk = finite(metrics.total_risk)
   if (distance != null) values.push(`${formatNumber(distance, 3)} km`)
   if (time != null) values.push(`${formatNumber(time, 3)} phút`)
-  if (cost != null) values.push(`chi phí kịch bản ×100: ${formatNumber(cost, 3)}`)
+  if (cost != null) values.push(`chi phí kịch bản: ${formatNumber(cost, 3)}`)
   if (risk != null) values.push(`rủi ro: ${formatNumber(risk, 3)}`)
   return values.length ? values.join('; ') : 'chưa có đủ số liệu tổng hợp'
 }

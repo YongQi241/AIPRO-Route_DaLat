@@ -153,7 +153,7 @@ export function buildRouteReasoning(result, names, edgeFeatures = []) {
     figures: [
       { label: 'Quãng đường', value: finite(metrics.total_distance_km), unit: 'km' },
       { label: 'Thời gian di chuyển', value: finite(metrics.total_time_min), unit: 'phút' },
-      { label: 'Chi phí kịch bản ×100', value: scaleCost(metrics.total_cost), unit: '' },
+      { label: 'Chi phí kịch bản', value: scaleCost(metrics.total_cost), unit: '' },
       { label: 'Tổng rủi ro', value: finite(metrics.total_risk), unit: '' },
       { label: 'Số đường đã chọn', value: finite(metrics.path_edge_count), unit: '' },
       { label: 'Số nút đã khám phá', value: finite(metrics.explored_nodes), unit: '' },
