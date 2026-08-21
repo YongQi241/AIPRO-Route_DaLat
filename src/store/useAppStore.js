@@ -39,7 +39,13 @@ function getStateEdgeFeatures(state) {
   return state.graphData.edges?.features ?? []
 }
 
-export const useAppStore = create((set) => ({
+const initialRouteComparison = {
+  status: REQUEST_STATUS.IDLE,
+  candidates: [],
+  message: null,
+}
+
+export const useAppStore = create((set, get) => ({
   graphData: {
     nodes: null,
     edges: null,
@@ -50,6 +56,8 @@ export const useAppStore = create((set) => ({
   selectedAlgorithm: 'astar',
   routeSelection: initialRouteSelection,
   routeResult: null,
+  routeComparison: initialRouteComparison,
+  activeRouteRequestId: 0,
   requestState: {
     status: REQUEST_STATUS.IDLE,
     message: null,
@@ -148,8 +156,12 @@ export const useAppStore = create((set) => ({
 
   resetRouteSelection: () => set({ routeSelection: initialRouteSelection }),
 
-  setRouteResult: (routeResult) =>
-    set((state) => ({
+  setRouteResult: (routeResult, requestId = null) => {
+    let accepted = false
+    set((state) => {
+      if (requestId != null && requestId !== state.activeRouteRequestId) return state
+      accepted = true
+      return {
       routeResult,
       requestState: {
         status: routeResult?.status ?? REQUEST_STATUS.ERROR,
@@ -159,11 +171,15 @@ export const useAppStore = create((set) => ({
       hasRevealedFinalResult:
         routeResult?.status === REQUEST_STATUS.SUCCESS &&
         getAnimationStepCount(routeResult, getStateEdgeFeatures(state)) === 0,
-    })),
+      }
+    })
+    return accepted
+  },
 
   clearRouteResult: () =>
     set({
       routeResult: null,
+      routeComparison: initialRouteComparison,
       requestState: {
         status: REQUEST_STATUS.IDLE,
         message: null,
@@ -172,27 +188,63 @@ export const useAppStore = create((set) => ({
       hasRevealedFinalResult: false,
     }),
 
-  setRouteRequestLoading: () =>
+  setRouteRequestLoading: () => {
+    const requestId = get().activeRouteRequestId + 1
     set({
+      activeRouteRequestId: requestId,
       routeResult: null,
+      routeComparison: {
+        ...initialRouteComparison,
+        status: REQUEST_STATUS.LOADING,
+      },
       requestState: {
         status: REQUEST_STATUS.LOADING,
         message: 'Đang tính toán tuyến đường…',
       },
       simulation: initialSimulationState,
       hasRevealedFinalResult: false,
-    }),
+    })
+    return requestId
+  },
 
-  setRouteRequestError: (message) =>
-    set({
+  setRouteRequestError: (message, requestId = null) =>
+    set((state) => requestId != null && requestId !== state.activeRouteRequestId ? state : ({
       routeResult: null,
+      routeComparison: initialRouteComparison,
       requestState: {
         status: REQUEST_STATUS.ERROR,
         message,
       },
       simulation: initialSimulationState,
       hasRevealedFinalResult: false,
-    }),
+    })),
+
+  setRouteComparisonLoading: (requestId) =>
+    set((state) => requestId !== state.activeRouteRequestId ? state : ({
+      routeComparison: {
+        status: REQUEST_STATUS.LOADING,
+        candidates: [],
+        message: null,
+      },
+    })),
+
+  setRouteComparisonResults: (requestId, candidates) =>
+    set((state) => requestId !== state.activeRouteRequestId ? state : ({
+      routeComparison: {
+        status: REQUEST_STATUS.SUCCESS,
+        candidates,
+        message: null,
+      },
+    })),
+
+  setRouteComparisonError: (requestId, message) =>
+    set((state) => requestId !== state.activeRouteRequestId ? state : ({
+      routeComparison: {
+        status: REQUEST_STATUS.ERROR,
+        candidates: [],
+        message,
+      },
+    })),
 
   dismissStatusMessage: () =>
     set({

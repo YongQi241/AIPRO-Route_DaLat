@@ -164,3 +164,47 @@ test('clearVisitNodes removes selections when multi-location mode is unavailable
   useAppStore.getState().clearVisitNodes()
   assert.deepEqual(useAppStore.getState().routeSelection.visitNodes, [])
 })
+
+test('comparison state never overwrites the primary route result', () => {
+  const requestId = useAppStore.getState().setRouteRequestLoading()
+  useAppStore.getState().setRouteResult(result, requestId)
+  const primary = useAppStore.getState().routeResult
+  const candidate = { ...result, optimization: 'distance', path_nodes: ['A', 'C', 'B'] }
+
+  useAppStore.getState().setRouteComparisonResults(requestId, [
+    { optimization: 'distance', result: candidate },
+  ])
+
+  assert.equal(useAppStore.getState().routeResult, primary)
+  assert.equal(useAppStore.getState().routeComparison.candidates[0].result, candidate)
+})
+
+test('a new request clears comparison data and rejects a late old comparison', () => {
+  const oldRequestId = useAppStore.getState().setRouteRequestLoading()
+  useAppStore.getState().setRouteResult(result, oldRequestId)
+  useAppStore.getState().setRouteComparisonResults(oldRequestId, [
+    { optimization: 'distance', result },
+  ])
+
+  const newRequestId = useAppStore.getState().setRouteRequestLoading()
+  assert.equal(useAppStore.getState().routeComparison.status, 'loading')
+  assert.deepEqual(useAppStore.getState().routeComparison.candidates, [])
+
+  useAppStore.getState().setRouteComparisonResults(oldRequestId, [
+    { optimization: 'time', result },
+  ])
+  assert.equal(useAppStore.getState().activeRouteRequestId, newRequestId)
+  assert.deepEqual(useAppStore.getState().routeComparison.candidates, [])
+})
+
+test('a comparison error preserves the successful primary result', () => {
+  const requestId = useAppStore.getState().setRouteRequestLoading()
+  useAppStore.getState().setRouteResult(result, requestId)
+  const primary = useAppStore.getState().routeResult
+
+  useAppStore.getState().setRouteComparisonError(requestId, 'API unavailable')
+
+  assert.equal(useAppStore.getState().routeResult, primary)
+  assert.equal(useAppStore.getState().requestState.status, 'success')
+  assert.equal(useAppStore.getState().routeComparison.status, 'error')
+})

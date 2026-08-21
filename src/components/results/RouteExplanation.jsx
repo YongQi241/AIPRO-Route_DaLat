@@ -7,6 +7,7 @@ import {
   formatOptimizationLabel,
 } from './resultFormatting'
 import { buildRouteReasoning } from './routeReasoning'
+import { buildOptimizationComparisonNarrative } from '../../services/routeComparison'
 import './RouteExplanation.css'
 
 function Figure({ label, value, unit = '' }) {
@@ -118,6 +119,7 @@ function SegmentConsiderations({ segments }) {
 
 export default function RouteExplanation({ className = '' }) {
   const result = useAppStore((state) => state.routeResult)
+  const comparison = useAppStore((state) => state.routeComparison)
   const nodes = useAppStore((state) => state.graphData.nodes)
   const edges = useAppStore((state) => state.graphData.edges)
   const names = useMemo(() => createNodeNameLookup(nodes), [nodes])
@@ -126,6 +128,10 @@ export default function RouteExplanation({ className = '' }) {
     [edges, names, result],
   )
   const rootClassName = ['route-explanation', className].filter(Boolean).join(' ')
+  const comparisonNarrative = useMemo(
+    () => buildOptimizationComparisonNarrative(result, comparison),
+    [comparison, result],
+  )
 
   return (
     <section className={rootClassName} aria-labelledby="route-explanation-title">
@@ -144,7 +150,7 @@ export default function RouteExplanation({ className = '' }) {
             <span>Tuyến đường đã chọn</span>
             <strong>{reasoning.path.join(' → ') || 'Không có tuyến hoàn chỉnh'}</strong>
             <p>{reasoning.method}</p>
-            {result.explanation && <p>{result.explanation}</p>}
+            {comparisonNarrative && <p>{comparisonNarrative}</p>}
           </section>
 
           <section className="route-explanation__section">

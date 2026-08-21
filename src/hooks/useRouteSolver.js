@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { solveRoute } from '../services/routeService'
+import { createComparisonRequests } from '../services/routeComparison'
 import { useAppStore } from '../store/useAppStore'
 
 export function useRouteSolver() {
@@ -10,6 +11,9 @@ export function useRouteSolver() {
     (state) => state.setRouteRequestError,
   )
   const setRouteResult = useAppStore((state) => state.setRouteResult)
+  const setRouteComparisonLoading = useAppStore((state) => state.setRouteComparisonLoading)
+  const setRouteComparisonResults = useAppStore((state) => state.setRouteComparisonResults)
+  const setRouteComparisonError = useAppStore((state) => state.setRouteComparisonError)
   const play = useAppStore((state) => state.play)
   const isSolving = useAppStore(
     (state) => state.requestState.status === 'loading',
@@ -17,31 +21,66 @@ export function useRouteSolver() {
 
   const runRouteSearch = useCallback(
     async (request) => {
-      setRouteRequestLoading()
+      const requestId = setRouteRequestLoading()
+      let result
 
       try {
-        const result = await solveRoute(request)
-        setRouteResult(result)
-
-        if (
-          result.status === 'success' &&
-          ((result.frontier_steps?.length ?? 0) > 0 ||
-            (result.visited_order?.length ?? 0) > 0)
-        ) {
-          play()
-        }
-
-        return result
+        result = await solveRoute(request)
       } catch (error) {
         const message =
           error instanceof Error
             ? error.message
             : 'Không thể hoàn tất yêu cầu định tuyến.'
-        setRouteRequestError(message)
+        setRouteRequestError(message, requestId)
         return null
       }
+
+      const accepted = setRouteResult(result, requestId)
+      if (!accepted) return result
+
+      if (
+        result.status === 'success' &&
+        ((result.frontier_steps?.length ?? 0) > 0 ||
+          (result.visited_order?.length ?? 0) > 0)
+      ) {
+        play()
+      }
+
+      if (result.status !== 'success') return result
+
+      setRouteComparisonLoading(requestId)
+      try {
+        const comparisonRequests = createComparisonRequests(request)
+        const settled = await Promise.allSettled(
+          comparisonRequests.map(async (comparisonRequest) => ({
+            optimization: comparisonRequest.optimization,
+            result: await solveRoute(comparisonRequest, { allowDemoFallback: false }),
+          })),
+        )
+        const candidates = settled
+          .filter(({ status }) => status === 'fulfilled')
+          .map(({ value }) => value)
+
+        if (candidates.length > 0) {
+          setRouteComparisonResults(requestId, candidates)
+        } else {
+          setRouteComparisonError(requestId, 'Không thể tải tuyến đối chứng.')
+        }
+      } catch {
+        setRouteComparisonError(requestId, 'Không thể tải tuyến đối chứng.')
+      }
+
+      return result
     },
-    [play, setRouteRequestError, setRouteRequestLoading, setRouteResult],
+    [
+      play,
+      setRouteComparisonError,
+      setRouteComparisonLoading,
+      setRouteComparisonResults,
+      setRouteRequestError,
+      setRouteRequestLoading,
+      setRouteResult,
+    ],
   )
 
   return {
