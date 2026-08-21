@@ -152,10 +152,10 @@ function congestedSegments(result) {
   if (segments.length === 0) return 'chưa có dữ liệu chi tiết theo đoạn'
   const congested = segments.filter((segment) => {
     const level = finite(segment?.congestion_level ?? segment?.congestion)
-    return level != null && level >= 4
+    return level != null && level >= 3
   })
-  if (congested.length === 0) return 'không có đoạn nào ở mức 4 hoặc 5'
-  return congested.map((segment) => {
+  if (congested.length === 0) return 'không có đoạn nào ở mức từ 3 đến 5'
+  return 'Tắc nghẽn ở: ' + congested.map((segment) => {
     const level = finite(segment?.congestion_level ?? segment?.congestion)
     return `${segment.from_node} → ${segment.to_node} (mức ${formatNumber(level, 1)}/5)`
   }).join(', ')
@@ -245,7 +245,7 @@ function algorithmOptimality(result) {
   } else {
     property = 'cần được đánh giá theo bảo đảm riêng của chiến lược tìm kiếm đang dùng'
   }
-  return `Xét thuật toán hiện tại là ${label}: thuật toán ${property}.`
+  return `Thuật toán hiện tại là ${label}: thuật toán ${property}.`
 }
 
 export function buildOptimizationComparisonNarrative(primaryResult, comparisonState) {
@@ -283,7 +283,7 @@ export function buildOptimizationComparisonNarrative(primaryResult, comparisonSt
       ? `${alternativeLabel} và các optimization độc lập đã kiểm tra`
       : alternativeLabel
     const congestion = congestedSegments(primaryResult)
-    return `${selection} ${subject} cũng chọn đúng chuỗi đường này; các đoạn tắc nghẽn trên tuyến là: ${congestion}. ${optimality}`
+    return `${selection} ${subject} cũng chọn đúng chuỗi đường này; Về tắc nghẽn trên tuyến: ${congestion}. ${optimality}`
   }
 
   const path = (candidate.result.path_nodes ?? []).join(' → ')
