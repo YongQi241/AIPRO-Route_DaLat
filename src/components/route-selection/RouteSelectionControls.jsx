@@ -19,7 +19,7 @@ const DEFAULT_OPTIMIZATIONS = [
   { value: 'balanced', label: 'Balanced' },
   { value: 'distance', label: 'Shortest' },
   { value: 'time', label: 'Fastest' },
-  { value: 'cost', label: 'Cheapest' },
+  { value: 'safest', label: 'Safest' },
 ]
 
 const MULTI_LOCATION_LABELS = {

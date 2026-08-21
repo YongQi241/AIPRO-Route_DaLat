@@ -5,7 +5,13 @@ import {
   scaleCost,
 } from '../components/results/resultFormatting.js'
 
-const COMPARISON_OPTIMIZATIONS = ['distance', 'time', 'balanced', 'cost']
+const COMPARISON_OPTIMIZATIONS = [
+  'distance',
+  'time',
+  'balanced',
+  'cost',
+  'safest',
+]
 
 const OBJECTIVE_METRICS = {
   shortest: 'total_distance_km',
@@ -154,7 +160,7 @@ function congestedSegments(result) {
     const level = finite(segment?.congestion_level ?? segment?.congestion)
     return level != null && level >= 3
   })
-  if (congested.length === 0) return 'không có đoạn nào ở mức từ 3 đến 5'
+  if (congested.length === 0) return 'không tồn tại đoạn tắt nghẽn từ mức 3 đến 5'
   return 'Tắc nghẽn ở: ' + congested.map((segment) => {
     const level = finite(segment?.congestion_level ?? segment?.congestion)
     return `${segment.from_node} → ${segment.to_node} (mức ${formatNumber(level, 1)}/5)`
@@ -293,5 +299,5 @@ export function buildOptimizationComparisonNarrative(primaryResult, comparisonSt
   const pathText = path || 'không có chuỗi node đầy đủ'
   const metrics = routeMetrics(candidate.result)
   const congestion = congestedSegments(candidate.result)
-  return `${selection} Tồn tại một tuyến khác${advantageText} theo ${alternativeLabel} là ${pathText} (${metrics}); so với tuyến hiện tại, tuyến này ${differences}; các đoạn tắc nghẽn là: ${congestion}. ${optimality}`
+  return `${selection} Tồn tại một tuyến khác${advantageText} theo ${alternativeLabel} là ${pathText} (${metrics}); so với tuyến hiện tại, tuyến này ${differences}; Về tắc nghẽn trên tuyến: ${congestion}. ${optimality}`
 }

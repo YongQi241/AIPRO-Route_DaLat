@@ -17,7 +17,7 @@ test('formats the backend-equivalent balanced formula', () => {
   })
   assert.equal(
     formatOptimizationFormula(formula),
-    'cost × 100 = 100 × (0.2·distance_norm + 0.5·time_norm + 0.15·congestion_norm + 0.15·risk_norm)',
+    'cost = 0.2·distance_norm + 0.5·time_norm + 0.15·congestion_norm + 0.15·risk_norm',
   )
 })
 

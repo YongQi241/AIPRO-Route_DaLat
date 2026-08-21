@@ -51,13 +51,21 @@ test('comparison requests preserve route inputs and exclude equivalent aliases',
   }
   const comparisons = createComparisonRequests(request)
 
-  assert.deepEqual(comparisons.map(({ optimization }) => optimization), ['distance', 'time'])
+  assert.deepEqual(comparisons.map(({ optimization }) => optimization), [
+    'distance',
+    'time',
+    'safest',
+  ])
   assert.deepEqual(comparisons[0].visit_nodes, ['B', 'C'])
   assert.equal(comparisons[0].algorithm, request.algorithm)
   assert.equal(comparisons[0].scenario_id, request.scenario_id)
   assert.equal(comparisons[0].return_to_start, true)
   assert.notEqual(comparisons[0].visit_nodes, request.visit_nodes)
-  assert.deepEqual(getComparisonOptimizations('balanced'), ['distance', 'time'])
+  assert.deepEqual(getComparisonOptimizations('balanced'), [
+    'distance',
+    'time',
+    'safest',
+  ])
 })
 
 test('narrative reports when the current route is shorter but slower', () => {

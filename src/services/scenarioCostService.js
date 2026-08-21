@@ -1,6 +1,5 @@
 import { getOptimizationFormula } from './scenarioCostFormula.js'
 
-const EDGE_COST_URL = '/api/graph/edge-costs'
 const EDGE_DATA_URL = '/data/generated/edges.csv'
 const CONDITION_DATA_URL = '/data/generated/edge_conditions.csv'
 
@@ -192,46 +191,14 @@ async function loadLocalData() {
   return localDataRequest
 }
 
-async function requestApi(scenarioId, optimization, signal) {
-  const query = new URLSearchParams({
-    scenario_id: scenarioId,
-    optimization,
-  })
-  const response = await fetch(`${EDGE_COST_URL}?${query}`, { signal })
-  const text = await response.text()
-  let payload = null
-  try {
-    payload = text ? JSON.parse(text) : null
-  } catch {
-    throw new Error(`Điểm cuối chi phí trả về JSON không hợp lệ (${response.status}).`)
-  }
-  if (!response.ok || payload?.status !== 'success') {
-    throw new Error(
-      payload?.message ??
-        `Không thể tải chi phí cạnh theo kịch bản (${response.status}).`,
-    )
-  }
-  return payload
-}
-
 export async function fetchScenarioEdgeCosts(
   scenarioId,
   optimization,
   { signal } = {},
 ) {
-  try {
-    return await requestApi(scenarioId, optimization, signal)
-  } catch (apiError) {
-    if (apiError.name === 'AbortError') throw apiError
-    const [edges, conditions] = await loadLocalData()
-    if (signal?.aborted) {
-      throw new DOMException('Yêu cầu đã bị hủy.', 'AbortError')
-    }
-    return calculateScenarioEdgeCosts(
-      edges,
-      conditions,
-      scenarioId,
-      optimization,
-    )
+  const [edges, conditions] = await loadLocalData()
+  if (signal?.aborted) {
+    throw new DOMException('Yêu cầu đã bị hủy.', 'AbortError')
   }
+  return calculateScenarioEdgeCosts(edges, conditions, scenarioId, optimization)
 }
