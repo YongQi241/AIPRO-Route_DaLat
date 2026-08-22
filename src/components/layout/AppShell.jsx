@@ -42,7 +42,7 @@ export default function AppShell({
 }) {
   const [isTopPanelCollapsed, setIsTopPanelCollapsed] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
-  const [isBottomPanelCollapsed, setIsBottomPanelCollapsed] = useState(false)
+  const [isBottomPanelCollapsed, setIsBottomPanelCollapsed] = useState(true)
   const renderedBottomPanel =
     typeof bottomPanel === 'function'
       ? bottomPanel({

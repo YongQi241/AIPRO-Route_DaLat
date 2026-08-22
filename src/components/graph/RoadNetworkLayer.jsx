@@ -1,11 +1,12 @@
 import { useMemo } from 'react'
-import { createDrawableEdges } from './graphGeometry'
+import { createDrawableEdges, isHighTraffic } from './graphGeometry'
 import { formatNodeNumber } from '../results/resultFormatting'
 import './RoadNetworkLayer.css'
 
 export default function RoadNetworkLayer({
   features = [],
   project,
+  congestionLevels = new Map(),
   onEdgeHover,
   hoveredEdgeId = null,
 }) {
@@ -19,10 +20,13 @@ export default function RoadNetworkLayer({
       <g className="road-network-layer__base">
         {drawableEdges.flatMap((edge) =>
           edge.paths.map((path) => {
+            const congestion = Number(
+              congestionLevels.get(edge.edgeId) ?? edge.congestion,
+            )
             const className = [
               'road-network-layer__edge',
               edge.closed && 'road-network-layer__edge--closed',
-              edge.congestion >= 4 && 'road-network-layer__edge--congested',
+              isHighTraffic(congestion) && 'road-network-layer__edge--congested',
               edge.edgeId === hoveredEdgeId &&
                 'road-network-layer__edge--hovered',
             ]

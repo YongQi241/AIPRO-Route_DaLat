@@ -18,8 +18,8 @@ test('explains A* expansion values in human terms', () => {
   }, [], { algorithm: 'A*', locationNames: names })
 
   assert.match(event.title, /A/)
-  assert.match(event.detail, /f\(n\)=5 nhỏ nhất/)
-  assert.match(event.detail, /g=2, h=3/)
+  assert.match(event.detail, /f\(n\)=0\.05 nhỏ nhất/)
+  assert.match(event.detail, /g=0\.02, h=0\.03/)
 })
 
 test('explains Dijkstra and UCS expansion with only the smallest g(n)', () => {
@@ -32,7 +32,7 @@ test('explains Dijkstra and UCS expansion with only the smallest g(n)', () => {
       candidateEdgeIds: ['E1'],
     }, [], { algorithm, locationNames: names })
 
-    assert.match(event.detail, /Chọn vì g\(n\)=2 nhỏ nhất trên biên/)
+    assert.match(event.detail, /Chọn vì g\(n\)=0\.02 nhỏ nhất trên biên/)
     assert.doesNotMatch(event.detail, /h\(n\)|f\(n\)/)
   }
 })
@@ -65,7 +65,7 @@ test('distinguishes a local scenario edge cost from cumulative search cost', () 
   })
 
   assert.match(event.title, /A → B/)
-  assert.match(event.detail, /Chi phí cạnh: 250/)
+  assert.match(event.detail, /Chi phí cạnh: 2\.5/)
   assert.match(event.detail, /g\(n\) là chi phí tích lũy/)
   assert.doesNotMatch(event.detail, /f\(n\)/)
 })

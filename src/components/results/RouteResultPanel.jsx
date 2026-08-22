@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useAppStore } from '../../store/useAppStore'
+import { isHighTraffic } from '../graph/graphGeometry'
 import {
   createNodeNameLookup,
   formatCost,
@@ -33,7 +34,7 @@ export default function RouteResultPanel({ className = '' }) {
   )
   const warningSegments = (result?.segments ?? []).filter(
     (segment) =>
-      Number(segment.congestion_level ?? 0) >= 4 ||
+      isHighTraffic(segment.congestion_level) ||
       Number(segment.risk ?? 0) > 0,
   ).length
   const rootClassName = ['route-result-panel', className]

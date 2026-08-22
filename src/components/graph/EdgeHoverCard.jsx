@@ -117,7 +117,7 @@ export default function EdgeHoverCard({
           {calculation.contributions && (
             <small>Các thành phần: {calculation.contributions}</small>
           )}
-          {calculation.result && <strong>= {calculation.result}</strong>}
+          {calculation.result && <strong>cost = {calculation.result}</strong>}
         </footer>
       )}
     </aside>

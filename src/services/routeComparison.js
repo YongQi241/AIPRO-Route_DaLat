@@ -5,19 +5,15 @@ import {
   scaleCost,
 } from '../components/results/resultFormatting.js'
 
-const COMPARISON_OPTIMIZATIONS = [
-  'distance',
-  'time',
-  'balanced',
-  'cost',
-  'safest',
-]
+export const COMPARISON_PRIORITY = ['balanced', 'time', 'distance', 'safest']
 
 const OBJECTIVE_METRICS = {
   shortest: 'total_distance_km',
   fastest: 'total_time_min',
   balanced: 'total_cost',
-  safest: 'total_risk',
+  // Safest is a risk-heavy weighted profile, so its solver minimizes the
+  // profile's route_cost rather than raw risk alone.
+  safest: 'total_cost',
 }
 
 export function normalizeOptimization(value) {
@@ -32,23 +28,33 @@ export function normalizeOptimization(value) {
 
 export function getComparisonOptimizations(currentOptimization) {
   const currentProfile = normalizeOptimization(currentOptimization)
-  const profiles = new Set([currentProfile])
+  return COMPARISON_PRIORITY.filter(
+    (optimization) => normalizeOptimization(optimization) !== currentProfile,
+  )
+}
 
-  return COMPARISON_OPTIMIZATIONS.filter((optimization) => {
-    const profile = normalizeOptimization(optimization)
-    if (profiles.has(profile)) return false
-    profiles.add(profile)
-    return true
-  })
+export function getOptimalRouteAlgorithm(request) {
+  return (request?.visit_nodes?.length ?? 0) > 0
+    ? 'brute_force_tsp'
+    : 'dijkstra'
 }
 
 export function createComparisonRequests(request) {
-  return getComparisonOptimizations(request?.optimization).map((optimization) => ({
+  const algorithm = getOptimalRouteAlgorithm(request)
+  const currentOptimization = request?.optimization ?? 'balanced'
+  const optimizations = [
+    currentOptimization,
+    ...getComparisonOptimizations(currentOptimization),
+  ]
+
+  return optimizations.map((optimization, index) => ({
     ...request,
     visit_nodes: Array.isArray(request?.visit_nodes)
       ? [...request.visit_nodes]
       : [],
+    algorithm,
     optimization,
+    comparison_role: index === 0 ? 'current_optimum' : 'alternative_optimum',
   }))
 }
 
@@ -80,7 +86,73 @@ function objectiveImprovement(primaryResult, candidate) {
   return Math.max(0, primaryValue - candidateValue) / Math.max(Math.abs(primaryValue), 1e-9)
 }
 
+function objectiveValue(result, optimization) {
+  const metric = OBJECTIVE_METRICS[normalizeOptimization(optimization)]
+  return metric ? finite(result?.metrics?.[metric]) : null
+}
+
+function objectiveValuesMatch(first, second) {
+  if (first == null || second == null) return false
+  const tolerance = Math.max(1, Math.abs(first), Math.abs(second)) * 1e-6
+  return Math.abs(first - second) <= tolerance
+}
+
+function comparisonPriority(candidate) {
+  const profile = normalizeOptimization(candidate?.optimization)
+  const index = COMPARISON_PRIORITY.findIndex(
+    (optimization) => normalizeOptimization(optimization) === profile,
+  )
+  return index < 0 ? COMPARISON_PRIORITY.length : index
+}
+
+export function getComparisonRecommendation(primaryResult, candidates = []) {
+  if (!primaryResult || primaryResult.status !== 'success') return null
+  const currentProfile = normalizeOptimization(primaryResult.optimization)
+  const successful = candidates.filter(
+    (candidate) => candidate?.result?.status === 'success',
+  )
+  const currentOptimum = successful.find((candidate) =>
+    candidate.comparisonRole === 'current_optimum' ||
+    candidate.comparison_role === 'current_optimum' ||
+    normalizeOptimization(candidate.optimization) === currentProfile,
+  )
+
+  if (currentOptimum) {
+    const currentValue = objectiveValue(primaryResult, currentProfile)
+    const optimumValue = objectiveValue(currentOptimum.result, currentProfile)
+    if (
+      currentValue != null &&
+      optimumValue != null &&
+      optimumValue < currentValue &&
+      !objectiveValuesMatch(currentValue, optimumValue)
+    ) {
+      return {
+        ...currentOptimum,
+        currentIsOptimal: false,
+        recommendationType: 'current_optimum',
+      }
+    }
+  }
+
+  const alternative = successful
+    .filter((candidate) =>
+      normalizeOptimization(candidate.optimization) !== currentProfile &&
+      !routesMatch(primaryResult, candidate.result),
+    )
+    .sort((left, right) => comparisonPriority(left) - comparisonPriority(right))[0]
+
+  if (!alternative) return null
+  return {
+    ...alternative,
+    currentIsOptimal: Boolean(currentOptimum),
+    recommendationType: 'alternative_optimum',
+  }
+}
+
 export function selectComparisonCandidate(primaryResult, candidates = []) {
+  const recommendation = getComparisonRecommendation(primaryResult, candidates)
+  if (recommendation) return recommendation
+
   const currentProfile = normalizeOptimization(primaryResult?.optimization)
   const seenProfiles = new Set([currentProfile])
   const eligible = candidates.filter((candidate) => {
@@ -261,13 +333,20 @@ export function buildOptimizationComparisonNarrative(primaryResult, comparisonSt
   const optimality = algorithmOptimality(primaryResult)
 
   if (comparisonState?.status === 'loading') {
-    return `${selection} Hệ thống đang tính tuyến đối chứng với cùng thuật toán và kịch bản. ${optimality}`
+    return `${selection} Hệ thống đang dùng bộ giải tối ưu độc lập để kiểm tra cấu hình hiện tại, sau đó tìm phương án thay thế theo thứ tự Balanced, Fastest, Shortest và Safest. ${optimality}`
   }
   if (comparisonState?.status === 'error') {
     return `${selection} Không thể tải tuyến đối chứng; kết quả chính vẫn được giữ nguyên. ${optimality}`
   }
 
-  const candidate = selectComparisonCandidate(primaryResult, comparisonState?.candidates)
+  const recommendation = getComparisonRecommendation(
+    primaryResult,
+    comparisonState?.candidates,
+  )
+  const candidate = recommendation ?? selectComparisonCandidate(
+    primaryResult,
+    comparisonState?.candidates,
+  )
   if (!candidate) {
     return `${selection} Chưa có một optimization độc lập phù hợp để đối chứng. ${optimality}`
   }
@@ -299,5 +378,11 @@ export function buildOptimizationComparisonNarrative(primaryResult, comparisonSt
   const pathText = path || 'không có chuỗi node đầy đủ'
   const metrics = routeMetrics(candidate.result)
   const congestion = congestedSegments(candidate.result)
+  if (recommendation?.recommendationType === 'current_optimum') {
+    return `${selection} Tuyến hiện tại chưa phải phương án tối ưu cho ${alternativeLabel}. Bộ giải ${formatAlgorithmLabel(candidate.result.algorithm)} tìm được tuyến tối ưu là ${pathText} (${metrics}); so với tuyến hiện tại, tuyến này ${differences}; Về tắc nghẽn trên tuyến: ${congestion}. ${optimality}`
+  }
+  if (recommendation?.currentIsOptimal) {
+    return `${selection} Tuyến hiện tại đã tối ưu cho cấu hình đang chọn. Theo thứ tự ưu tiên Balanced → Fastest → Shortest → Safest, phương án tối ưu thay thế đầu tiên là tuyến ${alternativeLabel}: ${pathText} (${metrics}); so với tuyến hiện tại, tuyến này ${differences}; Về tắc nghẽn trên tuyến: ${congestion}. ${optimality}`
+  }
   return `${selection} Tồn tại một tuyến khác${advantageText} theo ${alternativeLabel} là ${pathText} (${metrics}); so với tuyến hiện tại, tuyến này ${differences}; Về tắc nghẽn trên tuyến: ${congestion}. ${optimality}`
 }

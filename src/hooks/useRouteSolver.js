@@ -54,6 +54,9 @@ export function useRouteSolver() {
         const settled = await Promise.allSettled(
           comparisonRequests.map(async (comparisonRequest) => ({
             optimization: comparisonRequest.optimization,
+            algorithm: comparisonRequest.algorithm,
+            comparisonRole: comparisonRequest.comparison_role,
+            request: comparisonRequest,
             result: await solveRoute(comparisonRequest, { allowDemoFallback: false }),
           })),
         )

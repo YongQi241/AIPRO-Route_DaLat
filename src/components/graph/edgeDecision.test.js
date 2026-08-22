@@ -31,7 +31,7 @@ const describe = (edgeId, actions, algorithm = 'Dijkstra', context = {}) =>
 test('Dijkstra explains add, update, and keep with cumulative g(n)', () => {
   assert.equal(
     describe('E_ADD', [action('E_ADD', 'add', { gCost: 0.05 })]),
-    'Thêm vào biên: g(n)=5',
+    'Thêm vào biên: g(n)=0.05',
   )
   assert.equal(
     describe('E_UPDATE', [action(
@@ -41,7 +41,7 @@ test('Dijkstra explains add, update, and keep with cumulative g(n)', () => {
       { gCost: 0.05 },
       'E_AB',
     )]),
-    'Cập nhật biên: 2 < 5 thuộc về đường E_AB',
+    'Cập nhật biên: 0.02 < 0.05 thuộc về đường E_AB',
   )
   assert.equal(
     describe('E_KEEP', [action(
@@ -51,7 +51,7 @@ test('Dijkstra explains add, update, and keep with cumulative g(n)', () => {
       { gCost: 0.03 },
       'E_BD',
     )]),
-    'Không cập nhật: 7 ≥ 3 thuộc về đường E_BD',
+    'Không cập nhật: 0.07 ≥ 0.03 thuộc về đường E_BD',
   )
 })
 
@@ -62,7 +62,7 @@ test('UCS uses the same g(n) semantics and ignores h(n) and f(n)', () => {
     { gCost: 0.05, hCost: 0.9, fCost: 0.95 },
   )], 'Uniform-Cost Search')
 
-  assert.equal(reason, 'Thêm vào biên: g(n)=5')
+  assert.equal(reason, 'Thêm vào biên: g(n)=0.05')
   assert.doesNotMatch(reason, /h\(n\)|f\(n\)/)
 })
 
@@ -112,7 +112,7 @@ test('Dijkstra and UCS recognize their request IDs and display names', () => {
   const actions = [action('E1', 'add', { gCost: 0.01, fCost: 0.99 })]
 
   for (const algorithm of ['dijkstra', 'Dijkstra', 'ucs', 'UCS', 'Uniform-Cost Search']) {
-    assert.equal(describe('E1', actions, algorithm), 'Thêm vào biên: g(n)=1')
+    assert.equal(describe('E1', actions, algorithm), 'Thêm vào biên: g(n)=0.01')
   }
 })
 
@@ -129,7 +129,7 @@ test('A* keeps the complete g(n), h(n), and f(n) explanation', () => {
   for (const algorithm of ['astar', 'a*', 'A*', 'A* Search']) {
     assert.equal(
       describe('E1', actions, algorithm),
-      'Thêm vào biên: g(n)=2, h(n)=3, f(n)=g(n)+h(n)=5',
+      'Thêm vào biên: g(n)=0.02, h(n)=0.03, f(n)=g(n)+h(n)=0.05',
     )
   }
 })
@@ -142,14 +142,14 @@ test('does not invent a retained edge when previous_edge_id is absent', () => {
     { gCost: 0.05 },
   )])
 
-  assert.equal(reason, 'Cập nhật biên: 2 < 5')
+  assert.equal(reason, 'Cập nhật biên: 0.02 < 0.05')
   assert.doesNotMatch(reason, /thuộc về đường/)
 })
 
 test('falls back to priority for cumulative g(n) when g_cost is missing', () => {
   assert.equal(
     describe('E1', [action('E1', 'add', { priority: 0.025 })], 'UCS'),
-    'Thêm vào biên: g(n)=2.5',
+    'Thêm vào biên: g(n)=0.025',
   )
 })
 
@@ -166,7 +166,7 @@ test('preserves zero, decimals, and equality in cumulative comparisons', () => {
       { gCost: 0.0125 },
       'E_OLD',
     )]),
-    'Không cập nhật: 1.25 ≥ 1.25 thuộc về đường E_OLD',
+    'Không cập nhật: 0.013 ≥ 0.013 thuộc về đường E_OLD',
   )
 })
 

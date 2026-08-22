@@ -33,11 +33,12 @@ test('legend distinguishes all required node and edge states', () => {
   assert.equal(states.get('visited'), 'node')
   assert.equal(states.get('current'), 'node')
   assert.equal(states.get('final-node'), 'node')
-  assert.equal(states.get('pending'), 'edge')
-  assert.equal(states.get('checked'), 'edge')
+  assert.equal(states.has('pending'), false)
+  assert.equal(states.has('checked'), false)
   assert.equal(states.get('chosen'), 'edge')
   assert.equal(states.has('candidate'), false)
   assert.equal(states.get('route'), 'edge')
+  assert.equal(states.get('traffic'), 'edge')
   assert.equal(states.get('warning'), 'edge')
 })
 
@@ -48,4 +49,77 @@ test('PlaybackToolbar no longer exposes a manual Load data control', () => {
   )
 
   assert.doesNotMatch(source, /Load data|onLoad|loadDisabled/)
+})
+
+test('scenario detail is transient and detail panels start closed', () => {
+  const scenarioPanel = fs.readFileSync(
+    new URL('../route-selection/ScenarioFormulaPanel.jsx', import.meta.url),
+    'utf8',
+  )
+  const appShell = fs.readFileSync(
+    new URL('../layout/AppShell.jsx', import.meta.url),
+    'utf8',
+  )
+  const workspace = fs.readFileSync(
+    new URL('../graph/GraphWorkspace.jsx', import.meta.url),
+    'utf8',
+  )
+
+  assert.match(scenarioPanel, /setTimeout\(\(\) => setIsVisible\(false\), 3200\)/)
+  assert.match(appShell, /isBottomPanelCollapsed, setIsBottomPanelCollapsed\] = useState\(true\)/)
+  assert.match(workspace, /edgePopupsEnabled, setEdgePopupsEnabled\] = useState\(false\)/)
+})
+
+test('high traffic and risk warnings use separate graph styles', () => {
+  const finalRouteCss = fs.readFileSync(
+    new URL('../graph/FinalRouteLayer.css', import.meta.url),
+    'utf8',
+  )
+  const traversalCss = fs.readFileSync(
+    new URL('../graph/SearchTraversalLayer.css', import.meta.url),
+    'utf8',
+  )
+
+  assert.match(finalRouteCss, /edge--high-traffic/)
+  assert.match(finalRouteCss, /edge--warning/)
+  assert.doesNotMatch(traversalCss, /edge--pending|edge--checked/)
+})
+
+test('final route traffic stays above chosen search overlays', () => {
+  const workspace = fs.readFileSync(
+    new URL('../graph/GraphWorkspace.jsx', import.meta.url),
+    'utf8',
+  )
+  const traversalIndex = workspace.indexOf('<SearchTraversalLayer')
+  const finalRouteIndex = workspace.indexOf('<FinalRouteLayer')
+
+  assert.ok(traversalIndex >= 0)
+  assert.ok(finalRouteIndex > traversalIndex)
+})
+
+test('route explanation omits verbose metric, trace, and segment sections', () => {
+  const explanation = fs.readFileSync(
+    new URL('../results/RouteExplanation.jsx', import.meta.url),
+    'utf8',
+  )
+
+  assert.doesNotMatch(explanation, /Các chỉ số kết quả đã ghi nhận/)
+  assert.doesNotMatch(explanation, /Các đánh giá được ghi nhận khi tìm kiếm/)
+  assert.doesNotMatch(explanation, /Chỉ số và điều kiện của các đường đã chọn/)
+})
+
+test('route costs use their actual unscaled notation', () => {
+  const files = [
+    '../results/RouteResultPanel.jsx',
+    '../graph/EdgeLabelLayer.jsx',
+    '../graph/EdgeHoverCard.jsx',
+    '../route-selection/ScenarioFormulaPanel.jsx',
+  ]
+  const source = files.map((file) => fs.readFileSync(
+    new URL(file, import.meta.url),
+    'utf8',
+  )).join('\n')
+
+  assert.doesNotMatch(source, /×100|x100/i)
+  assert.match(source, /cost=/)
 })

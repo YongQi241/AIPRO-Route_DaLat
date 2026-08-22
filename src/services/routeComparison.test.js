@@ -3,7 +3,9 @@ import test from 'node:test'
 import {
   buildOptimizationComparisonNarrative,
   createComparisonRequests,
+  getComparisonRecommendation,
   getComparisonOptimizations,
+  getOptimalRouteAlgorithm,
   selectComparisonCandidate,
 } from './routeComparison.js'
 
@@ -39,7 +41,7 @@ function state(candidates) {
   return { status: 'success', candidates }
 }
 
-test('comparison requests preserve route inputs and exclude equivalent aliases', () => {
+test('comparison requests use the exact multi-stop oracle and profile priority', () => {
   const request = {
     algorithm: 'nearest_neighbor',
     start_node: 'A',
@@ -52,20 +54,24 @@ test('comparison requests preserve route inputs and exclude equivalent aliases',
   const comparisons = createComparisonRequests(request)
 
   assert.deepEqual(comparisons.map(({ optimization }) => optimization), [
-    'distance',
+    'cost',
     'time',
+    'distance',
     'safest',
   ])
   assert.deepEqual(comparisons[0].visit_nodes, ['B', 'C'])
-  assert.equal(comparisons[0].algorithm, request.algorithm)
+  assert.equal(comparisons[0].algorithm, 'brute_force_tsp')
+  assert.equal(comparisons[0].comparison_role, 'current_optimum')
+  assert.equal(comparisons[1].comparison_role, 'alternative_optimum')
   assert.equal(comparisons[0].scenario_id, request.scenario_id)
   assert.equal(comparisons[0].return_to_start, true)
   assert.notEqual(comparisons[0].visit_nodes, request.visit_nodes)
   assert.deepEqual(getComparisonOptimizations('balanced'), [
-    'distance',
     'time',
+    'distance',
     'safest',
   ])
+  assert.equal(getOptimalRouteAlgorithm({ visit_nodes: [] }), 'dijkstra')
 })
 
 test('narrative reports when the current route is shorter but slower', () => {
@@ -84,7 +90,7 @@ test('narrative reports when the current route is shorter but slower', () => {
   assert.match(narrative, /dài hơn 3 km/)
   assert.match(narrative, /nhanh hơn 6 phút/)
   assert.match(narrative, /^Tuyến hiện tại được chọn với độ dài tuyến đường là chính\./)
-  assert.match(narrative, /Xét thuật toán hiện tại là Dijkstra: thuật toán tối ưu tổng trọng số với điều kiện mọi trọng số cạnh không âm\./)
+  assert.match(narrative, /Thuật toán hiện tại là Dijkstra: thuật toán tối ưu tổng trọng số với điều kiện mọi trọng số cạnh không âm\./)
 })
 
 test('narrative reports when the current route is faster but longer', () => {
@@ -142,7 +148,7 @@ test('narrative handles no-path, missing metrics, and comparison errors', () => 
   )
 })
 
-test('candidate selection ignores balanced-cost aliases and is deterministic', () => {
+test('candidate selection follows balanced, fastest, shortest, safest priority', () => {
   const primary = result({ optimization: 'balanced', distance: 10, time: 10 })
   const alias = result({ optimization: 'cost', path: ['A', 'D'], edges: ['E_AD'] })
   const shortest = result({
@@ -163,7 +169,57 @@ test('candidate selection ignores balanced-cost aliases and is deterministic', (
     { optimization: 'distance', result: shortest },
   ])
 
-  assert.equal(selected.optimization, 'distance')
+  assert.equal(selected.optimization, 'time')
+})
+
+test('recommends the current-profile oracle when the selected algorithm is not optimal', () => {
+  const primary = result({
+    optimization: 'balanced',
+    algorithm: 'BFS',
+    cost: 10,
+  })
+  const optimum = result({
+    optimization: 'balanced',
+    algorithm: 'Dijkstra',
+    path: ['A', 'C', 'B'],
+    edges: ['E_AC', 'E_CB'],
+    cost: 7,
+  })
+  const recommendation = getComparisonRecommendation(primary, [
+    {
+      optimization: 'balanced',
+      comparisonRole: 'current_optimum',
+      result: optimum,
+    },
+  ])
+
+  assert.equal(recommendation.result, optimum)
+  assert.equal(recommendation.currentIsOptimal, false)
+  assert.equal(recommendation.recommendationType, 'current_optimum')
+})
+
+test('when current is optimal, recommends the first distinct profile by priority', () => {
+  const primary = result({ optimization: 'shortest', distance: 5 })
+  const currentOptimum = result({ optimization: 'distance', distance: 5 })
+  const fastest = result({
+    optimization: 'time',
+    path: ['A', 'F', 'B'],
+    edges: ['E_AF', 'E_FB'],
+  })
+  const balanced = result({
+    optimization: 'balanced',
+    path: ['A', 'C', 'B'],
+    edges: ['E_AC', 'E_CB'],
+  })
+  const recommendation = getComparisonRecommendation(primary, [
+    { optimization: 'time', result: fastest },
+    { optimization: 'distance', comparisonRole: 'current_optimum', result: currentOptimum },
+    { optimization: 'balanced', result: balanced },
+  ])
+
+  assert.equal(recommendation.result, balanced)
+  assert.equal(recommendation.currentIsOptimal, true)
+  assert.equal(recommendation.recommendationType, 'alternative_optimum')
 })
 
 test('Cheapest is disclosed as a Balanced-profile alias', () => {
@@ -198,7 +254,7 @@ test('narrative lists highly congested segments from the alternative route', () 
   ]))
 
   assert.match(narrative, /Tồn tại một tuyến khác nhanh hơn/)
-  assert.match(narrative, /các đoạn tắc nghẽn là: A → C \(mức 4\/5\)/)
+  assert.match(narrative, /Tắc nghẽn ở: A → C \(mức 4\/5\)/)
 })
 
 test('narrative states the correct optimality condition for A*', () => {

@@ -60,9 +60,15 @@
   background: #f8fafc;
 }
 
-.segment-details__list .segment-details__item--warning {
+.segment-details__list .segment-details__item--traffic {
   border-color: #fed7aa;
   background: #fff7ed;
+}
+
+.segment-details__list .segment-details__item--warning {
+  border-color: #fca5a5;
+  border-left: 4px solid #dc2626;
+  background: #fef2f2;
 }
 
 .segment-details__index {
@@ -77,8 +83,12 @@
   font-weight: 800;
 }
 
-.segment-details__item--warning .segment-details__index {
+.segment-details__item--traffic .segment-details__index {
   background: #ea580c;
+}
+
+.segment-details__item--warning .segment-details__index {
+  background: #dc2626;
 }
 
 .segment-details__route {

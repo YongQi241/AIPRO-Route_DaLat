@@ -106,7 +106,7 @@ export default function GraphWorkspace({
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT)
   const [isPanning, setIsPanning] = useState(false)
   const [layoutMode, setLayoutMode] = useState('graph')
-  const [edgePopupsEnabled, setEdgePopupsEnabled] = useState(true)
+  const [edgePopupsEnabled, setEdgePopupsEnabled] = useState(false)
   const [hoveredEdge, setHoveredEdge] = useState(null)
   const [edgeHoverPosition, setEdgeHoverPosition] = useState(null)
   const graphData = useAppStore((state) => state.graphData)
@@ -167,6 +167,17 @@ export default function GraphWorkspace({
   const closedEdgeIds = useMemo(
     () => new Set((activeCostData?.closed_edge_ids ?? []).map(String)),
     [activeCostData?.closed_edge_ids],
+  )
+  const scenarioCongestionLevels = useMemo(
+    () => new Map(
+      Object.entries(activeCostData?.edge_cost_details ?? {}).map(
+        ([edgeId, detail]) => [
+          String(edgeId),
+          Number(detail?.scenario_congestion ?? detail?.effective_congestion),
+        ],
+      ),
+    ),
+    [activeCostData?.edge_cost_details],
   )
   const activeSearchEdgeIds = useMemo(() => {
     if (!isSearchVisible) return []
@@ -571,16 +582,9 @@ export default function GraphWorkspace({
             <RoadNetworkLayer
               features={displayEdgeFeatures}
               project={drawing.project}
+              congestionLevels={scenarioCongestionLevels}
               onEdgeHover={handleEdgeHover}
               hoveredEdgeId={hoveredEdge?.edgeId ?? null}
-            />
-            <FinalRouteLayer
-              features={displayEdgeFeatures}
-              project={drawing.project}
-              pathEdgeIds={visiblePathEdges}
-              segments={result?.segments}
-              visible={isSuccessful && visiblePathEdges.length > 0}
-              onEdgeHover={handleEdgeHover}
             />
             <SearchTraversalLayer
               features={displayEdgeFeatures}
@@ -594,6 +598,14 @@ export default function GraphWorkspace({
               finalPathEdgeIds={
                 isSearchComplete ? result?.path_edges ?? [] : []
               }
+              onEdgeHover={handleEdgeHover}
+            />
+            <FinalRouteLayer
+              features={displayEdgeFeatures}
+              project={drawing.project}
+              pathEdgeIds={visiblePathEdges}
+              segments={result?.segments}
+              visible={isSuccessful && visiblePathEdges.length > 0}
               onEdgeHover={handleEdgeHover}
             />
             {layoutMode === 'graph' && (

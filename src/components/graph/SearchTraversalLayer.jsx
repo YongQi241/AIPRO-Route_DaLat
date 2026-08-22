@@ -80,7 +80,7 @@ export default function SearchTraversalLayer({
         resolveEdges(edgeLookup, candidateEdgeIds, 'pending').map(
           withTraceState,
         ),
-      ),
+      ).filter((edge) => edge.kind === 'chosen'),
     }
   }, [
     branchEdgeIds,

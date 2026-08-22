@@ -5,6 +5,11 @@ export function getLineCoordinates(geometry) {
   return []
 }
 
+export function isHighTraffic(value) {
+  const congestion = Number(value)
+  return Number.isFinite(congestion) && congestion >= 3
+}
+
 export function lineToPath(line, project) {
   return line
     .map((coordinate, index) => {

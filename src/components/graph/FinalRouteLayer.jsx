@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { createDrawableEdges } from './graphGeometry'
+import { createDrawableEdges, isHighTraffic } from './graphGeometry'
 import { formatNodeNumber } from '../results/resultFormatting'
 import './FinalRouteLayer.css'
 
@@ -66,13 +66,15 @@ export default function FinalRouteLayer({
             edge.segment?.congestion_level ?? edge.congestion,
           )
           const risk = Number(edge.segment?.risk ?? 0)
-          const isWarning = congestion >= 4 || risk > 0
+          const hasHighTraffic = isHighTraffic(congestion)
+          const isWarning = risk > 0
 
           return (
             <path
               key={`final-${edge.routeIndex}-${path.id}`}
               className={[
                 'final-route-layer__edge',
+                hasHighTraffic && 'final-route-layer__edge--high-traffic',
                 isWarning && 'final-route-layer__edge--warning',
               ]
                 .filter(Boolean)

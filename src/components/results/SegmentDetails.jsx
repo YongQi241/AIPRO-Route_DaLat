@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useAppStore } from '../../store/useAppStore'
+import { isHighTraffic } from '../graph/graphGeometry'
 import {
   createNodeNameLookup,
   formatMetric,
@@ -54,9 +55,8 @@ export default function SegmentDetails({ className = '' }) {
           {orderedSegments.map(({ edgeId, data }, index) => {
             const congestion = Number(data?.congestion_level)
             const risk = Number(data?.risk)
-            const hasWarning =
-              (Number.isFinite(congestion) && congestion >= 4) ||
-              (Number.isFinite(risk) && risk > 0)
+            const hasHighTraffic = isHighTraffic(congestion)
+            const hasWarning = Number.isFinite(risk) && risk > 0
             const fromName =
               nodeNameLookup.get(String(data?.from_node)) ??
               data?.from_node ??
@@ -67,9 +67,10 @@ export default function SegmentDetails({ className = '' }) {
             return (
               <li
                 key={`${edgeId}-${index}`}
-                className={
-                  hasWarning ? 'segment-details__item--warning' : undefined
-                }
+                className={[
+                  hasHighTraffic && 'segment-details__item--traffic',
+                  hasWarning && 'segment-details__item--warning',
+                ].filter(Boolean).join(' ') || undefined}
               >
                 <div className="segment-details__index">{index + 1}</div>
                 <div className="segment-details__route">

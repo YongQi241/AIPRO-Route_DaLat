@@ -223,17 +223,6 @@
   border-top: 3px solid;
 }
 
-.graph-workspace__legend-swatch--pending {
-  border-color: #94a3b8;
-  border-top-style: dotted;
-  opacity: 0.65;
-}
-
-.graph-workspace__legend-swatch--checked {
-  border-color: #f59e0b;
-  border-top-style: dashed;
-}
-
 .graph-workspace__legend-swatch--chosen {
   border-color: #16a34a;
   border-top-width: 4px;
@@ -244,9 +233,16 @@
   border-color: #2563eb;
 }
 
-.graph-workspace__legend-swatch--warning {
+.graph-workspace__legend-swatch--traffic {
   border-color: #f97316;
   border-top-style: dashed;
+}
+
+.graph-workspace__legend-swatch--warning {
+  border-color: #dc2626;
+  border-top-width: 5px;
+  border-top-style: dotted;
+  filter: drop-shadow(0 0 2px rgb(220 38 38 / 70%));
 }
 
 .graph-workspace__message {

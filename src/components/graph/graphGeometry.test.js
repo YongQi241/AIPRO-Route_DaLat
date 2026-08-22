@@ -1,9 +1,16 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { getLineLabelPosition } from './graphGeometry.js'
+import { getLineLabelPosition, isHighTraffic } from './graphGeometry.js'
 
 const identity = ([x, y]) => [x, y]
+
+test('classifies scenario congestion level 3 and above as high traffic', () => {
+  assert.equal(isHighTraffic(2.99), false)
+  assert.equal(isHighTraffic(3), true)
+  assert.equal(isHighTraffic('5'), true)
+  assert.equal(isHighTraffic(null), false)
+})
 
 test('places an edge label at its length midpoint with a perpendicular offset', () => {
   assert.deepEqual(getLineLabelPosition([[0, 0], [10, 0]], identity), {

@@ -208,3 +208,32 @@ test('a comparison error preserves the successful primary result', () => {
   assert.equal(useAppStore.getState().requestState.status, 'success')
   assert.equal(useAppStore.getState().routeComparison.status, 'error')
 })
+
+test('activating a recommended route loads it and starts playback immediately', () => {
+  const store = useAppStore.getState()
+  store.setGraphData({ nodes: { type: 'FeatureCollection', features: [] }, edges })
+  store.setSpeed(2)
+  const recommendedResult = {
+    ...result,
+    algorithm: 'Dijkstra',
+    optimization: 'time',
+    path_nodes: ['A', 'C'],
+    path_edges: ['E_AC'],
+  }
+
+  store.activateComparisonRoute({
+    algorithm: 'dijkstra',
+    optimization: 'time',
+    result: recommendedResult,
+    request: { algorithm: 'dijkstra', optimization: 'time' },
+  })
+
+  const state = useAppStore.getState()
+  assert.equal(state.routeResult, recommendedResult)
+  assert.equal(state.selectedAlgorithm, 'dijkstra')
+  assert.equal(state.routeSelection.optimization, 'time')
+  assert.equal(state.simulation.status, SIMULATION_STATUS.PLAYING)
+  assert.equal(state.simulation.currentStep, 0)
+  assert.equal(state.simulation.speed, 2)
+  assert.equal(state.routeComparison.status, 'idle')
+})

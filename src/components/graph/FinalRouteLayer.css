@@ -15,9 +15,16 @@
   animation-delay: calc(var(--route-index) * 70ms);
 }
 
-.final-route-layer__edge--warning {
+.final-route-layer__edge--high-traffic {
   stroke: #f97316;
   stroke-dasharray: 10 4;
+}
+
+.final-route-layer__edge--warning {
+  stroke: #dc2626;
+  stroke-width: 7;
+  stroke-dasharray: 2 3;
+  filter: drop-shadow(0 0 4px rgb(220 38 38 / 80%));
 }
 
 @keyframes final-route-reveal {

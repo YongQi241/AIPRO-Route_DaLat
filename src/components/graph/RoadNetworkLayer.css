@@ -24,7 +24,8 @@
 }
 
 .road-network-layer__edge--congested.road-network-layer__edge--hovered {
-  stroke: #ea580c;
+  stroke: #c2410c;
+  stroke-width: 4;
 }
 
 .road-network-layer__edge--closed.road-network-layer__edge--hovered {
@@ -32,7 +33,9 @@
 }
 
 .road-network-layer__edge--congested {
-  stroke: #fdba74;
+  stroke: #f97316;
+  stroke-width: 3;
+  stroke-dasharray: 7 3;
 }
 
 .road-network-layer__edge--closed {

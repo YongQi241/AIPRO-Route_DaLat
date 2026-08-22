@@ -99,6 +99,12 @@
   border-left: 4px solid #4f46e5;
   border-radius: 7px;
   background: #eef2ff;
+  animation: route-selection-formula-appear 180ms ease-out;
+}
+
+@keyframes route-selection-formula-appear {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .route-selection__formula strong {
@@ -237,4 +243,8 @@
   .route-selection__intermediate-input {
     grid-template-columns: 1fr;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-selection__formula { animation: none; }
 }

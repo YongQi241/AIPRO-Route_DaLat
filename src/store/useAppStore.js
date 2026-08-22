@@ -246,6 +246,42 @@ export const useAppStore = create((set, get) => ({
       },
     })),
 
+  activateComparisonRoute: (candidate) =>
+    set((state) => {
+      const routeResult = candidate?.result
+      if (routeResult?.status !== REQUEST_STATUS.SUCCESS) return state
+
+      const totalSteps = getAnimationStepCount(
+        routeResult,
+        getStateEdgeFeatures(state),
+      )
+      const algorithm = candidate?.request?.algorithm ?? candidate?.algorithm
+      const optimization = candidate?.optimization ?? routeResult.optimization
+
+      return {
+        activeRouteRequestId: state.activeRouteRequestId + 1,
+        selectedAlgorithm: algorithm ?? state.selectedAlgorithm,
+        routeSelection: {
+          ...state.routeSelection,
+          optimization: optimization ?? state.routeSelection.optimization,
+        },
+        routeResult,
+        routeComparison: initialRouteComparison,
+        requestState: {
+          status: REQUEST_STATUS.SUCCESS,
+          message: null,
+        },
+        simulation: {
+          ...initialSimulationState,
+          speed: state.simulation.speed,
+          status: totalSteps > 0
+            ? SIMULATION_STATUS.PLAYING
+            : SIMULATION_STATUS.IDLE,
+        },
+        hasRevealedFinalResult: totalSteps === 0,
+      }
+    }),
+
   dismissStatusMessage: () =>
     set({
       requestState: {
